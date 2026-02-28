@@ -1,0 +1,26 @@
+[
+    {
+        "team_photo": "./assets/images/teams/team01.webp",
+        "team_name": "Heru Hariyanto",
+        "team_division": "BOD",
+        "team_skill": "Leadership"
+    },
+    {
+        "team_photo": "./assets/images/teams/team02.webp",
+        "team_name": "Refy",
+        "team_division": "Human Resource",
+        "team_skill": "Employee Screening"
+    },
+    {
+        "team_photo": "./assets/images/teams/team03.webp",
+        "team_name": "Supryanto",
+        "team_division": "Human Resource",
+        "team_skill": "Leadership"
+    },
+    {
+        "team_photo": "./assets/images/teams/team04.webp",
+        "team_name": "Kiki",
+        "team_division": "Human Resource",
+        "team_skill": "Employee Screening"
+    }
+]

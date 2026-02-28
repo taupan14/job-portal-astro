@@ -1,0 +1,278 @@
+@import "./_theme.css";
+@import "./_avatar.css";
+@import "./_badge.css";
+@import "./_button.css";
+@import "./_datepicker.css";
+@import "./_form.css";
+@import "./_select.css";
+@import "./_gallery.css";
+@import "./_splide.css";
+@import "./_table.css";
+
+@layer base {
+  * {
+    @apply min-w-0
+        min-h-0
+        [-webkit-overflow-scrolling:touch]
+        [text-rendering:optimizeLegibility]
+        [-webkit-font-smoothing:antialiased]
+        [-moz-osx-font-smoothing:grayscale]
+        [-webkit-tap-highlight-color:transparent]
+        scroll-pt-[calc(var(--space-header)+(var(--spacing)*8))]
+        [scrollbar-width:thin]
+        [scrollbar-color:var(--color-dark-400)_transparent]
+    
+        selection:bg-dark-400
+        selection:text-dark-900;
+  }
+
+  @supports selector(::-webkit-scrollbar) {
+    ::-webkit-scrollbar {
+      @apply size-1.5;
+    }
+    ::-webkit-scrollbar-thumb {
+      @apply bg-dark-400;
+    }
+  }
+
+  body {
+    @apply text-dark-600
+        bg-body
+
+        lg:overflow-hidden;
+  }
+
+  main {
+    @apply overflow-x-clip;
+  }
+
+  b,
+  strong {
+    @apply font-semibold
+        text-dark-950;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h5,
+  .h1,
+  .h2,
+  .h3,
+  .h4,
+  .h5 {
+    @apply font-bold
+        leading-tighter
+        tracking-tight
+        text-dark-950
+        text-[clamp(var(--min-size),var(--val-size),var(--max-size))];
+  }
+
+  h1,
+  .h1 {
+    --min-size: var(--text-5xl);
+    --val-size: 5vw;
+    --max-size: 5rem;
+  }
+  h2,
+  .h2 {
+    --min-size: var(--text-5xl);
+    --val-size: 3.75vw;
+    --max-size: var(--text-6xl);
+  }
+  h3,
+  .h3 {
+    --min-size: var(--text-4xl);
+    --val-size: 3vw;
+    --max-size: var(--text-5xl);
+  }
+  h4,
+  .h4 {
+    --min-size: var(--text-4xl);
+    --val-size: 2.75vw;
+    --max-size: 2.75rem;
+  }
+  h5,
+  .h5 {
+    --min-size: var(--text-2xl);
+    --val-size: 1.875vw;
+    --max-size: var(--text-3xl);
+  }
+
+  h6,
+  .h6 {
+    @apply text-xs
+        font-medium
+        tracking-normal
+        text-dark-600;
+  }
+}
+
+@layer utilities {
+  .max-container {
+    @apply max-w-screen-2xl
+        mx-auto
+        px-4
+        lg:px-8
+        2xl:px-0;
+  }
+
+  .max-full-container {
+    @apply px-4
+        lg:px-8;
+  }
+
+  .icon {
+    @apply inline-flex
+        shrink-0;
+
+    &.icon-stroke > * {
+      @apply stroke-[currentColor]
+            transition-colors
+            duration-800
+            ease-custom;
+    }
+    &.icon-fill > *,
+    &.icon-fill > g > * {
+      @apply fill-[currentColor]
+            transition-colors
+            duration-800
+            ease-custom;
+    }
+    &.icon-duo > * {
+      &[fill] {
+        @apply fill-[currentColor];
+      }
+      &[stroke] {
+        @apply stroke-[currentColor];
+      }
+    }
+    &.icon-duo g > * {
+      &[fill] {
+        @apply fill-[currentColor];
+      }
+    }
+  }
+
+  [data-split-line] {
+    .word {
+      @apply relative
+            z-10
+            first:ml-0
+            ml-[0.235em];
+    }
+
+    &[data-reveal] {
+      .line {
+        @apply !w-full;
+      }
+    }
+  }
+
+  .text-gradient-primary {
+    @apply text-transparent
+        bg-clip-text
+        box-decoration-slice
+        bg-gradient-to-r
+        from-primary-900
+        to-primary-600;
+  }
+
+  .post-entry:not(.no-grid) {
+    @apply lg:grid
+        lg:grid-cols-[calc(100%/12)_[breakout-start]_calc(100%/12)_calc(100%/12)_[content-start]_1fr_[content-end]_calc(100%/12)_calc(100%/12)_[breakout-end]_calc(100%/12)]
+        lg:[&>*]:[grid-column:content]
+        lg:[&_img]:[grid-column:breakout]
+        lg:gap-y-8;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+      @apply lg:mt-8
+            lg:mb-0;
+    }
+
+    img {
+      @apply lg:my-8;
+    }
+
+    p,
+    ul,
+    ol {
+      @apply lg:my-0;
+    }
+
+    blockquote {
+      @apply lg:my-8;
+    }
+  }
+
+  .post-entry {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+      @apply text-3xl
+            mt-8
+            mb-6
+            first:mt-0
+            last:mb-0
+            lg:mt-12;
+    }
+
+    img {
+      @apply w-full
+            rounded-lg
+            my-16
+            first:mt-0
+            last:mb-0;
+    }
+
+    p,
+    ul,
+    ol {
+      @apply text-[1.075rem]
+            leading-[1.675]
+            font-normal
+            my-6
+            first:mt-0
+            last:mb-0
+            lg:my-8;
+    }
+
+    ul,
+    ol {
+      @apply flex
+            flex-col
+            gap-3.5;
+
+      li {
+        @apply relative
+                pl-6
+                
+
+                before:size-1.5
+                before:rounded-full
+                before:bg-primary-600
+                before:absolute
+                before:top-[0.575em]
+                before:left-0;
+      }
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-spin {
+    animation: spin 0.8s linear infinite;
+  }
+}

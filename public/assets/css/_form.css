@@ -1,0 +1,113 @@
+@layer components {
+    input,
+    select,
+    textarea {
+        @apply
+        [&::-webkit-search-decoration]:hidden
+        [&::-webkit-search-cancel-button]:hidden
+        [&::-webkit-search-results-button]:hidden
+        [&::-webkit-search-results-decoration]:hidden
+        [&::-webkit-outer-spin-button]:hidden
+        [&::-webkit-inner-spin-button]:hidden
+        appearance-none
+        outline-0;
+    }
+
+    select {
+        @apply
+        cursor-pointer;
+
+        option {
+            @apply
+            text-[13px]
+        }
+    }
+
+    .c-form-wrapper {
+        @apply
+        relative
+        flex
+        flex-col
+    }
+
+
+    .c-form {
+        --border-input: var(--color-dark-300);
+
+        @apply
+        relative
+        flex
+        flex-col
+    }
+
+    .c-label {
+        @apply
+        text-[13px]
+        leading-4
+        font-medium
+        w-full
+        -mb-1
+    }
+
+    .c-input {
+        @apply
+        w-full
+        font-semibold
+        leading-5
+        py-[calc((var(--spacing)*3)-1px)]
+        border-y
+        border-t-transparent
+        border-b-(--border-input)
+        text-dark-950
+        
+        placeholder:text-[currentColor]
+        placeholder:opacity-30
+
+        focus:[--border-input:var(--color-dark-950)];
+
+        &[type=file] {
+            @apply
+            file:text-xs
+            file:leading-4
+            file:font-bold
+            file:uppercase
+            file:tracking-wide
+            file:mr-4
+            file:text-dark-400
+        }
+    }
+
+    .c-form-default {
+        .c-label {
+            @apply
+            px-4
+            mb-1.5
+        }
+        .c-input {
+            @apply
+            !border-none
+            py-3
+            px-4
+            bg-white
+            ring-1
+            ring-dark-300
+            rounded-lg
+
+            placeholder:opacity-100
+        }
+
+        .c-textarea {
+            @apply
+            mt-0
+        }
+    }
+
+    .c-textarea {
+        @apply
+        pt-0
+        mt-3
+        field-sizing-content
+        min-h-7
+        resize-none
+    }
+}

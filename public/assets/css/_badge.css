@@ -1,0 +1,58 @@
+@layer components {
+    .badge {
+        @apply
+        inline-flex
+        items-center
+        justify-center
+        shrink-0
+        py-1.5
+        px-3
+        rounded-lg
+        bg-dark-200
+        text-dark-950;
+        
+        & > * {
+            @apply
+            text-[13px]
+            leading-4
+            font-semibold
+        }
+    }
+
+    .badge-dark {
+        @apply
+        bg-dark-950
+        text-white
+    }
+
+    .badge-primary {
+        @apply
+        bg-primary-600
+        text-white
+    }
+
+    .badge-secondary {
+        @apply
+        bg-secondary-600
+        text-white
+    }
+
+    .badge-success {
+        @apply
+        bg-success-500
+        text-white
+    }
+
+    .badge-outline {
+        @apply
+        !bg-transparent
+        ring-1
+        ring-dark-100
+        text-dark-950;
+
+        &.badge-dark {
+            @apply
+            ring-dark-950
+        }
+    }
+}

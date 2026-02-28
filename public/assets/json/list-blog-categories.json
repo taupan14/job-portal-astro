@@ -1,0 +1,50 @@
+[
+    {
+        "blog_category": "Teknologi",
+        "blog_total": 12
+    },
+    {
+        "blog_category": "Kesehatan",
+        "blog_total": 8
+    },
+    {
+        "blog_category": "Bisnis",
+        "blog_total": 10
+    },
+    {
+        "blog_category": "Pendidikan",
+        "blog_total": 15
+    },
+    {
+        "blog_category": "Lingkungan",
+        "blog_total": 7
+    },
+    {
+        "blog_category": "Olahraga",
+        "blog_total": 9
+    },
+    {
+        "blog_category": "Kuliner",
+        "blog_total": 11
+    },
+    {
+        "blog_category": "Seni & Budaya",
+        "blog_total": 6
+    },
+    {
+        "blog_category": "Travel",
+        "blog_total": 14
+    },
+    {
+        "blog_category": "Otomotif",
+        "blog_total": 5
+    },
+    {
+        "blog_category": "Gaya Hidup",
+        "blog_total": 13
+    },
+    {
+        "blog_category": "Finansial",
+        "blog_total": 10
+    }
+]

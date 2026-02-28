@@ -1,0 +1,122 @@
+[
+    {
+        "logo": "./assets/images/logo/logo01.svg",
+        "job_title": "Cleaning Service",
+        "job_location": "New York, NY",
+        "job_sallary": "$15/hour",
+        "job_type": "Full Time",
+        "job_company": "CleanCo Solutions",
+        "job_about": "CleanCo Solutions adalah perusahaan yang bergerak di bidang jasa kebersihan komersial dan residensial, menyediakan layanan pembersihan berkualitas tinggi untuk kantor, rumah, dan fasilitas umum.",
+        "job_category": "Jasa Kebersihan"
+    },
+    {
+        "logo": "./assets/images/logo/logo02.svg",
+        "job_title": "Software Engineer",
+        "job_location": "San Francisco, CA",
+        "job_sallary": "$120,000/year",
+        "job_type": "Full Time",
+        "job_company": "Tech Innovators Inc.",
+        "job_about": "Tech Innovators Inc. adalah perusahaan teknologi yang fokus pada pengembangan perangkat lunak inovatif, termasuk aplikasi mobile, platform cloud, dan solusi kecerdasan buatan.",
+        "job_category": "Teknologi"
+    },
+    {
+        "logo": "./assets/images/logo/logo03.svg",
+        "job_title": "Graphic Designer",
+        "job_location": "Remote",
+        "job_sallary": "$25/hour",
+        "job_type": "Freelance",
+        "job_company": "Creative Minds Agency",
+        "job_about": "Creative Minds Agency adalah agensi kreatif yang mengkhususkan diri dalam desain grafis, branding, dan konten visual untuk klien dari berbagai industri.",
+        "job_category": "Desain Kreatif"
+    },
+    {
+        "logo": "./assets/images/logo/logo04.svg",
+        "job_title": "Marketing Manager",
+        "job_location": "Los Angeles, CA",
+        "job_sallary": "$80,000/year",
+        "job_type": "Full Time",
+        "job_company": "MarketPro Solutions",
+        "job_about": "MarketPro Solutions adalah perusahaan konsultan pemasaran yang membantu bisnis mengembangkan strategi pemasaran digital, kampanye iklan, dan analisis pasar.",
+        "job_category": "Pemasaran"
+    },
+    {
+        "logo": "./assets/images/logo/logo05.svg",
+        "job_title": "Data Analyst",
+        "job_location": "Seattle, WA",
+        "job_sallary": "$90,000/year",
+        "job_type": "Full Time",
+        "job_company": "DataWorks LLC",
+        "job_about": "DataWorks LLC adalah perusahaan yang berfokus pada analisis data besar, menyediakan solusi analitik dan insights berbasis data untuk mendukung pengambilan keputusan bisnis.",
+        "job_category": "Analisis Data"
+    },
+    {
+        "logo": "./assets/images/logo/logo06.svg",
+        "job_title": "Content Writer",
+        "job_location": "Remote",
+        "job_sallary": "$20/hour",
+        "job_type": "Freelance",
+        "job_company": "Wordsmith Studios",
+        "job_about": "Wordsmith Studios adalah perusahaan yang menyediakan layanan penulisan konten kreatif, termasuk artikel blog, copywriting, dan konten media sosial untuk berbagai industri.",
+        "job_category": "Penulisan Konten"
+    },
+    {
+        "logo": "./assets/images/logo/logo07.svg",
+        "job_title": "Customer Support Representative",
+        "job_location": "Chicago, IL",
+        "job_sallary": "$18/hour",
+        "job_type": "Part Time",
+        "job_company": "Supportify Inc.",
+        "job_about": "Supportify Inc. adalah perusahaan yang menyediakan layanan dukungan pelanggan 24/7 untuk berbagai bisnis, termasuk layanan teknis, penanganan keluhan, dan bantuan umum.",
+        "job_category": "Layanan Pelanggan"
+    },
+    {
+        "logo": "./assets/images/logo/logo08.svg",
+        "job_title": "Sales Manager",
+        "job_location": "Dallas, TX",
+        "job_sallary": "$75,000/year",
+        "job_type": "Full Time",
+        "job_company": "SalesForce Dynamics",
+        "job_about": "SalesForce Dynamics adalah perusahaan yang mengkhususkan diri dalam solusi manajemen hubungan pelanggan (CRM) dan layanan konsultasi penjualan untuk meningkatkan kinerja bisnis.",
+        "job_category": "Penjualan"
+    },
+    {
+        "logo": "./assets/images/logo/logo09.svg",
+        "job_title": "Photographer",
+        "job_location": "Remote",
+        "job_sallary": "$50/hour",
+        "job_type": "Freelance",
+        "job_company": "SnapShots Studio",
+        "job_about": "SnapShots Studio adalah studio fotografi profesional yang menawarkan layanan fotografi komersial, pernikahan, dan acara khusus, serta pengeditan foto berkualitas tinggi.",
+        "job_category": "Fotografi"
+    },
+    {
+        "logo": "./assets/images/logo/logo10.svg",
+        "job_title": "HR Specialist",
+        "job_location": "Atlanta, GA",
+        "job_sallary": "$65,000/year",
+        "job_type": "Full Time",
+        "job_company": "PeopleFirst Corp",
+        "job_about": "PeopleFirst Corp adalah perusahaan konsultan sumber daya manusia yang menyediakan layanan rekrutmen, pelatihan, dan pengembangan karyawan untuk organisasi di berbagai sektor.",
+        "job_category": "Sumber Daya Manusia"
+    },
+    {
+        "logo": "./assets/images/logo/logo11.svg",
+        "job_title": "Financial Analyst",
+        "job_location": "Boston, MA",
+        "job_sallary": "$85,000/year",
+        "job_type": "Full Time",
+        "job_company": "FinancePro Advisors",
+        "job_about": "FinancePro Advisors adalah perusahaan konsultan keuangan yang menyediakan analisis keuangan, perencanaan investasi, dan strategi manajemen risiko untuk klien korporat dan individu.",
+        "job_category": "Keuangan"
+    },
+    {
+        "logo": "./assets/images/logo/logo12.svg",
+        "job_title": "Social Media Manager",
+        "job_location": "Remote",
+        "job_sallary": "$30/hour",
+        "job_type": "Freelance",
+        "job_company": "Buzzworthy Media",
+        "job_about": "Buzzworthy Media adalah agensi media sosial yang mengkhususkan diri dalam manajemen akun media sosial, pembuatan konten, dan kampanye pemasaran digital untuk meningkatkan keterlibatan audiens.",
+        "job_category": "Media Sosial"
+    }
+]

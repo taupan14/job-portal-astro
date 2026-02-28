@@ -1,11 +1,1793 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { apiGet } from "../lib/api";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Fetch data dari Express saat server render (SSR)
+// Cookie diteruskan agar Express tahu siapa yang request
+const cookieHeader = Astro.request.headers.get("cookie") ?? "";
+
+// Sesuaikan endpoint dengan yang ada di Express kamu
+const jobs = await apiGet<{ id: string; title: string; company: string }[]>(
+  "/api/jobs/latest",
+  cookieHeader,
+);
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BaseLayout title="Beranda">
+  <!-- Paste HTML dari index.html di sini -->
+
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="description" content="Runlapan" />
+      <meta name="referrer" content="no-referrer-when-downgrade" />
+      <title>RUNLAPAN | Job Portal</title>
+
+      <style>
+        #preloader {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100dvw;
+          height: 100dvh;
+          z-index: 9999;
+          background-color: oklch(41.01% 0.245 278.93);
+          display: grid;
+          place-content: center;
+
+          #preloader-spinner {
+            position: relative;
+            isolation: isolate;
+            width: 5rem;
+            height: 5rem;
+            z-index: 20;
+            padding: 1rem;
+
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: contain;
+              object-position: center;
+            }
+
+            &::before {
+              content: "";
+              position: absolute;
+              inset: 0;
+              border: 3px solid;
+              border-color: oklch(41.01% 0.245 278.93) transparent transparent;
+              border-radius: 50%;
+              animation: preloaderSpin 0.5s linear infinite;
+            }
+          }
+        }
+
+        #preloader-transition {
+          position: absolute;
+          inset: 0;
+          background-color: white;
+          z-index: 10;
+        }
+
+        @keyframes preloaderSpin {
+          to {
+            rotate: 360deg;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div id="app">
+        <!-- @components sectionHeader -->
+
+        <main id="section-main" data-barba="wrapper">
+          <div
+            data-header-scheme="dark"
+            data-barba="container"
+            data-barba-namespace="home"
+          >
+            <section
+              id="section-hero"
+              class="relative isolate bg-gradient-to-b from-primary-600 to-primary-900 pt-(--space-header)"
+            >
+              <div class="py-16 | lg:py-24 | 2xl:pb-32">
+                <div class="max-container">
+                  <div
+                    class="grid gap-16 mb-16 | lg:grid-cols-12 lg:mb-24 | 2xl:mb-32"
+                  >
+                    <div class="col-span-full | lg:col-span-7">
+                      <div class="flex flex-col gap-16">
+                        <div
+                          class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
+                        >
+                          <div class="inline-flex items-center gap-3">
+                            <div
+                              class="size-1.5 rounded-full bg-warning-400 shrink-0"
+                            >
+                            </div>
+                            <div
+                              class="text-sm leading-none font-bold uppercase tracking-wide text-white"
+                            >
+                              Selamat Datang
+                            </div>
+                          </div>
+                          <h1
+                            class="text-white leading-none [--val-size:6.5vw] [--max-size:6.5rem] text-balance"
+                          >
+                            Cari Lowongan Kerja dan Temukan Kandidat Terbaik
+                          </h1>
+                        </div>
+                        <div class="flex flex-col gap-8">
+                          <!-- <p class="grow text-white/70 text-balance | lg:pr-[20%]">Percayakan Kepada Kami Untuk Jasa Layanan Cari Karyawan, Pasang Lowongan, dan Cari Lowongan Kerja.</p> -->
+                          <div
+                            class="flex flex-col items-center gap-2 | lg:gap-16 lg:flex-row"
+                          >
+                            <button
+                              type="button"
+                              aria-label="CariLoker"
+                              class="btn btn-circle-primary | not-lg:justify-start not-lg:w-full"
+                              data-hover-effect
+                              data-modal-target="modal-cari-loker"
+                            >
+                              Cari Loker
+                              <svg
+                                class="icon icon-stroke circle-icon circle-right icon-up-right"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M17.5 6.5L6 18"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                                <path
+                                  d="M8 6H18V16"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                              </svg>
+                            </button>
+                            <button
+                              type="button"
+                              aria-label="CariLoker"
+                              class="btn btn-circle-dark | not-lg:justify-start not-lg:w-full | lg:hidden"
+                              data-hover-effect
+                              data-modal-target="modal-cari-loker"
+                            >
+                              Cari Loker
+                              <svg
+                                class="icon icon-stroke circle-icon circle-right icon-up-right"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M17.5 6.5L6 18"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                                <path
+                                  d="M8 6H18V16"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                              </svg>
+                            </button>
+                            <button
+                              type="button"
+                              aria-label="PasangLoker"
+                              class="inline-flex items-center gap-4 shrink-0 | not-lg:hidden"
+                              data-hover-group
+                              data-modal-target="modal-pasang-loker"
+                            >
+                              <div
+                                class="link text-sm font-bold uppercase tracking-wide text-white [--text-hover:white]"
+                                data-hover-effect
+                              >
+                                Pasang Loker
+                              </div>
+                              <div
+                                class="btn btn-icon btn-primary"
+                                data-hover-effect
+                              >
+                                <svg
+                                  class="icon icon-stroke icon-up-right"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M17.5 6.5L6 18"
+                                    stroke="#141B34"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                                  <path
+                                    d="M8 6H18V16"
+                                    stroke="#141B34"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                                </svg>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-5">
+                      <div
+                        class="relative isolate z-10 size-full pointer-events-nosne select-nsone"
+                      >
+                        <div
+                          class="aspect-3/4 | not-lg:[mask-image:linear-gradient(to_bottom,black_65%,transparent)] | lg:aspect-auto lg:absolute lg:inset-x-0 lg:-top-16 lg:-bottom-24 | 2xl:-bottom-32"
+                        >
+                          <img
+                            src="./assets/images/person01.webp"
+                            alt=""
+                            class="size-full object-contain"
+                          />
+                        </div>
+                        <div
+                          class="absolute inset-0 | lg:h-min lg:m-y-auto lg:px-12"
+                        >
+                          <div
+                            class="relative size-full flex flex-col justify-between items-start | lg:aspect-square"
+                          >
+                            <div
+                              class="p-6 rounded-lg bg-primary-600 shadow-2xl flex flex-col items-center text-center gap-4"
+                            >
+                              <svg
+                                class="icon icon-fill text-white size-10"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  opacity="0.4"
+                                  d="M1.25 12C1.25 6.06294 6.06294 1.25 12 1.25C17.9371 1.25 22.75 6.06294 22.75 12C22.75 12.9748 22.6553 13.955 22.1796 14.7413C21.6693 15.5847 20.8111 16.0703 19.6061 16.2425C18.3866 16.4167 17.3426 16.4167 16.493 16.4167H16.4815C15.593 16.4167 15.0103 16.4231 14.561 16.5536C14.1887 16.6617 13.9111 16.8549 13.6708 17.3354C13.4711 17.7348 13.4789 17.9911 13.5315 18.1909C13.5967 18.4383 13.7467 18.6736 13.9905 19.0352L14.0229 19.0831C14.3184 19.5203 14.75 20.1588 14.75 21C14.75 21.4139 14.6396 21.7983 14.382 22.1074C14.1315 22.4079 13.8057 22.5603 13.5177 22.6409C13.0737 22.7651 12.5352 22.7572 12.1754 22.7518H12.1754L12.175 22.7518C12.1103 22.7509 12.0515 22.75 12 22.75C6.06294 22.75 1.25 17.9371 1.25 12Z"
+                                  fill="#141B34"></path>
+                                <path
+                                  fill-rule="evenodd"
+                                  clip-rule="evenodd"
+                                  d="M6.03417 15.2614C5.89188 14.7279 6.20701 14.1796 6.73804 14.0366L6.74668 14.0343C7.27771 13.8914 7.82355 14.208 7.96583 14.7414C8.10812 15.2749 7.79299 15.8232 7.26196 15.9662L7.25332 15.9685C6.72229 16.1114 6.17645 15.7949 6.03417 15.2614Z"
+                                  fill="#141B34"></path>
+                                <path
+                                  d="M7.25 8.5C7.25 7.25736 8.25736 6.25 9.5 6.25C10.7426 6.25 11.75 7.25736 11.75 8.5C11.75 9.74264 10.7426 10.75 9.5 10.75C8.25736 10.75 7.25 9.74264 7.25 8.5Z"
+                                  fill="#141B34"></path>
+                                <path
+                                  d="M14.25 9.5C14.25 8.25736 15.2574 7.25 16.5 7.25C17.7426 7.25 18.75 8.25736 18.75 9.5C18.75 10.7426 17.7426 11.75 16.5 11.75C15.2574 11.75 14.25 10.7426 14.25 9.5Z"
+                                  fill="#141B34"></path>
+                              </svg>
+                              <div
+                                class="text-sm leading-none font-bold uppercase tracking-wide text-white hidden"
+                              >
+                                UI Designer
+                              </div>
+                            </div>
+                            <div
+                              class="p-6 rounded-lg bg-primary-100 shadow-2xl flex flex-col items-center text-center gap-4 self-end"
+                            >
+                              <svg
+                                class="icon icon-fill text-primary-600 size-10"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <g opacity="0.4">
+                                  <path
+                                    fill-rule="evenodd"
+                                    clip-rule="evenodd"
+                                    d="M2 5C2 4.19711 2.43749 3.55194 2.96527 3.08401C3.49422 2.61504 4.20256 2.2384 4.99202 1.94235C6.57833 1.34749 8.70269 1 11 1C13.2973 1 15.4217 1.34749 17.008 1.94235C17.7974 2.2384 18.5058 2.61504 19.0347 3.08401C19.5625 3.55194 20 4.19711 20 5V9.98763C20 10.6889 19.9155 11.1623 19.5429 11.5753C19.4158 11.7162 19.3522 11.7867 19.2457 11.8025C19.1391 11.8183 19.022 11.7478 18.7879 11.6068C18.4118 11.3803 17.9711 11.25 17.5 11.25C16.4699 11.25 15.5853 11.8731 15.2025 12.7629C15.1775 12.8211 15.1649 12.8501 15.1537 12.8686C15.1296 12.9077 15.1104 12.9285 15.0731 12.9553C15.0556 12.9679 15.0302 12.9811 14.9796 13.0075C14.9251 13.0358 14.8979 13.05 14.8759 13.0574C14.8292 13.0732 14.7991 13.0766 14.75 13.0717C14.727 13.0694 14.6938 13.0608 14.6275 13.0436C13.7521 12.8166 12.8035 13.0816 12.1739 13.7563C12.0664 13.8715 12.0127 13.9291 11.9587 13.9538C11.9048 13.9785 11.8405 13.981 11.7119 13.986C11.4731 13.9953 11.2355 14 11 14C8.6113 14 6.01354 13.5188 4.0508 12.5952C3.64779 12.4055 3.28325 12.2037 2.95806 11.9907C2.15337 11.4637 2 10.9324 2 9.98763V5ZM5.57313 6.13845C4.97883 5.9045 4.55524 5.65279 4.29209 5.41948C3.9354 5.10324 3.9354 4.89676 4.29209 4.58052C4.57279 4.33166 5.03602 4.06185 5.69427 3.81501C7.0034 3.32409 8.87903 3 11 3C13.121 3 14.9966 3.32409 16.3057 3.81501C16.964 4.06185 17.4272 4.33166 17.7079 4.58052C18.0646 4.89676 18.0646 5.10324 17.7079 5.41948C17.4272 5.66834 16.964 5.93815 16.3057 6.18499C14.9966 6.67591 13.121 7 11 7C10.1029 7 9.24969 6.94202 8.46467 6.83796C7.48782 6.70847 6.52272 6.51225 5.57313 6.13845ZM6.21587 10.1237C5.81919 10.0045 5.40095 10.2294 5.2817 10.6261C5.16246 11.0228 5.38736 11.441 5.78404 11.5602C6.42365 11.7525 7.13136 11.9087 7.8874 12.0234C8.29692 12.0856 8.6793 11.804 8.74146 11.3945C8.80362 10.9849 8.52203 10.6026 8.11251 10.5404C7.41722 10.4349 6.77942 10.2932 6.21587 10.1237Z"
+                                    fill="#141B34"></path>
+                                  <path
+                                    fill-rule="evenodd"
+                                    clip-rule="evenodd"
+                                    d="M11.7089 16.4654C11.6018 16.2197 11.5483 16.0968 11.4732 16.0478C11.398 15.9987 11.2848 15.9991 11.0583 15.9997C11.0389 15.9998 11.0194 15.9998 11 15.9998C8.346 15.9998 5.60931 15.5388 3.1992 14.4046C3.00604 14.3137 2.81512 14.2177 2.62747 14.1164C2.3392 13.9608 2.19506 13.883 2.09753 13.9412C2 13.9993 2 14.1584 2 14.4765V18.9998C2 19.8027 2.43749 20.4479 2.96527 20.9158C3.49422 21.3848 4.20256 21.7614 4.99202 22.0575C6.57833 22.6523 8.70269 22.9998 11 22.9998C12.3606 22.9998 13.6606 22.8779 14.824 22.6549C14.8724 22.6456 14.8967 22.641 14.9098 22.6341C14.968 22.6035 14.9811 22.5242 14.9357 22.4766C14.9255 22.4659 14.9037 22.4535 14.86 22.4288C14.8505 22.4234 14.8458 22.4207 14.8412 22.4187C14.8215 22.41 14.8012 22.4078 14.78 22.4123C14.7752 22.4134 14.7695 22.4152 14.7582 22.4188C13.7141 22.7514 12.5356 22.3649 11.9073 21.4027C11.331 20.5203 11.384 19.4089 11.9555 18.5964C12.0399 18.4764 12.0821 18.4165 12.0959 18.3667C12.1098 18.3169 12.1052 18.2509 12.0961 18.1188C12.0877 17.9968 12.0834 17.8739 12.0834 17.75C12.0834 17.6263 12.0877 17.5034 12.0961 17.3816C12.1052 17.2495 12.1098 17.1834 12.0959 17.1337C12.082 17.0839 12.0398 17.0239 11.9554 16.904C11.858 16.7656 11.7757 16.6185 11.7089 16.4654ZM6.21587 17.1237C5.81919 17.0045 5.40095 17.2294 5.2817 17.6261C5.16246 18.0228 5.38736 18.441 5.78404 18.5602C6.42365 18.7525 7.13136 18.9087 7.8874 19.0234C8.29692 19.0856 8.6793 18.804 8.74146 18.3945C8.80362 17.9849 8.52203 17.6026 8.11251 17.5404C7.41722 17.4349 6.77942 17.2932 6.21587 17.1237Z"
+                                    fill="#141B34"></path>
+                                </g>
+                                <path
+                                  fill-rule="evenodd"
+                                  clip-rule="evenodd"
+                                  d="M6.21611 10.1257C5.81943 10.0065 5.40119 10.2314 5.28195 10.628C5.1627 11.0247 5.38761 11.443 5.78428 11.5622C6.42389 11.7545 7.1316 11.9106 7.88764 12.0254C8.29716 12.0875 8.67954 11.8059 8.7417 11.3964C8.80387 10.9869 8.52228 10.6045 8.11276 10.5424C7.41746 10.4368 6.77966 10.2951 6.21611 10.1257Z"
+                                  fill="#141B34"></path>
+                                <path
+                                  fill-rule="evenodd"
+                                  clip-rule="evenodd"
+                                  d="M6.21611 17.1257C5.81943 17.0065 5.40119 17.2314 5.28195 17.628C5.1627 18.0247 5.38761 18.443 5.78428 18.5622C6.42389 18.7545 7.1316 18.9106 7.88764 19.0254C8.29716 19.0875 8.67954 18.8059 8.7417 18.3964C8.80387 17.9869 8.52228 17.6045 8.11276 17.5424C7.41746 17.4368 6.77966 17.2951 6.21611 17.1257Z"
+                                  fill="#141B34"></path>
+                                <path
+                                  fill-rule="evenodd"
+                                  clip-rule="evenodd"
+                                  d="M17.5001 12.75C18.0524 12.75 18.5001 13.1977 18.5001 13.75V14.0199C19.0994 14.1754 19.6436 14.4674 20.0951 14.8609L20.4533 14.627C20.9157 14.325 21.5354 14.4551 21.8374 14.9175C22.1394 15.3799 22.0093 15.9995 21.5469 16.3015L21.213 16.5196C21.345 16.9061 21.4168 17.3201 21.4168 17.75C21.4168 18.18 21.345 18.594 21.2129 18.9806L21.5466 19.1985C22.009 19.5005 22.139 20.1201 21.837 20.5825C21.535 21.0449 20.9153 21.175 20.4529 20.873L20.095 20.6392C19.6434 21.0327 19.0994 21.3246 18.5001 21.4801V21.75C18.5001 22.3023 18.0524 22.75 17.5001 22.75C16.9478 22.75 16.5001 22.3023 16.5001 21.75V21.4801C15.9009 21.3246 15.3568 21.0327 14.9053 20.6392L14.5473 20.873C14.0849 21.175 13.4652 21.0449 13.1632 20.5825C12.8612 20.1201 12.9913 19.5005 13.4537 19.1985L13.7873 18.9806C13.6552 18.594 13.5834 18.18 13.5834 17.75C13.5834 17.3201 13.6552 16.9061 13.7872 16.5196L13.4533 16.3015C12.9909 15.9995 12.8609 15.3799 13.1629 14.9175C13.4649 14.4551 14.0845 14.325 14.5469 14.627L14.9051 14.8609C15.3567 14.4674 15.9008 14.1754 16.5001 14.0199V13.75C16.5001 13.1977 16.9478 12.75 17.5001 12.75ZM17.5001 15.8929C16.8267 15.8929 16.2406 16.2277 15.8992 16.7284C15.6989 17.0222 15.5834 17.3722 15.5834 17.75C15.5834 18.1279 15.6989 18.4779 15.8993 18.7717C16.2407 19.2724 16.8268 19.6071 17.5001 19.6071C18.1735 19.6071 18.7595 19.2724 19.1009 18.7717C19.3013 18.4779 19.4168 18.1279 19.4168 17.75C19.4168 17.3722 19.3014 17.0222 19.101 16.7284C18.7596 16.2277 18.1735 15.8929 17.5001 15.8929Z"
+                                  fill="#141B34"></path>
+                              </svg>
+                              <div
+                                class="text-sm leading-none font-bold uppercase tracking-wide text-white hidden"
+                              >
+                                UI Designer
+                              </div>
+                            </div>
+                            <div
+                              class="p-6 rounded-lg bg-warning-400 shadow-2xl flex flex-col items-center text-center gap-4 translate-x-full"
+                            >
+                              <svg
+                                class="icon icon-fill text-dark-950 size-10"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  opacity="0.4"
+                                  d="M22.2469 10.3424C22.2452 10.0638 22.2444 9.92444 22.1566 9.83722C22.0689 9.75 21.9289 9.75 21.649 9.75H2.35096C2.07108 9.75 1.93114 9.75 1.84339 9.83722C1.75563 9.92444 1.75478 10.0638 1.75307 10.3424C1.74999 10.8458 1.75 11.3787 1.75 11.9428V12.0572C1.74999 14.2479 1.74998 15.9686 1.93059 17.312C2.11568 18.6886 2.50272 19.7809 3.36091 20.6391C4.21911 21.4973 5.31137 21.8843 6.68802 22.0694C8.03144 22.25 9.7521 22.25 11.9428 22.25H12.0572C14.2479 22.25 15.9686 22.25 17.312 22.0694C18.6886 21.8843 19.7809 21.4973 20.6391 20.6391C21.4973 19.7809 21.8843 18.6886 22.0694 17.312C22.25 15.9686 22.25 14.2479 22.25 12.0572V11.9428C22.25 11.3787 22.25 10.8458 22.2469 10.3424Z"
+                                  fill="#141B34"></path>
+                                <path
+                                  fill-rule="evenodd"
+                                  clip-rule="evenodd"
+                                  d="M12.0579 1.75H11.9435H11.9435C9.75282 1.74999 8.03214 1.74998 6.68872 1.93059C5.31207 2.11568 4.21981 2.50272 3.36161 3.36091C2.50342 4.21911 2.11638 5.31137 1.93129 6.68802C1.89188 6.98118 1.86107 7.29229 1.83698 7.62234C1.81576 7.91313 1.80515 8.05853 1.89415 8.15427C1.98315 8.25 2.13164 8.25 2.42863 8.25H21.5728C21.8698 8.25 22.0183 8.25 22.1073 8.15427C22.1963 8.05853 22.1856 7.91313 22.1644 7.62234C22.1403 7.29229 22.1095 6.98118 22.0701 6.68802C21.885 5.31137 21.498 4.21911 20.6398 3.36091C19.7816 2.50272 18.6893 2.11568 17.3127 1.93059C15.9693 1.74998 14.2486 1.74999 12.0579 1.75H12.0579ZM6 5C6 4.44772 6.44571 4 6.99553 4H7.00447C7.55429 4 8 4.44772 8 5C8 5.55229 7.55429 6 7.00447 6H6.99553C6.44571 6 6 5.55229 6 5ZM10.9955 4C10.4457 4 10 4.44772 10 5C10 5.55229 10.4457 6 10.9955 6H11.0045C11.5543 6 12 5.55229 12 5C12 4.44772 11.5543 4 11.0045 4H10.9955Z"
+                                  fill="#141B34"></path>
+                                <path
+                                  fill-rule="evenodd"
+                                  clip-rule="evenodd"
+                                  d="M7.4319 13.5104C7.16147 13.8241 7.19659 14.2977 7.51034 14.5681L8.73688 15.6253C8.93658 15.7974 9.06848 15.9123 9.15913 16C9.06848 16.0878 8.93658 16.2026 8.73688 16.3747L7.51034 17.4319C7.19659 17.7023 7.16147 18.1759 7.4319 18.4897C7.70233 18.8034 8.17591 18.8385 8.48966 18.5681L9.7162 17.5109C9.72666 17.5019 9.73712 17.4929 9.74757 17.4839C9.97803 17.2853 10.205 17.0898 10.3682 16.9054C10.5487 16.7015 10.75 16.4046 10.75 16C10.75 15.5954 10.5487 15.2985 10.3682 15.0946C10.205 14.9103 9.97803 14.7147 9.74757 14.5161C9.73712 14.5071 9.72666 14.4981 9.7162 14.4891L8.48966 13.4319C8.17591 13.1615 7.70233 13.1966 7.4319 13.5104Z"
+                                  fill="#141B34"></path>
+                                <path
+                                  fill-rule="evenodd"
+                                  clip-rule="evenodd"
+                                  d="M11.25 18C11.25 17.5858 11.5858 17.25 12 17.25H16C16.4142 17.25 16.75 17.5858 16.75 18C16.75 18.4142 16.4142 18.75 16 18.75H12C11.5858 18.75 11.25 18.4142 11.25 18Z"
+                                  fill="#141B34"></path>
+                              </svg>
+                              <div
+                                class="text-sm leading-none font-bold uppercase tracking-wide text-white hidden"
+                              >
+                                Software
+                              </div>
+                            </div>
+                            <div
+                              class="absolute inset-1/12 border-2 border-dashed border-white/50 rounded-lg -z-1"
+                            >
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    class="relative isolate rounded-lg px-4 pb-16 | not-lg:bg-gradient-to-b not-lg:from-transparent not-lg:to-primary-600 | lg:bg-primary-600 lg:pt-8 lg:px-8"
+                  >
+                    <form action="page-jobs.html">
+                      <div class="grid gap-6 | lg:grid-cols-3">
+                        <div class="col-span-full | lg:col-span-1">
+                          <div class="c-from-wrapper">
+                            <div class="c-form c-form-default">
+                              <label
+                                for="input-location"
+                                class="c-label text-white">Lokasi</label
+                              >
+                              <input
+                                id="input-location"
+                                type="text"
+                                class="c-input"
+                                placeholder="Pilih lokasi"
+                              />
+                            </div>
+                            <div class="text-xs mt-1 px-4 text-white/70">
+                              please fill out this field
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-span-full | lg:col-span-1">
+                          <div class="c-from-wrapper">
+                            <div class="c-form c-form-default">
+                              <label
+                                for="select-work"
+                                class="c-label text-white"
+                                >Bidang Pekerjaan</label
+                              >
+                              <select id="select-work" class="c-input c-select"
+                                ><option value="" disabled selected
+                                  >Pilih bidang perkerjaan</option
+                                ></select
+                              >
+                            </div>
+                            <div class="text-xs mt-1 px-4 text-white/70">
+                              please fill out this field
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-span-full | lg:col-span-1">
+                          <div class="c-from-wrapper">
+                            <div class="c-form c-form-default">
+                              <label
+                                for="select-position"
+                                class="c-label text-white">Jabatan</label
+                              >
+                              <select
+                                id="select-position"
+                                class="c-input c-select"
+                                ><option value="" disabled selected
+                                  >Pilih jabatan</option
+                                ></select
+                              >
+                            </div>
+                            <div class="text-xs mt-1 px-4 text-white/70">
+                              please fill out this field
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        class="absolute bottom-0 inset-x-0 w-min mx-auto translate-y-1/2"
+                      >
+                        <button
+                          type="submit"
+                          class="btn btn-lg btn-icon btn-dark"
+                          data-hover-effect
+                        >
+                          <svg
+                            class="icon icon-stroke icon-up"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M17.5 17.5L22 22"
+                              stroke="#141B34"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"></path>
+                            <path
+                              d="M20 11C20 6.02944 15.9706 2 11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C15.9706 20 20 15.9706 20 11Z"
+                              stroke="#141B34"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </form>
+                    <!-- <div class="absolute inset-y-0 right-0 w-dvw bg-primary-600 -z-1 rounded-lg"></div> -->
+                  </div>
+                </div>
+              </div>
+              <div
+                class="absolute inset-0 [-webkit-mask-image:radial-gradient(closest-side,black,transparent)] -z-1 -translate-y-1/4 -translate-x-1/2 pointer-events-none opacity-20 [--square:4rem] [--line-w:1px] | lg:[--square:6rem] lg:[--line-w:1px]"
+              >
+                <div
+                  class="size-full bg-[repeating-linear-gradient(to_left,var(--color-primary-100),var(--color-primary-100)_var(--line-w),transparent_var(--line-w),transparent_var(--square)),repeating-linear-gradient(to_bottom,var(--color-primary-100),var(--color-primary-100)_var(--line-w),transparent_var(--line-w),transparent_var(--square))]"
+                >
+                </div>
+              </div>
+              <div
+                class="absolute inset-0 [-webkit-mask-image:radial-gradient(closest-side,black,transparent)] -z-1 translate-y-1/4 translate-x-1/2 pointer-events-none opacity-20 [--square:4rem] [--line-w:1px] | lg:[--square:6rem] lg:[--line-w:1px] | not-lg:hidden"
+              >
+                <div
+                  class="size-full bg-[repeating-linear-gradient(to_left,var(--color-primary-100),var(--color-primary-100)_var(--line-w),transparent_var(--line-w),transparent_var(--square)),repeating-linear-gradient(to_bottom,var(--color-primary-100),var(--color-primary-100)_var(--line-w),transparent_var(--line-w),transparent_var(--square))]"
+                >
+                </div>
+              </div>
+            </section>
+
+            <section id="section-loker" class="lg:mb-8">
+              <div class="bg-primary-900 py-16 | lg:pt-32">
+                <div class="max-container">
+                  <div class="grid mb-16 | lg:grid-cols-12 lg:mb-24">
+                    <div class="col-span-full | lg:col-span-6 lg:col-start-4">
+                      <div
+                        class="relative flex flex-col gap-6 items-center text-center"
+                      >
+                        <div class="inline-flex items-center gap-3">
+                          <div
+                            class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                          >
+                          </div>
+                          <div
+                            class="text-sm leading-none font-bold uppercase tracking-wide text-white"
+                          >
+                            Loker Update
+                          </div>
+                        </div>
+                        <h2 class="leading-none text-balance text-white">
+                          Temukan Peluang Karir yang Sesuai Keahlian Anda
+                        </h2>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="grid gap-16 | lg:gap-6 lg:grid-cols-12">
+                    <div class="col-span-full | lg:col-span-3">
+                      <div
+                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
+                      >
+                        <div class="text-sm font-bold text-warning-400">
+                          01.
+                        </div>
+                        <div
+                          class="flex flex-col gap-4 pt-6 border-t border-white/30"
+                        >
+                          <h5
+                            class="text-xl text-balance tracking-normal text-white"
+                          >
+                            Pilih Bidang Pekerjaan
+                          </h5>
+                          <p class="text-balance text-white/70">
+                            Pilih pekerjaan sesuai dengan minat, kemampuan,
+                            gaji, dan prospek kerja
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-3">
+                      <div
+                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
+                      >
+                        <div class="text-sm font-bold text-warning-400">
+                          02.
+                        </div>
+                        <div
+                          class="flex flex-col gap-4 pt-6 border-t border-white/30"
+                        >
+                          <h5
+                            class="text-xl text-balance tracking-normal text-white"
+                          >
+                            Klik Detail Informasi
+                          </h5>
+                          <p class="text-balance text-white/70">
+                            Informasi berkaitan dengan pekerjaan atau posisi
+                            yang tersedia
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-3">
+                      <div
+                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
+                      >
+                        <div class="text-sm font-bold text-warning-400">
+                          03.
+                        </div>
+                        <div
+                          class="flex flex-col gap-4 pt-6 border-t border-white/30"
+                        >
+                          <h5
+                            class="text-xl text-balance tracking-normal text-white"
+                          >
+                            Bantu Teman Dengan Share
+                          </h5>
+                          <p class="text-balance text-white/70">
+                            Membantu berbagi informasi pekerjaan dengan teman
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-3">
+                      <div
+                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
+                      >
+                        <div class="text-sm font-bold text-warning-400">
+                          04.
+                        </div>
+                        <div
+                          class="flex flex-col gap-4 pt-6 border-t border-white/30"
+                        >
+                          <h5
+                            class="text-xl text-balance tracking-normal text-white"
+                          >
+                            Klik Lamar Ayo Kamu Bisa
+                          </h5>
+                          <p class="text-balance text-white/70">
+                            Ajukan diri untuk mendapatkan pekerjaan di suatu
+                            perusahaan
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="relative py-16 | lg:pb-24">
+                <div class="max-container">
+                  <div
+                    class="grid gap-16 splide group/slide"
+                    data-slide-jobs="6"
+                  >
+                    <div class="splide__track !overflow-visible">
+                      <div
+                        class="splide__list [&>*]:w-[calc(1/1.125*100%)] | lg:[&>*]:w-[calc((1/3*100%)-(1.5rem*2/3))] | 2xl:[&>*]:w-[calc((1/4*100%)-(1.5rem*3/4))]"
+                      >
+                        <!-- @components listSlideJobs -->
+                        <div class="splide__slide">
+                          <a
+                            href="page-jobs.html"
+                            class="relative isolate flex flex-col justify-between bg-primary-600 rounded-lg overflow-clip p-4 h-full p-6"
+                            data-hover-group
+                          >
+                            <div
+                              class="btn btn-icon btn-white self-end"
+                              data-hover-effect
+                            >
+                              <svg
+                                class="icon icon-stroke icon-up-right"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M17.5 6.5L6 18"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                                <path
+                                  d="M8 6H18V16"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                              </svg>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                              <div
+                                class="text-sm leading-none font-bold uppercase tracking-wide text-white/70"
+                              >
+                                Runlapan
+                              </div>
+                              <h5 class="text-balance text-white">
+                                Jelajahi Karirmu
+                              </h5>
+                            </div>
+                            <div
+                              class="absolute inset-0 [-webkit-mask-image:radial-gradient(circle_at_center,black,transparent)] -z-1 -translate-y-1/4 translate-x-1/4 pointer-events-none [--square:4rem] [--line-w:1px]"
+                            >
+                              <div
+                                class="size-full bg-[repeating-linear-gradient(to_left,var(--color-primary-400),var(--color-primary-400)_var(--line-w),transparent_var(--line-w),transparent_var(--square)),repeating-linear-gradient(to_bottom,var(--color-primary-400),var(--color-primary-400)_var(--line-w),transparent_var(--line-w),transparent_var(--square))]"
+                              >
+                              </div>
+                            </div>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- <div class="flex justify-between gap-4">
+                    <a href="page-jobs.html" class="btn btn-dark" data-hover-effect>
+                        Jelajahi Pekerjaan
+                    </a>
+                    <div class="flex items-center gap-1">
+                        <button type="button" class="btn-splide-prev btn btn-icon" data-hover-effect>
+                            <svg class="icon icon-stroke icon-left" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill="none" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M4.2,12h16.3"/>
+                                <path fill="none" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M10.6,19.1L3.5,12 l7.1-7.1"/>
+                            </svg>
+                        </button>
+                        <button type="button" class="btn-splide-next btn btn-icon" data-hover-effect>
+                            <svg class="icon icon-stroke icon-right" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill="none" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M19.8,12H3.5"/>
+                                <path fill="none" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M13.4,4.9l7.1,7.1 l-7.1,7.1"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div> -->
+                  </div>
+                </div>
+                <div
+                  class="absolute inset-x-0 top-0 bottom-1/2 bg-primary-900 -z-1"
+                >
+                </div>
+              </div>
+            </section>
+
+            <section
+              id="section-employes"
+              class="relative py-16 | lg:py-24 lg:my-8"
+            >
+              <div class="max-container">
+                <div class="grid gap-16 mb-16 | lg:gap-8 lg:grid-cols-12">
+                  <div class="col-span-full | lg:col-span-6 lg:col-start-3">
+                    <div
+                      class="flex flex-col gap-6 | lg:gap-4 | not-lg:items-center not-lg:text-center"
+                      data-title-wrapper
+                    >
+                      <div
+                        class="inline-flex items-center gap-3 | lg:w-min"
+                        data-subtitle
+                      >
+                        <div
+                          class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                        >
+                        </div>
+                        <div
+                          class="text-sm leading-none font-bold uppercase tracking-wide | lg:w-min"
+                        >
+                          Karyawan Kami
+                        </div>
+                      </div>
+                      <h2 class="leading-none text-balance" data-title>
+                        Jumlah & Struktur Karyawan Radar Utama Nusantara
+                      </h2>
+                    </div>
+                  </div>
+                  <div
+                    class="grid-item col-span-full | lg:col-span-4 lg:col-start-7 | not-lg:text-center"
+                  >
+                    <p class="text-balance">
+                      Hingga saat ini, perusahaan kami didukung oleh 1000+
+                      karyawan yang tersebar di berbagai departemen, bekerja
+                      sama untuk mencapai tujuan bersama.
+                    </p>
+                  </div>
+                </div>
+                <div class="grid gap-4 | lg:gap-6">
+                  <div
+                    class="grid gap-16 splide group/slide"
+                    data-slide-employes
+                  >
+                    <div class="splide__track !overflow-visible">
+                      <div
+                        class="splide__list [&>*]:w-[calc(1/1.25*100%)] | lg:[&>*]:w-[calc(1/4*100%)]"
+                      >
+                        <!-- @components listSlideEmployes -->
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="grid gap-16 splide group/slide"
+                    data-slide-employes
+                    data-splide='{"autoScroll":{"speed":-1}}'
+                  >
+                    <div class="splide__track !overflow-visible">
+                      <div
+                        class="splide__list [&>*]:w-[calc(1/1.25*100%)] | lg:[&>*]:w-[calc(1/4*100%)]"
+                      >
+                        <!-- @components listSlideEmployes -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="absolute inset-0 [-webkit-mask-image:radial-gradient(closest-side,black,transparent)] -z-1 -translate-y-1/4 -translate-x-1/2 pointer-events-none opacity-20 [--square:4rem] [--line-w:1px] | lg:[--square:6rem] lg:[--line-w:1px]"
+              >
+                <div
+                  class="size-full bg-[repeating-linear-gradient(to_left,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square)),repeating-linear-gradient(to_bottom,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square))]"
+                >
+                </div>
+              </div>
+            </section>
+
+            <section
+              id="section-why-us"
+              class="relative isolate py-16 | lg:py-24 lg:my-8"
+            >
+              <div class="max-container">
+                <div
+                  class="grid gap-16 mb-16 | lg:gap-8 lg:grid-cols-12 lg:items-end lg:mb-24"
+                >
+                  <div class="col-span-full | lg:col-span-6">
+                    <div
+                      class="flex flex-col gap-6 | lg:gap-4 | not-lg:items-center not-lg:text-center"
+                      data-title-wrapper
+                    >
+                      <div
+                        class="inline-flex items-center gap-3 | lg:w-min"
+                        data-subtitle
+                      >
+                        <div
+                          class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                        >
+                        </div>
+                        <div
+                          class="text-sm leading-none font-bold uppercase tracking-wide | lg:w-min"
+                        >
+                          Kenapa Kami
+                        </div>
+                      </div>
+                      <h2 class="leading-none text-balance" data-title>
+                        Kami Membantu Bisnis & Pekerjaan Menjadi Lebih Mudah
+                      </h2>
+                    </div>
+                  </div>
+                  <div
+                    class="col-span-full | lg:col-span-4 lg:col-start-9 | not-lg:text-center"
+                  >
+                    <p class="text-balance">
+                      Kami menawarkan solusi inovatif untuk efisiensi bisnis dan
+                      pekerjaan. Dengan teknologi, kami memudahkan proses,
+                      menghemat waktu, dan meningkatkan produktivitas.
+                    </p>
+                  </div>
+                </div>
+                <div class="relative isolate | 2xl:pb-24">
+                  <div
+                    class="grid gap-16 | lg:grid-cols-12 lg:gap-x-6 lg:[&>*:nth-last-child(2)]:row-start-3 lg:[&>*:nth-last-child(3)]:row-start-3 lg:[&>*:last-child]:row-span-2 | 2xl:gap-y-24"
+                  >
+                    <div class="col-span-full | lg:col-span-3">
+                      <div
+                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
+                      >
+                        <div class="text-sm font-bold text-primary-600">
+                          01.
+                        </div>
+                        <div
+                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
+                        >
+                          <h5 class="text-xl text-balance tracking-normal">
+                            Gratis Cari Loker
+                          </h5>
+                          <p class="text-balance">
+                            Kami Menawarkan lowongan kerja secara gratis dan
+                            dapat memberikan beberapa keuntungan bagi perusahaan
+                            atau organisasi.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-3">
+                      <div
+                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
+                      >
+                        <div class="text-sm font-bold text-primary-600">
+                          02.
+                        </div>
+                        <div
+                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
+                        >
+                          <h5 class="text-xl text-balance tracking-normal">
+                            Gratis Pelamar Kerja
+                          </h5>
+                          <p class="text-balance">
+                            Bagi anda para pencari kerja, mencari peluang tanpa
+                            biaya dapat menjadi langkah cerdas untuk
+                            memaksimalkan potensi mereka tanpa menguras
+                            anggaran.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-3">
+                      <div
+                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
+                      >
+                        <div class="text-sm font-bold text-primary-600">
+                          03.
+                        </div>
+                        <div
+                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
+                        >
+                          <h5 class="text-xl text-balance tracking-normal">
+                            Gratis Software HR
+                          </h5>
+                          <p class="text-balance">
+                            Kami Menyediakan Software HR yang telah menjadi
+                            fondasi utama dalam dunia bisnis modern, membantu
+                            perusahaan mengelola aspek-aspek kritis dari sumber
+                            daya manusia dengan lebih efektif.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-3">
+                      <div
+                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
+                      >
+                        <div class="text-sm font-bold text-primary-600">
+                          04.
+                        </div>
+                        <div
+                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
+                        >
+                          <h5 class="text-xl text-balance tracking-normal">
+                            Cash Flow Bisnis Anda
+                          </h5>
+                          <p class="text-balance">
+                            Kami memberikan Solusi agar Arus kas cash flow
+                            Perusahaan anda tetap terjaga dengan baik dan dapat
+                            keberlanjutan dengan cara bekerjasama dengan kami.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-3">
+                      <div
+                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
+                      >
+                        <div class="text-sm font-bold text-primary-600">
+                          05.
+                        </div>
+                        <div
+                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
+                        >
+                          <h5 class="text-xl text-balance tracking-normal">
+                            Kasbon Karyawan
+                          </h5>
+                          <p class="text-balance">
+                            Kami Menawarkan Sistem Kasbon Karyawan yang
+                            bermanfaat pada Karyawan Perusahaan Anda.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-3">
+                      <div
+                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
+                      >
+                        <div class="text-sm font-bold text-primary-600">
+                          06.
+                        </div>
+                        <div
+                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
+                        >
+                          <h5 class="text-xl text-balance tracking-normal">
+                            Gratis Cari Karyawan
+                          </h5>
+                          <p class="text-balance">
+                            Kami Menawarkan Pencarian Karyawan secara gratis dan
+                            dapat memberikan beberapa keuntungan bagi perusahaan
+                            atau organisasi anda.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-3">
+                      <div
+                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
+                      >
+                        <div class="text-sm font-bold text-primary-600">
+                          07.
+                        </div>
+                        <div
+                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
+                        >
+                          <h5 class="text-xl text-balance tracking-normal">
+                            Gratis Training
+                          </h5>
+                          <p class="text-balance">
+                            Kami Memberikan Pelatihan atau training yang
+                            memiliki banyak keuntungan, baik bagi perusahaan
+                            maupun individu.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-3">
+                      <div
+                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
+                      >
+                        <div class="text-sm font-bold text-primary-600">
+                          08.
+                        </div>
+                        <div
+                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
+                        >
+                          <h5 class="text-xl text-balance tracking-normal">
+                            Gratis Konsultasi
+                          </h5>
+                          <p class="text-balance">
+                            Kami Memberikan Konsultasi GRATIS, baik itu dalam
+                            konteks bisnis, pendidikan, atau masalah pribadi,
+                            dapat memberikan sejumlah keuntungan bagi individu
+                            atau perusahaan.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="col-span-full | lg:col-span-5 lg:col-start-8 | not-lg:mb-8 not-lg:-order-1"
+                    >
+                      <div class="relative isolate | lg:h-full">
+                        <div
+                          class="not-lg:aspect-square | lg:absolute lg:left-0 lg:top-0 lg lg:-bottom-27 lg:-right-8 | 2xl:-right-[calc((100vw-var(--breakpoint-2xl))/2)]"
+                        >
+                          <img
+                            src="./assets/images/thumbnails/img01.webp"
+                            alt=""
+                            class="size-full object-cover rounded-lg overflow-clip | lg:rounded-r-none"
+                          />
+                          <div
+                            class="absolute top-12 left-12 -bottom-12 -right-4 rounded-l-lg bg-primary-600 -z-1 | lg:right-0 lg:-left-12"
+                          >
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="grid mt-16 | lg:grid-cols-12 lg:gap-y-16 lg:gap-x-8"
+                  >
+                    <div
+                      class="col-span-full | lg:col-span-3 | not-lg:text-center"
+                    >
+                      <!-- <a href="page-why-us-detail.html" class="w-full pl-6 btn justify-between" data-hover-effect>
+                        Lihat Detail
+                        <svg class="icon icon-stroke circle-icon circle-right icon-up-right" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.5 6.5L6 18" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 6H18V16" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a> -->
+                      <a
+                        href="page-why-us-detail.html"
+                        class="inline-flex items-center gap-4 justify-between | lg:flex"
+                        data-hover-group
+                      >
+                        <div
+                          class="text-sm font-bold uppercase tracking-wide text-dark-950"
+                          data-hover-effect
+                        >
+                          Lihat Detail
+                        </div>
+                        <div class="btn btn-icon btn-primary" data-hover-effect>
+                          <svg
+                            class="icon icon-stroke icon-up-right"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M17.5 6.5L6 18"
+                              stroke="#141B34"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"></path>
+                            <path
+                              d="M8 6H18V16"
+                              stroke="#141B34"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"></path>
+                          </svg>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section id="section-testimonials" class="relative isolate">
+              <div class="pt-16 | lg:pt-24">
+                <div class="max-container">
+                  <div class="grid mb-16 | lg:grid-cols-12">
+                    <div class="col-span-full | lg:col-span-6 lg:col-start-4">
+                      <div
+                        class="relative flex flex-col gap-6 items-center text-center"
+                      >
+                        <div class="inline-flex items-center gap-3">
+                          <div
+                            class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                          >
+                          </div>
+                          <div
+                            class="text-sm leading-none font-bold uppercase tracking-wide"
+                          >
+                            Testimonials
+                          </div>
+                        </div>
+                        <h2 class="leading-none text-balance">
+                          Apa Kata Pengguna tentang Runlapan
+                        </h2>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="splide group/slide w-min mx-auto max-w-full | not-lg:hidden"
+                    data-slide-testimony-avatar
+                  >
+                    <div class="splide__track !overflow-visible">
+                      <div class="splide__list gap-4">
+                        <!-- @components listSlideTestimonialsAvatar -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="relative isolate pb-24 | lg:py-24 lg:pb-32">
+                <div class="max-container">
+                  <div class="splide group/slide" data-slide-testimony-content>
+                    <div class="splide__track !overflow-visible">
+                      <div
+                        class="splide__list !h-auto [&>*]:w-[calc(1/1.125*100%)] | lg:[&>*]:w-[calc(1/3.5*100%)]"
+                      >
+                        <!-- @components listSlideTestimonials -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="absolute top-1/2 bottom-0 inset-x-0 bg-primary-900 -z-1"
+                >
+                </div>
+              </div>
+              <div
+                class="absolute inset-0 [-webkit-mask-image:radial-gradient(closest-side,black,transparent)] -z-1 -translate-y-1/4 -translate-x-1/2 pointer-events-none opacity-20 [--square:4rem] [--line-w:1px] | lg:[--square:6rem] lg:[--line-w:1px]"
+              >
+                <div
+                  class="size-full bg-[repeating-linear-gradient(to_left,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square)),repeating-linear-gradient(to_bottom,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square))]"
+                >
+                </div>
+              </div>
+            </section>
+
+            <section id="section-services" class="relative bg-primary-900">
+              <div
+                class="relative isolate py-16 | lg:py-24 lg:mb-8 | 2xl:pt-32"
+              >
+                <div class="max-container relative">
+                  <div class="grid gap-16 | lg:grid-cols-12">
+                    <div class="col-span-full | lg:col-span-5 lg:col-start-8">
+                      <div
+                        class="flex flex-col gap-16 | lg:sticky lg:inset-y-[36vh] | not-lg:text-center"
+                      >
+                        <div
+                          class="flex flex-col gap-6 | lg:gap-4 | not-lg:items-center not-lg:text-center"
+                          data-title-wrapper
+                        >
+                          <div
+                            class="inline-flex items-center gap-3 | lg:w-min"
+                            data-subtitle
+                          >
+                            <div
+                              class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                            >
+                            </div>
+                            <div
+                              class="text-sm leading-none font-bold uppercase tracking-wide text-white | lg:w-min"
+                            >
+                              Service Kami
+                            </div>
+                          </div>
+                          <h2
+                            class="leading-none text-balance text-white"
+                            data-title
+                          >
+                            Layanan Terpadu untuk Para Pencari Kerja
+                          </h2>
+                        </div>
+                        <p class="text-balance text-white/70">
+                          Kami menawarkan solusi inovatif untuk efisiensi bisnis
+                          dan pekerjaan. Dengan teknologi, kami memudahkan
+                          proses, menghemat waktu, dan meningkatkan
+                          produktivitas.
+                        </p>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-6 lg:-order-1">
+                      <div class="grid gap-4 | lg:gap-6" data-services>
+                        <!-- @commponents listServices -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="absolute inset-0 -z-1">
+                  <div class="sticky top-0 h-dvh">
+                    <div
+                      class="absolute inset-0 [-webkit-mask-image:radial-gradient(closest-side,black,transparent)] -z-1 translate-y-1/3 translate-x-1/2 pointer-events-none opacity-30 [--square:4rem] [--line-w:1px] | lg:[--square:6rem] lg:[--line-w:1px]"
+                    >
+                      <div
+                        class="size-full bg-[repeating-linear-gradient(to_left,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square)),repeating-linear-gradient(to_bottom,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square))]"
+                      >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="relative isolate py-16 | lg:pt-24 lg:mt-8">
+                <div class="max-container">
+                  <div class="grid gap-16 mb-16 | lg:gap-8 lg:grid-cols-12">
+                    <div class="col-span-full | lg:col-span-6 lg:col-start-3">
+                      <div
+                        class="flex flex-col gap-6 | lg:gap-4 | not-lg:items-center not-lg:text-center"
+                        data-title-wrapper
+                      >
+                        <div
+                          class="inline-flex items-center gap-3 | lg:w-min"
+                          data-subtitle
+                        >
+                          <div
+                            class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                          >
+                          </div>
+                          <div
+                            class="text-sm leading-none font-bold uppercase tracking-wide text-white | lg:w-min"
+                          >
+                            Produk Kami
+                          </div>
+                        </div>
+                        <h2
+                          class="leading-none text-balance text-white"
+                          data-title
+                        >
+                          Dukungan untuk Masa Depan Karirmu
+                        </h2>
+                      </div>
+                    </div>
+                    <div
+                      class="grid-item col-span-full | lg:col-span-4 lg:col-start-7 | not-lg:text-center"
+                    >
+                      <p class="text-balance text-white/70">
+                        Dapatkan dukungan lengkap untuk karir Anda, dari
+                        pencarian lowongan hingga tips interview.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="relative isolate">
+                  <div class="max-container">
+                    <div class="grid gap-8 | lg:grid-cols-12">
+                      <div class="col-span-full | lg:col-span-8 lg:col-start-3">
+                        <div class="splide group/slide" data-slide-products>
+                          <div class="splide__track !overflow-visible mb-8">
+                            <div class="splide__list">
+                              <!-- @components listSlideProducts -->
+                            </div>
+                          </div>
+                          <div class="flex items-center justify-between">
+                            <div class="splide__pagination_fraction"></div>
+                            <div class="flex items-center gap-1">
+                              <button
+                                type="button"
+                                class="btn-splide-prev btn btn-sm btn-icon"
+                                data-hover-effect
+                              >
+                                <svg
+                                  class="icon icon-stroke icon-left"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    fill="none"
+                                    stroke="#141B34"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M4.2,12h16.3"></path>
+                                  <path
+                                    fill="none"
+                                    stroke="#141B34"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M10.6,19.1L3.5,12 l7.1-7.1"></path>
+                                </svg>
+                              </button>
+                              <button
+                                type="button"
+                                class="btn-splide-next btn btn-sm btn-icon"
+                                data-hover-effect
+                              >
+                                <svg
+                                  class="icon icon-stroke icon-right"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    fill="none"
+                                    stroke="#141B34"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M19.8,12H3.5"></path>
+                                  <path
+                                    fill="none"
+                                    stroke="#141B34"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M13.4,4.9l7.1,7.1 l-7.1,7.1"></path>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="absolute top-1/2 -bottom-16 inset-x-0 bg-body -z-1"
+                  >
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section
+              id="section-clients"
+              class="relative isolate py-16 | lg:py-24 lg:my-8"
+            >
+              <div class="max-container">
+                <div class="grid mb-16 | lg:grid-cols-12">
+                  <div class="col-span-full | lg:col-span-6 lg:col-start-4">
+                    <div
+                      class="relative flex flex-col gap-6 items-center text-center"
+                    >
+                      <div class="inline-flex items-center gap-3">
+                        <div
+                          class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                        >
+                        </div>
+                        <div
+                          class="text-sm leading-none font-bold uppercase tracking-wide"
+                        >
+                          Klien Kami
+                        </div>
+                      </div>
+                      <h2 class="leading-none text-balance">
+                        Mereka yang Percaya Menggunakan Jasa Kami
+                      </h2>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="px-4">
+                <div
+                  class="flex flex-wrap justify-center overflow-clip [&>*]:w-[calc((1/2*100%)+1px)] [&>*]:border-r [&>*]:border-b [&>*]:border-dark-300 [&>*:last-child]:border-r-transparent [&>*]:-mr-px [&>*]:-mb-px | lg:[&>*]:w-[calc((1/6*100%)+1px)]"
+                  data-clients="18"
+                >
+                  <!-- @components listClients -->
+                </div>
+              </div>
+            </section>
+
+            <section
+              id="section-news"
+              class="relative isolate py-16 | lg:py-24 lg:my-8"
+            >
+              <div class="max-container">
+                <div class="grid mb-16 | lg:grid-cols-12">
+                  <div class="col-span-full | lg:col-span-6 lg:col-start-4">
+                    <div
+                      class="relative flex flex-col gap-6 items-center text-center"
+                    >
+                      <div class="inline-flex items-center gap-3">
+                        <div
+                          class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                        >
+                        </div>
+                        <div
+                          class="text-sm leading-none font-bold uppercase tracking-wide"
+                        >
+                          Berita
+                        </div>
+                      </div>
+                      <h2 class="leading-none text-balance">
+                        Pilihan Berita Terkini dari Runlapan
+                      </h2>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="grid gap-x-6 gap-y-12 | lg:grid-cols-3"
+                  data-blog="3"
+                >
+                  <!-- @components listBlog -->
+                </div>
+                <div class="flex justify-center mt-16">
+                  <a
+                    href="page-blog.html"
+                    class="btn btn-outline"
+                    data-hover-effect>Berita Lainnya</a
+                  >
+                </div>
+              </div>
+            </section>
+
+            <section
+              id="section-faq"
+              class="relative isolate py-16 | lg:py-24 lg:my-8"
+            >
+              <div class="max-container">
+                <div class="grid gap-24 | lg:gap-8 lg:grid-cols-12">
+                  <div class="col-span-full | lg:col-span-6 lg:col-start-7">
+                    <div class="relative isolate aspect-square | lg:size-full">
+                      <div class="relative size-full rounded-lg overflow-clip">
+                        <img
+                          src="./assets/images/thumbnails/img04.webp"
+                          alt=""
+                          class="size-full object-cover"
+                        />
+                      </div>
+                      <div
+                        class="absolute top-12 left-12 -bottom-12 -right-12 rounded-lg bg-primary-600 -z-1"
+                      >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-span-full | lg:col-span-5 lg:-order-1">
+                    <div
+                      class="grid gap-16 place-content-between | lg:min-h-full"
+                    >
+                      <div
+                        class="flex flex-col gap-6 | lg:gap-4 | not-lg:items-center not-lg:text-center"
+                        data-title-wrapper
+                      >
+                        <div
+                          class="inline-flex items-center gap-3 w-min"
+                          data-subtitle
+                        >
+                          <div
+                            class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                          >
+                          </div>
+                          <div
+                            class="text-sm leading-none font-bold uppercase tracking-wide w-min"
+                          >
+                            FAQ
+                          </div>
+                        </div>
+                        <h2 class="leading-none text-balance" data-title>
+                          Pertanyaan yang Sering Diajukan
+                        </h2>
+                      </div>
+                      <div class="grid gap-16 | lg:gap-24">
+                        <div
+                          class="accordion grid divide-y divide-dark-400"
+                          data-parent
+                          data-faq="3"
+                        >
+                          <!-- @components listFaq -->
+                        </div>
+                        <div class="flex items-center justify-between">
+                          <div class="font-medium">Butuh Bantuan ?</div>
+                          <a
+                            href="page-faq.html"
+                            class="flex items-center gap-4"
+                            data-hover-group
+                          >
+                            <div
+                              class="text-sm font-bold uppercase tracking-wide text-dark-950"
+                              data-hover-effect
+                            >
+                              Selengkapnya
+                            </div>
+                            <div
+                              class="btn btn-icon btn-primary"
+                              data-hover-effect
+                            >
+                              <svg
+                                class="icon icon-stroke icon-up-right"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M17.5 6.5L6 18"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                                <path
+                                  d="M8 6H18V16"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                              </svg>
+                            </div>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="absolute inset-0 [-webkit-mask-image:radial-gradient(closest-side,black,transparent)] -z-1 -translate-y-1/4 translate-x-1/2 pointer-events-none opacity-20 | lg:[--square:6rem] lg:[--line-w:1px]"
+              >
+                <div
+                  class="size-full bg-[repeating-linear-gradient(to_left,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square)),repeating-linear-gradient(to_bottom,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square))]"
+                >
+                </div>
+              </div>
+            </section>
+          </div>
+          <!-- data-barba container -->
+        </main>
+
+        <!-- @components sectionFooter -->
+      </div>
+      <!-- #app -->
+
+      <div
+        id="modal-cari-loker"
+        class="fixed top-0 inset-x-0 z-[999] invisible"
+        data-modal
+      >
+        <div
+          class="relative w-full h-dvh flex flex-col overflow-auto"
+          data-lenis-prevent
+        >
+          <div
+            class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
+          >
+            <div class="grow w-full flex flex-col max-container">
+              <div class="grid gap-4 | lg:grid-cols-12">
+                <div
+                  class="grid-item col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
+                >
+                  <div
+                    class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
+                    data-modal-content
+                  >
+                    <div class="absolute top-0 right-0">
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-icon btn-dark"
+                        data-hover-effect
+                        data-modal-hide
+                      >
+                        <svg
+                          class="icon icon-stroke"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6"
+                            stroke="#141B34"
+                            stroke-width="1.5"
+                            stroke-linejoin="round"></path>
+                        </svg>
+                      </button>
+                    </div>
+                    <div class="shrink-0 px-6 py-4 | lg:py-6">
+                      <div class="flex flex-col gap-4 items-center text-center">
+                        <div
+                          class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
+                        >
+                          Cari Loker
+                        </div>
+                        <h4 class="w-full font-bold leading-none text-balance">
+                          Apakah Anda Sudah Memiliki Id Number ?
+                        </h4>
+                      </div>
+                    </div>
+                    <!-- <div class="shrink-0 px-6 py-4 | lg:py-6">
+                                <article class="post-entry no-grid">
+                                    
+                                </article>
+                            </div> -->
+                    <div class="shrink-0 px-6 py-4 | lg:py-6">
+                      <form action="index-login.html">
+                        <div class="grid gap-6">
+                          <div class="c-form-wrapper">
+                            <div class="c-form">
+                              <label for="input-idnumber" class="c-label"
+                                >Masukan ID Number</label
+                              >
+                              <input
+                                type="number"
+                                name="input-idnumber"
+                                inputmode="numeric"
+                                class="c-input"
+                                placeholder="Masuan id number"
+                              />
+                            </div>
+                            <div class="text-xs mt-1 text-dark-400">
+                              please fill out this field
+                            </div>
+                          </div>
+                          <button
+                            type="submit"
+                            class="btn btn-primary"
+                            data-hover-effect
+                          >
+                            Submit
+                          </button>
+                          <div class="flex items-center gap-4">
+                            <div class="grow h-px bg-dark-200"></div>
+                            <div
+                              class="text-sm leading-none font-bold uppercase tracking-wide"
+                            >
+                              Atau
+                            </div>
+                            <div class="grow h-px bg-dark-200"></div>
+                          </div>
+                          <a href="/applicant" class="btn" data-hover-effect
+                            >Daftar Sekarang</a
+                          >
+                          <!-- <button
+                            type="button"
+                            class="btn"
+                            data-hover-effect
+                            data-barba-navigate="/applicant"
+                            >Daftar Sekarang</button
+                          > -->
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="modal-pasang-loker"
+        class="fixed top-0 inset-x-0 z-[999] invisible"
+        data-modal
+      >
+        <div
+          class="relative w-full h-dvh flex flex-col overflow-auto"
+          data-lenis-prevent
+        >
+          <div
+            class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
+          >
+            <div class="grow w-full flex flex-col max-container">
+              <div class="grid gap-4 | lg:grid-cols-12">
+                <div
+                  class="grid-item col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
+                >
+                  <div
+                    class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
+                    data-modal-content
+                  >
+                    <div class="absolute top-0 right-0">
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-icon btn-dark"
+                        data-hover-effect
+                        data-modal-hide
+                      >
+                        <svg
+                          class="icon icon-stroke"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6"
+                            stroke="#141B34"
+                            stroke-width="1.5"
+                            stroke-linejoin="round"></path>
+                        </svg>
+                      </button>
+                    </div>
+                    <div class="shrink-0 px-6 py-4 | lg:py-6">
+                      <div class="flex flex-col gap-4 items-center text-center">
+                        <div
+                          class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
+                        >
+                          Pasang Loker
+                        </div>
+                        <h4 class="w-full font-bold leading-none text-balance">
+                          Apakah Anda Sudah Memiliki Id Number ?
+                        </h4>
+                      </div>
+                    </div>
+                    <!-- <div class="shrink-0 px-6 py-4 | lg:py-6">
+                                <article class="post-entry no-grid">
+                                    
+                                </article>
+                            </div> -->
+                    <div class="shrink-0 px-6 py-4 | lg:py-6">
+                      <form action="index-login.html">
+                        <div class="grid gap-6">
+                          <div class="c-form-wrapper">
+                            <div class="c-form">
+                              <label for="input-idnumber" class="c-label"
+                                >Masukan ID Number</label
+                              >
+                              <input
+                                type="number"
+                                name="input-idnumber"
+                                inputmode="numeric"
+                                class="c-input"
+                                placeholder="Masuan id number"
+                              />
+                            </div>
+                            <div class="text-xs mt-1 text-dark-400">
+                              please fill out this field
+                            </div>
+                          </div>
+                          <button
+                            type="submit"
+                            class="btn btn-primary"
+                            data-hover-effect
+                          >
+                            Submit
+                          </button>
+                          <div class="flex items-center gap-4">
+                            <div class="grow h-px bg-dark-200"></div>
+                            <div
+                              class="text-sm leading-none font-bold uppercase tracking-wide"
+                            >
+                              Atau
+                            </div>
+                            <div class="grow h-px bg-dark-200"></div>
+                          </div>
+                          <a href="/company" class="btn" data-hover-effect
+                            >Daftar Sekarang</a
+                          >
+                          <!-- <button
+                            type="button"
+                            class="btn"
+                            data-hover-effect
+                            data-barba-navigate="/company"
+                            >Daftar Sekarang</button
+                          > -->
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <svg
+        width="0"
+        height="0"
+        class="absolute hidden"
+        color-interpolation-filters="sRGB"
+      >
+        <defs>
+          <filter id="gooey-content">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"
+            ></feGaussianBlur>
+            <feColorMatrix
+              in="blur"
+              mode="matrix"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 11 -6"
+              result="gooey-content"></feColorMatrix>
+            <feComposite in="SourceGraphic" in2="gooey-content" operator="atop"
+            ></feComposite>
+            <feBlend in="SourceGraphic" in2="gooey-content"></feBlend>
+          </filter>
+        </defs>
+      </svg>
+
+      <div id="preloader">
+        <div id="preloader-spinner">
+          <img src="./assets/images/logo/logo-icon.png" alt="Runlapan" />
+        </div>
+        <div id="preloader-transition"></div>
+      </div>
+
+      <script type="module" src="/src/main.js"></script>
+    </body>
+  </html>
+</BaseLayout>
+
+<script>
+  import Splide from "@splidejs/splide";
+
+  const el = document.querySelector<HTMLElement>("#splide-hero");
+  if (el) {
+    new Splide(el).mount();
+  }
+</script>

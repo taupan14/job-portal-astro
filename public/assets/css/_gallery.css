@@ -1,0 +1,205 @@
+.lg-inner,
+.lg-slide,
+.lg-components,
+.lg-item {
+    @apply
+    ease-custom
+    duration-500
+}
+
+.lg-backdrop {
+    @apply
+    !bg-transparent
+    bg-gradient-to-b
+    from-dark-950/50
+    to-primary-900/80
+    backdrop-blur
+    !ease-custom
+    !duration-500
+}
+.lg-outer {
+    .lg-img-wrap {
+        @apply
+        py-4
+    }
+
+    .lg-video-cont {
+        @apply
+        rounded-lg
+        overflow-clip;
+
+        .lg-object {
+            @apply
+            object-cover
+            object-center
+        }
+    }
+
+    .lg-thumb-outer {
+        @apply
+        bg-transparent
+    }
+
+    .lg-thumb {
+        @apply
+        py-4
+    }
+}
+.lg-image {
+    @apply
+    rounded-lg
+}
+.lg-sub-html {
+    @apply
+    max-w-screen-lg
+    mx-auto
+    px-0
+    pt-4
+    !pb-6
+    font-sans
+    text-sm
+    !ease-custom
+
+    [&_a]:!no-underline;
+
+    p {
+        @apply
+        !text-sm
+        !mt-0
+        mb-4
+        last:mb-0
+    }
+}
+.lg-toolbar {
+    @apply
+    absolute
+    top-0
+    inset-x-0
+    flex
+    items-center
+    py-4
+    px-3
+    gap-0.5
+    lg:px-4
+}
+
+.lg-toolbar .lg-icon,
+.lg-icon {
+    @apply
+    p-0
+    !size-8
+    !flex
+    !items-center
+    !justify-center
+    !rounded-lg
+    text-xs
+    font-light
+    opacity-100
+
+    !bg-white
+    !text-dark-950
+    !transition-none
+
+    before:!hidden
+    after:!hidden;
+
+    .icon {
+        @apply
+        size-4;
+
+        & > * {
+            @apply
+            !transition-none
+        }
+    }
+
+    &.lg-zoom-out {
+        @apply
+        !bg-dark-300
+    }
+}
+
+.lg-toolbar {
+    .lg-counter {
+        @apply
+        order-first
+        text-[11px]
+        uppercase
+        leading-4
+        font-semibold
+        !h-auto
+        py-1.5
+        !px-3
+        rounded-lg
+        bg-white
+        text-dark-950
+        mr-auto
+        lg:px-4
+    }
+}
+
+.lg-content {
+    @apply
+    !top-0
+}
+
+.lg-close {
+    @apply
+    order-last
+    after:!content-['\f40e']
+}
+.lg-zoom {
+    @apply
+    after:!content-['asd']
+}
+.lg-download {
+    @apply
+    after:!content-['\f33d']
+}
+
+.lg-next,
+.lg-prev {
+    @apply
+    !bg-dark-950
+    !text-white
+    top-1/2
+    -translate-y-1/2
+    m-0
+}
+.lg-next {
+    @apply
+    !right-3
+    before:content-['\f138']
+    lg:!right-4
+}
+.lg-prev {
+    @apply
+    !left-3
+    after:content-['\f137']
+    lg:!left-4
+}
+.lg-video-loading .lg-video-play-icon-circle {
+    @apply
+    stroke-primary-700
+}
+
+.lg-outer[data-lg-slide-type=video],
+.lg-outer[data-lg-slide-type=iframe],
+.lg-outer.lg-first-slide-loading {
+    .lg-zoom-in,
+    .lg-actual-size,
+    .lg-zoom-out {
+        @apply
+        !opacity-100
+        !bg-dark-300
+    }
+}
+
+.lg-zoomed {
+    .lg-icon {
+        &.lg-zoom-out {
+            @apply
+            !bg-white
+        }
+    }
+}

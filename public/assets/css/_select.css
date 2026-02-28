@@ -1,0 +1,78 @@
+.c-select {
+        /* &.focus {
+            @apply
+            outline-2
+            outline-offset-[3px]
+            outline-primary-400;
+        } */
+
+        .ts-dropdown,
+        .ts-control,
+        .ts-control input {
+            @apply
+            text-[size:inherit]
+            leading-[inherit]
+            text-[inherit]
+            font-semibold
+        }
+
+        .ts-control {
+            @apply
+            relative
+            !border-none
+            p-0
+            rounded-none
+            !bg-transparent;
+    
+            & > * {
+                @apply
+                inline-flex
+                font-semibold
+            }
+
+            input {
+                @apply
+                w-auto
+                min-w-0
+                placeholder:text-dark-950
+            }
+        }
+
+        .ts-dropdown {
+            @apply
+            mx-0
+            my-2
+            border-none
+            shadow-[0_1.25rem_2.75rem]
+            shadow-dark-950/15
+            rounded-lg
+            overflow-clip;
+
+            .option,
+            .optgroup-header,
+            .no-results,
+            .create {
+                @apply
+                py-2.5
+                px-4
+                text-sm
+            }
+
+            .active,
+            .selected {
+                @apply
+                bg-dark-950/5
+                text-dark-950
+            }
+
+            [aria-disabled] {
+                @apply
+                !opacity-100;
+
+                img {
+                    @apply
+                    grayscale
+                }
+            }
+        }
+    }

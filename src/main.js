@@ -1,0 +1,41 @@
+// COMPONENTS
+import "@scripts/sectionHeader";
+import "@scripts/sectionFooter";
+// import '@scripts/listSlideServices'
+import "@scripts/listSlideJobs";
+import "@scripts/listSlideEmployes";
+import "@scripts/listSlideTestimonialsAvatar";
+import "@scripts/listSlideTestimonials";
+import "@scripts/listServices";
+import "@scripts/listSlideRelatedServices";
+import "@scripts/listSlideProducts";
+import "@scripts/listSlideRelatedProducts";
+import "@scripts/listClients";
+import "@scripts/listBlog";
+import "@scripts/listSlideBlog";
+import "@scripts/listFaq";
+import "@scripts/listPrivacy";
+import "@scripts/listJobs";
+import "@scripts/listBlogCategories";
+import "@scripts/listSlideTeams";
+import "@scripts/listGalleryAlbum";
+import "@scripts/listSlideAlbum";
+import "@scripts/listGalleryPhoto";
+import "@scripts/listGalleryVideo";
+import "@scripts/pagination";
+
+// JS
+import "@js/_lenis";
+import "@js/_dropdown";
+import "@js/_modal";
+import "@js/_slide";
+import "@js/_gallery";
+import "@js/_tooltip";
+import "@js/_select";
+import "@js/_tabbed";
+import "@js/_datepicker";
+import "@js/_main";
+
+// CSS
+import "@css/global.css";
+import "@fonts/fonts.css";

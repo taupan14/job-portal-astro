@@ -1,0 +1,51 @@
+.table-wrapper {
+    @apply
+    overflow-x-auto
+}
+
+.table {
+    @apply
+    min-w-full;
+
+    th {
+        @apply
+        text-start
+        pb-3
+        px-4
+        border-b
+        border-dark-300
+        text-sm
+        font-semibold
+        text-dark-950
+        first:pl-0
+        last:pr-0
+    }
+
+    td {
+        @apply
+        text-start
+        text-sm
+        font-medium
+        pt-5
+        pb-3
+        px-4
+        border-b
+        border-dark-300
+        first:pl-0
+        last:pr-0
+        align-top
+    }
+
+    tr {
+        @apply
+        last:[&_td]:border-none
+    }
+
+    &.table-align-between {
+        th,td {
+            @apply
+            first:text-start
+            last:text-end
+        }
+    }
+}

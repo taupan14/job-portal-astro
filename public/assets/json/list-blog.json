@@ -1,0 +1,74 @@
+[
+    {
+        "blog_img": "./assets/images/thumbnails/img01.webp",
+        "blog_category": "Teknologi",
+        "blog_title": "10 Tren Teknologi Terbaru yang Wajib Diketahui di 2024",
+        "blog_date": "15 Maret, 2024"
+    },
+    {
+        "blog_img": "./assets/images/thumbnails/img02.webp",
+        "blog_category": "Kesehatan",
+        "blog_title": "Cara Menjaga Kesehatan Mental di Era Digital",
+        "blog_date": "14 Maret, 2024"
+    },
+    {
+        "blog_img": "./assets/images/thumbnails/img03.webp",
+        "blog_category": "Bisnis",
+        "blog_title": "Strategi Sukses Memulai Bisnis Online bagi Pemula",
+        "blog_date": "13 Maret, 2024"
+    },
+    {
+        "blog_img": "./assets/images/thumbnails/img04.webp",
+        "blog_category": "Pendidikan",
+        "blog_title": "Metode Belajar Efektif untuk Generasi Z",
+        "blog_date": "12 Maret, 2024"
+    },
+    {
+        "blog_img": "./assets/images/thumbnails/img05.webp",
+        "blog_category": "Lingkungan",
+        "blog_title": "5 Langkah Sederhana untuk Hidup Lebih Ramah Lingkungan",
+        "blog_date": "11 Maret, 2024"
+    },
+    {
+        "blog_img": "./assets/images/thumbnails/img06.webp",
+        "blog_category": "Olahraga",
+        "blog_title": "Tips Meningkatkan Stamina untuk Pemula dalam Olahraga Lari",
+        "blog_date": "10 Maret, 2024"
+    },
+    {
+        "blog_img": "./assets/images/thumbnails/img07.webp",
+        "blog_category": "Kuliner",
+        "blog_title": "Resep Masakan Sehat untuk Sarapan Pagi yang Praktis",
+        "blog_date": "9 Maret, 2024"
+    },
+    {
+        "blog_img": "./assets/images/thumbnails/img08.webp",
+        "blog_category": "Seni & Budaya",
+        "blog_title": "Mengenal Kesenian Tradisional yang Mulai Terlupakan",
+        "blog_date": "8 Maret, 2024"
+    },
+    {
+        "blog_img": "./assets/images/thumbnails/img09.webp",
+        "blog_category": "Travel",
+        "blog_title": "Destinasi Wisata Tersembunyi di Indonesia yang Wajib Dikunjungi",
+        "blog_date": "7 Maret, 2024"
+    },
+    {
+        "blog_img": "./assets/images/thumbnails/img10.webp",
+        "blog_category": "Otomotif",
+        "blog_title": "Inovasi Terbaru dalam Dunia Mobil Listrik",
+        "blog_date": "6 Maret, 2024"
+    },
+    {
+        "blog_img": "./assets/images/thumbnails/img11.webp",
+        "blog_category": "Gaya Hidup",
+        "blog_title": "Cara Menciptakan Work-Life Balance yang Sehat",
+        "blog_date": "5 Maret, 2024"
+    },
+    {
+        "blog_img": "./assets/images/thumbnails/img12.webp",
+        "blog_category": "Finansial",
+        "blog_title": "Tips Mengelola Keuangan Pribadi agar Lebih Produktif",
+        "blog_date": "4 Maret, 2024"
+    }
+]

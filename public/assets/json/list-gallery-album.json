@@ -1,0 +1,74 @@
+[
+    {
+        "album_img": "./assets/images/thumbnails/img01.webp",
+        "album_title": "Job Fair 2024",
+        "album_date": "15 Maret, 2024",
+        "album_total": "12"
+    },
+    {
+        "album_img": "./assets/images/thumbnails/img02.webp",
+        "album_title": "Workshop Karir Sukses",
+        "album_date": "20 Maret, 2024",
+        "album_total": "18"
+    },
+    {
+        "album_img": "./assets/images/thumbnails/img03.webp",
+        "album_title": "Company Visit: PT XYZ",
+        "album_date": "25 Maret, 2024",
+        "album_total": "24"
+    },
+    {
+        "album_img": "./assets/images/thumbnails/img04.webp",
+        "album_title": "Networking Session 2024",
+        "album_date": "30 Maret, 2024",
+        "album_total": "15"
+    },
+    {
+        "album_img": "./assets/images/thumbnails/img05.webp",
+        "album_title": "Seminar Keterampilan Interview",
+        "album_date": "5 April, 2024",
+        "album_total": "20"
+    },
+    {
+        "album_img": "./assets/images/thumbnails/img06.webp",
+        "album_title": "Career Expo Jakarta",
+        "album_date": "10 April, 2024",
+        "album_total": "30"
+    },
+    {
+        "album_img": "./assets/images/thumbnails/img07.webp",
+        "album_title": "Testimoni Karyawan Sukses",
+        "album_date": "15 April, 2024",
+        "album_total": "10"
+    },
+    {
+        "album_img": "./assets/images/thumbnails/img08.webp",
+        "album_title": "Pelatihan CV dan Portofolio",
+        "album_date": "20 April, 2024",
+        "album_total": "22"
+    },
+    {
+        "album_img": "./assets/images/thumbnails/img09.webp",
+        "album_title": "Hiring Day: Startup Edition",
+        "album_date": "25 April, 2024",
+        "album_total": "25"
+    },
+    {
+        "album_img": "./assets/images/thumbnails/img10.webp",
+        "album_title": "Company Culture Day",
+        "album_date": "30 April, 2024",
+        "album_total": "18"
+    },
+    {
+        "album_img": "./assets/images/thumbnails/img11.webp",
+        "album_title": "Webinar Karir Masa Depan",
+        "album_date": "5 Mei, 2024",
+        "album_total": "14"
+    },
+    {
+        "album_img": "./assets/images/thumbnails/img12.webp",
+        "album_title": "Success Stories Alumni",
+        "album_date": "10 Mei, 2024",
+        "album_total": "16"
+    }
+]

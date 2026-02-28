@@ -1,0 +1,50 @@
+[
+    {
+        "gallery_img": "./assets/images/thumbnails/img01.webp",
+        "gallery_title": "Gallery Title"
+    },
+    {
+        "gallery_img": "./assets/images/thumbnails/img02.webp",
+        "gallery_title": "Gallery Title"
+    },
+    {
+        "gallery_img": "./assets/images/thumbnails/img03.webp",
+        "gallery_title": "Gallery Title"
+    },
+    {
+        "gallery_img": "./assets/images/thumbnails/img04.webp",
+        "gallery_title": "Gallery Title"
+    },
+    {
+        "gallery_img": "./assets/images/thumbnails/img05.webp",
+        "gallery_title": "Gallery Title"
+    },
+    {
+        "gallery_img": "./assets/images/thumbnails/img06.webp",
+        "gallery_title": "Gallery Title"
+    },
+    {
+        "gallery_img": "./assets/images/thumbnails/img07.webp",
+        "gallery_title": "Gallery Title"
+    },
+    {
+        "gallery_img": "./assets/images/thumbnails/img08.webp",
+        "gallery_title": "Gallery Title"
+    },
+    {
+        "gallery_img": "./assets/images/thumbnails/img09.webp",
+        "gallery_title": "Gallery Title"
+    },
+    {
+        "gallery_img": "./assets/images/thumbnails/img10.webp",
+        "gallery_title": "Gallery Title"
+    },
+    {
+        "gallery_img": "./assets/images/thumbnails/img11.webp",
+        "gallery_title": "Gallery Title"
+    },
+    {
+        "gallery_img": "./assets/images/thumbnails/img12.webp",
+        "gallery_title": "Gallery Title"
+    }
+]

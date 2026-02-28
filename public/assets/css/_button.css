@@ -1,0 +1,406 @@
+@layer components {
+    button {
+        @apply
+        cursor-pointer
+    }
+    
+    [data-hover-effect] {
+        --text-hover: var(--color-dark-950);
+
+        @apply
+        inline-flex
+        items-center
+        whitespace-nowrap;
+
+        span {
+            @apply
+            transition-colors
+            duration-800
+            ease-custom
+            [text-shadow:0_var(--y-shadow)_0_var(--text-hover,currentColor)]
+        }
+
+        .icon {
+            &.icon-left {
+                @apply
+                drop-shadow-[var(--icon-width)_0_var(--icon-hover)]
+            }
+            &.icon-right {
+                @apply
+                drop-shadow-[calc(var(--icon-width)*-1)_0_var(--icon-hover)]
+            }
+            &.icon-up {
+                @apply
+                drop-shadow-[0_var(--icon-width)_0_var(--icon-hover)]
+            }
+            &.icon-up-right {
+                @apply
+                drop-shadow-[calc(var(--icon-width)*-1)_var(--icon-width)_0_var(--icon-hover)]
+            }
+            &.icon-down-right {
+                @apply
+                drop-shadow-[calc(var(--icon-width)*-1)_calc(var(--icon-width)*-1)_0_var(--icon-hover)]
+            }
+            &.icon-down {
+                @apply
+                drop-shadow-[0_calc(var(--icon-width)*-1)_0_var(--icon-hover)]
+            }
+        }
+
+        &:hover {
+            span {
+                @apply
+                [animation:_linkHover_800ms_theme('transitionTimingFunction.custom')_forwards]
+            }
+            .icon {
+                &.icon-left {
+                    @apply
+                    [animation:_iconHoverLeft_800ms_theme('transitionTimingFunction.custom')_forwards]
+                }
+                &.icon-right {
+                    @apply
+                    [animation:_iconHoverRight_800ms_theme('transitionTimingFunction.custom')_forwards]
+                }
+                &.icon-up {
+                    @apply
+                    [animation:_iconHoverUp_800ms_theme('transitionTimingFunction.custom')_forwards]
+                }
+                &.icon-up-right {
+                    @apply
+                    [animation:_iconHoverUpRight_800ms_theme('transitionTimingFunction.custom')_forwards]
+                }
+                &.icon-down-right {
+                    @apply
+                    [animation:_iconHoverDownRight_800ms_theme('transitionTimingFunction.custom')_forwards]
+                }
+                &.icon-down {
+                    @apply
+                    [animation:_iconHoverDown_800ms_theme('transitionTimingFunction.custom')_forwards]
+                }
+            }
+        }
+    }
+
+    .btn {
+        --circle-size: calc(var(--spacing)*10);
+        --circle-bg: var(--color-dark-950);
+        --text-hover: var(--color-dark-950);
+        --bg-hover: var(--color-dark-200);
+        --icon-hover: var(--color-dark-950);
+
+        .btn-hover {
+            @apply
+            block
+        }
+
+        .icon {
+            @apply
+            size-4.5
+            delay-100
+        }
+
+        @apply
+        relative
+        isolate
+        shrink-0
+        cursor-pointer
+        inline-flex
+        items-center
+        justify-center
+        text-sm
+        leading-5
+        font-bold
+        uppercase
+        tracking-wide
+        py-3
+        px-6
+        rounded-lg
+        bg-dark-200
+        text-dark-950;
+
+        .btn-circle {
+            @apply
+            absolute
+            inset-y-0
+            my-auto
+            rounded-md;
+
+            &:has(.circle-left) {
+                @apply
+                left-0.5
+            }
+            &:has(.circle-right) {
+                @apply
+                right-0.5
+            }
+        }
+        &:has(.btn-circle) {
+            &:has(.circle-right) {
+                @apply
+                pr-[calc(var(--circle-size)+(var(--spacing)*6))]
+            }
+            &:has(.circle-left) {
+                @apply
+                pl-[calc(var(--circle-size)+(var(--spacing)*6))]
+            }
+            &.w-full {
+                @apply
+                px-[calc(var(--circle-size)+(var(--spacing)*6))]
+            }
+        }
+
+        &.btn-circle-primary {
+            --circle-bg: var(--color-primary-600);
+            --circle-text: white;
+            --icon-hover: var(--circle-text);
+        }
+        &.btn-circle-dark {
+            --circle-bg: var(--color-dark-950);
+            --circle-text: white;
+            --icon-hover: var(--circle-text);
+        }
+        &.btn-circle-white {
+            --circle-bg: white;
+            --circle-text: var(--color-dark-950);
+            --icon-hover: var(--circle-text);
+        }
+
+        &.btn-sm {
+            --circle-size: calc(var(--spacing)*8);
+
+            @apply
+            py-2
+            px-4
+        }
+
+        &.btn-outline {
+            @apply
+            bg-transparent
+            ring-inset
+            ring-1
+            ring-[var(--ring-color,var(--color-dark-200))];
+        }
+    }
+
+    .btn-icon {
+        @apply
+        !p-0
+        size-11;
+
+        &.btn-xs {
+            @apply
+            size-7;
+
+            .icon {
+                @apply
+                size-3
+            }
+        }
+
+        &.btn-sm {
+            @apply
+            size-9;
+            
+            .icon {
+                @apply
+                size-4
+            }
+        }
+
+        &.btn-lg {
+            @apply
+            size-18;
+
+            .icon {
+                @apply
+                size-6
+            }
+        }
+
+        &.btn-xl {
+            @apply
+            size-24
+        }
+
+        &.btn-2xl {
+            @apply
+            size-28; 
+        }
+    }
+
+    .btn-circle {
+        @apply
+        !p-0
+        inline-flex
+        items-center
+        justify-center
+        w-[var(--circle-size,calc(var(--spacing)*11))]
+        h-[var(--circle-size,calc(var(--spacing)*11))]
+        rounded-md
+        bg-(--circle-bg)
+        text-(--circle-text)
+    }
+
+    .btn-primary {
+        --text-hover: white;
+        --icon-hover: white;
+        --bg-hover: var(--color-primary-600);
+
+        @apply
+        bg-primary-600
+        text-white;
+
+        /* .btn-circle {
+            --circle-bg: white;
+            --circle-text: var(--color-dark-950);
+            --icon-hover: var(--color-dark-950);
+        } */
+    }
+
+    .btn-secondary {
+        --icon-hover: white;
+        --text-hover: white;
+        --bg-hover: var(--color-secondary-600);
+
+        @apply
+        bg-secondary-600
+        text-white;
+
+        /* .btn-circle {
+            --icon-hover: var(--color-dark-950);
+            --circle-text: var(--color-dark-950);
+        } */
+    }
+
+    .btn-dark {
+        --text-hover: white;
+        --ring-color: var(--color-dark-950);
+        --icon-hover: white;
+
+        @apply
+        bg-dark-950
+        text-white;
+
+        &.btn-outline {
+            --text-hover: var(--color-dark-950);
+
+            @apply
+            text-dark-950;
+
+            /* .btn-circle {
+                --circle-bg: var(--color-dark-950);
+                --circle-text: white;
+                --icon-hover: white;
+            } */
+        }
+
+        /* .btn-circle {
+            --circle-bg: white;
+            --circle-text: var(--color-dark-950);
+            --icon-hover: var(--color-dark-950);
+        } */
+    }
+
+    .btn-white {
+        --icon-hover: var(--color-dark-950);
+
+        @apply
+        bg-white
+        text-dark-950;
+
+        &.btn-outline {
+            --icon-hover: white;
+            --ring-color: white;
+
+            @apply
+            text-white
+        }
+    }
+
+    .link {
+        @apply
+        bg-[linear-gradient(var(--link-direction,to_right),var(--link-underline,var(--text-hover,currentColor)),var(--link-underline,var(--text-hover,currentColor)))]
+        bg-[size:var(--link-from,100%)_var(--link-underline-width,1px)]
+        bg-[position:var(--link-offset-x,0%)_var(--link-offset-y,100%)]
+        bg-no-repeat
+        transition-[background-size,color]
+        duration-800
+        ease-custom
+        hover:[--link-from:0%]
+        hover:[--link-offset-x:100%];
+
+        &.link-reverse {
+            --link-from: 0%;
+            --link-offset-x: 100%;
+            
+            @apply
+            hover:[--link-from:100%]
+            hover:[--link-offset-x:0%];
+        }
+    }
+
+    [data-hover-group] {
+        &:hover {
+            [data-hover-effect] {
+                span {
+                    @apply
+                    [animation:_linkHover_800ms_theme('transitionTimingFunction.custom')_forwards]
+                }
+                .icon {
+                    &.icon-left {
+                        @apply
+                        [animation:_iconHoverLeft_800ms_theme('transitionTimingFunction.custom')_forwards]
+                    }
+                    &.icon-right {
+                        @apply
+                        [animation:_iconHoverRight_800ms_theme('transitionTimingFunction.custom')_forwards]
+                    }
+                    &.icon-up {
+                        @apply
+                        [animation:_iconHoverUp_800ms_theme('transitionTimingFunction.custom')_forwards]
+                    }
+                    &.icon-up-right {
+                        @apply
+                        [animation:_iconHoverUpRight_800ms_theme('transitionTimingFunction.custom')_forwards]
+                    }
+                    &.icon-down-right {
+                        @apply
+                        [animation:_iconHoverDownRight_800ms_theme('transitionTimingFunction.custom')_forwards]
+                    }
+                }
+            }
+            .link {
+                --link-from: 0%;
+                --link-offset-x: 100%;
+        
+                &.link-reverse {    
+                    --link-from: 100%;
+                    --link-offset-x: 0%;
+                }
+            }
+        }
+    }
+
+    @keyframes linkHover {
+        to { transform: translateY(calc(var(--y-shadow) * -1)) }
+    }
+    @keyframes iconHoverUp {
+        to { transform: translateY(calc(var(--icon-width) * -1)) }
+    }
+    @keyframes iconHoverUpRight {
+        to { transform: translate(var(--icon-width), calc(var(--icon-width) * -1)) }
+    }
+    @keyframes iconHoverDownRight {
+        to { transform: translate(var(--icon-width), var(--icon-width)) }
+    }
+    @keyframes iconHoverRight {
+        to { transform: translateX(var(--icon-width)) }
+    }
+    @keyframes iconHoverDown {
+        to { transform: translateY(var(--icon-width)) }
+    }
+    @keyframes iconHoverLeft {
+        to { transform: translateX(calc(var(--icon-width) * -1)) }
+    }
+
+}

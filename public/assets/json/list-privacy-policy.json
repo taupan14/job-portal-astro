@@ -1,0 +1,83 @@
+[
+  {
+    "title": "Pengumpulan dan Penggunaan Data",
+    "subtitle": "LookIT HR berkomitmen untuk melindungi privasi pengguna. Kami hanya mengumpulkan data yang diperlukan untuk menyediakan dan meningkatkan layanan kami. Kami tidak akan menggunakan informasi Anda untuk tujuan lain tanpa persetujuan Anda.",
+    "list": []
+  },
+  {
+    "title": "Pengumpulan dan Penggunaan Data Lokasi (Geolocation)",
+    "subtitle": "Kami mengumpulkan informasi lokasi presisi dan/atau lokasi perkiraan Anda saat Anda menggunakan aplikasi kami. Pengumpulan ini dapat dilakukan melalui GPS, Wi-Fi, atau menara seluler, tergantung pada pengaturan perangkat Anda.",
+    "list": [
+      "Untuk menyediakan layanan inti: Data lokasi digunakan untuk memfasilitasi fitur utama aplikasi yang memerlukan informasi geografis, seperti menampilkan informasi yang relevan dengan lokasi Anda saat ini, menyediakan arah, atau menemukan layanan/tempat terdekat.",
+      "Peningkatan pengalaman pengguna: Kami dapat menggunakan data lokasi yang diagregasi dan anonim untuk memahami pola penggunaan dan meningkatkan relevansi konten atau fitur yang ditawarkan.",
+      "Keamanan dan pencegahan penipuan: Dalam beberapa kasus, data lokasi dapat digunakan untuk tujuan keamanan, seperti memverifikasi aktivitas yang mencurigakan atau mencegah penipuan.",
+      "Pengumpulan data lokasi hanya akan dilakukan setelah Anda memberikan persetujuan eksplisit melalui sistem izin perangkat Anda. Anda memiliki kendali penuh untuk mengaktifkan atau menonaktifkan layanan lokasi untuk aplikasi kami kapan saja melalui pengaturan perangkat Anda. Jika Anda menonaktifkan layanan lokasi, beberapa fitur aplikasi mungkin tidak berfungsi sebagaimana mestinya.",
+      "Data lokasi Anda tidak akan dibagikan kepada pihak ketiga untuk tujuan pemasaran atau iklan tanpa persetujuan eksplisit Anda. Data lokasi mungkin dibagikan kepada penyedia layanan pihak ketiga yang bekerja atas nama kami untuk mendukung fungsionalitas aplikasi (misalnya, penyedia peta), namun mereka terikat oleh kewajiban kerahasiaan yang ketat dan hanya diizinkan untuk menggunakan data untuk tujuan yang ditentukan."
+    ]
+  },
+  {
+    "title": "Informasi Lain yang Kami Kumpulkan",
+    "subtitle": "Kami dapat mengumpulkan informasi berikut:",
+    "list": [
+      "Informasi yang Anda berikan secara langsung (misalnya, nama, alamat email, nomor telepon) ketika Anda mengisi formulir atau mendaftar untuk layanan kami.",
+      "Informasi yang dikumpulkan secara otomatis (misalnya, alamat IP, jenis browser, data penggunaan) melalui cookie dan teknologi serupa.",
+      "Informasi Perangkat (Contoh: model perangkat, sistem operasi, ID perangkat unik) Untuk memastikan kompatibilitas aplikasi, meningkatkan kinerja, dan menganalisis masalah teknis.",
+      "Informasi lain yang Anda pilih untuk berikan kepada kami."
+    ]
+  },
+  {
+    "title": "Bagaimana Data Pengguna Dikumpulkan",
+    "subtitle": "Data dapat dikumpulkan melalui berbagai cara, termasuk:",
+    "list": [
+      "Informasi yang Anda berikan secara langsung: Saat Anda mengisi formulir atau mendaftar untuk layanan kami.",
+      "Langsung dari Pengguna: Saat Anda memasukkan informasi ke dalam aplikasi (misalnya, membuat profil).",
+      "Secara Otomatis: Melalui teknologi pelacakan seperti cookie (jika relevan untuk aplikasi seluler, meskipun lebih umum di web), SDK pihak ketiga, dan analitik."
+    ]
+  },
+  {
+    "title": "Bagaimana Kami Menggunakan Informasi Anda",
+    "subtitle": "Kami menggunakan informasi Anda untuk:",
+    "list": [
+      "Menyediakan dan memelihara layanan kami.",
+      "Menanggapi pertanyaan dan permintaan Anda.",
+      "Mengirimkan informasi terkait layanan, seperti pembaruan atau pemberitahuan.",
+      "Meningkatkan situs web dan layanan kami.",
+      "Melindungi hak dan properti kami.",
+      "Mematuhi kewajiban hukum."
+    ]
+  },
+  {
+    "title": "Bagaimana Kami Melindungi Informasi Anda",
+    "subtitle": "Kami mengambil langkah-langkah keamanan yang wajar untuk melindungi informasi Anda dari akses yang tidak sah, penggunaan, atau pengungkapan. Langkah-langkah ini mencakup:",
+    "list": ["Enkripsi data.", "Kontrol akses.", "Prosedur keamanan fisik."]
+  },
+  {
+    "title": "Pembagian Informasi Anda",
+    "subtitle": "Kami dapat membagikan informasi Anda dengan:",
+    "list": [
+      "Penyedia layanan pihak ketiga yang membantu kami mengoperasikan situs web dan menyediakan layanan kami.",
+      "Otoritas yang berwenang jika diwajibkan oleh hukum.",
+      "Pihak lain dengan persetujuan Anda."
+    ]
+  },
+  {
+    "title": "Cookie dan Teknologi Serupa",
+    "subtitle": "Kami menggunakan cookie dan teknologi serupa untuk mengumpulkan informasi dan meningkatkan pengalaman Anda di situs web kami. Anda dapat mengatur pengaturan browser Anda untuk menolak cookie, tetapi ini dapat memengaruhi fungsionalitas situs web.",
+    "list": []
+  },
+  {
+    "title": "Tautan ke Situs Web Lain",
+    "subtitle": "Situs web kami dapat berisi tautan ke situs web lain. Kami tidak bertanggung jawab atas praktik privasi situs web tersebut.",
+    "list": []
+  },
+  {
+    "title": "Perubahan pada Kebijakan Privasi Ini",
+    "subtitle": "Kami dapat memperbarui Kebijakan Privasi ini dari waktu ke waktu. Kami akan memposting perubahan pada halaman ini dan memberitahu Anda jika ada perubahan yang signifikan.",
+    "list": []
+  },
+  {
+    "title": "Hubungi Kami",
+    "subtitle": "Jika Anda memiliki pertanyaan tentang Kebijakan Privasi ini, silakan hubungi kami di Alamat Jl. Gas alam No.65A Kel. Curug, Kec. Cimanggis Depok 16451.",
+    "list": []
+  }
+]

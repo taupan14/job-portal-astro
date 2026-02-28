@@ -1,0 +1,50 @@
+@font-face {
+    font-family: "Reyhan";
+    font-style: normal;
+    font-weight: 900;
+    src: url("Reyhan-Black.woff2") format("woff2");
+    font-display: swap;
+}
+@font-face {
+    font-family: "Reyhan";
+    font-style: normal;
+    font-weight: 700;
+    src: url("Reyhan-Bold.woff2") format("woff2");
+    font-display: swap;
+}
+@font-face {
+    font-family: "Reyhan";
+    font-style: normal;
+    font-weight: 800;
+    src: url("Reyhan-Extrabold.woff2") format("woff2");
+    font-display: swap;
+}
+@font-face {
+    font-family: "Reyhan";
+    font-style: normal;
+    font-weight: 300;
+    src: url("Reyhan-Light.woff2") format("woff2");
+    font-display: swap;
+}
+@font-face {
+    font-family: "Reyhan";
+    font-style: normal;
+    font-weight: 500;
+    src: url("Reyhan-Medium.woff2") format("woff2");
+    font-display: swap;
+}
+@font-face {
+    font-family: "Reyhan";
+    font-style: normal;
+    font-weight: 400;
+    src: url("Reyhan-Regular.woff2") format("woff2");
+    font-display: swap;
+}
+@font-face {
+    font-family: "Reyhan";
+    font-style: normal;
+    font-weight: 600;
+    src: url("Reyhan-Semibold.woff2") format("woff2");
+    font-display: swap;
+}
+

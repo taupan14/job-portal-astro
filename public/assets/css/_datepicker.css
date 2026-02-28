@@ -1,0 +1,277 @@
+.dcalendarpicker {
+    --w: calc(var(--spacing)*82);
+
+    @apply
+    grid
+    place-content-center
+    !bg-dark-950/60
+    transition-all
+    duration-500
+    !ease-custom
+    !opacity-0
+    delay-200;
+
+    .dudp__wrapper {
+        @apply
+        font-sans
+        text-sm
+        relative
+        inset-auto
+        !transform-none
+        bg-white
+        w-(--w)
+        rounded-lg
+        [clip-path:inset(50%_round_0.5rem)]
+        transition-all
+        duration-500
+        ease-custom
+    }
+    
+    .dudp__cal-container {
+        @apply
+        w-(--w);
+
+        .dudp__btn-cal-prev,
+        .dudp__btn-cal-next {
+            @apply
+            transition-none
+            flex
+            items-center
+            justify-center
+            size-8
+            top-5.5
+            rounded-lg
+            bg-transparent
+            text-[size:inherit]
+            leading-[inherit]
+            hover:bg-dark-100
+        }
+
+        .dudp__calendar-views {
+            @apply
+            w-[calc(var(--w)*3)]
+            grid
+            grid-cols-3
+        }
+        
+        .dudp__calendar {
+            @apply
+            p-4;
+
+            .dudp__cal-month-year {
+                @apply
+                py-3
+                flex
+                items-center
+                justify-center
+                gap-4
+                text-[size:inherit]
+                leading-[inherit]
+                font-medium;
+
+                span {
+                    @apply
+                    px-0
+                }
+            }
+
+            .dudp__weekdays,
+            .dudp__cal-week {
+                @apply
+                grid
+                grid-cols-7
+                gap-0.5
+            }
+
+            .dudp__weekdays {
+                @apply
+                py-3;
+
+                span {
+                    @apply
+                    text-xs
+                    font-semibold
+                    uppercase
+                }
+            }
+
+            .dudp__cal-week {
+                .dudp__date {
+                    @apply
+                    w-full
+                    h-auto
+                    aspect-square
+                    flex
+                    items-center
+                    justify-center
+                    text-dark-950
+                    !font-semibold
+                    !rounded-lg
+                    before:hidden;
+
+                    &:not(.disabled):not(.selected):not(.range-from):not(.range-to) {
+                        @apply
+                        hover:bg-dark-100
+                    }
+
+                    &.current {
+                        @apply
+                        text-primary-600
+                    }
+
+                    &.selected {
+                        @apply
+                        bg-primary-600
+                    }
+
+                    &.range-from {
+                        @apply
+                        !bg-primary-600
+                    }
+                    &.range-to {
+                        @apply
+                        !bg-primary-600
+                    }
+
+                    &.in-range,
+                    &.in-range-preview {
+                        @apply
+                        bg-dark-100
+                    }
+                }
+            }
+        }
+
+        .dudp__dates-holder {
+            @apply
+            grid
+            gap-0.5
+        }
+
+        .dudp__months-view {
+            @apply
+            p-4;
+
+            .dudp__month-row {
+                @apply
+                w-full
+                grow
+                grid
+                grid-cols-4
+                gap-2
+            }
+
+            .dudp__month {
+                @apply
+                relative
+                isolate
+                min-w-auto
+                size-auto
+                text-[size:inherit]
+                font-medium
+                text-dark-950
+                leading-none
+                flex
+                items-center
+                justify-center
+                !bg-transparent
+
+                before:absolute
+                before:inset-x-0
+                before:aspect-square
+                before:rounded-lg
+                before:bg-dark-200
+                before:-z-1
+                before:opacity-0
+                hover:before:opacity-100;
+
+                &.selected {
+                    @apply
+                    text-primary-600
+                }
+            }
+        }
+
+        .dudp__years-view {
+            .dudp__year {
+                @apply
+                font-medium
+                py-3
+                text-[size:inherit]
+                leading-[inherit]
+                transition-none
+                hover:bg-dark-100;
+
+                &.selected {
+                    @apply
+                    font-bold
+                    !text-primary-600
+                    text-2xl
+                    leading-none
+                }
+            }
+        }
+
+        .dudp__buttons {
+            @apply
+            flex
+            justify-end
+            pt-0
+            p-4;
+
+            .dudp__button {
+                @apply
+                inline-flex
+                items-center
+                justify-center
+                text-sm
+                leading-5
+                font-bold
+                uppercase
+                tracking-wide
+                py-1.5
+                px-3
+                rounded-lg
+                bg-primary-50
+                text-primary-600
+                hover:bg-primary-50
+            }
+        }
+    }
+
+    .dudp__calendar-header {
+        @apply
+        flex
+        flex-col
+        p-4
+        rounded-lg
+        bg-primary-600
+        text-white
+        text-[size:inherit]
+        leading-[inherit];
+        
+        .dudp__sel-year {
+            @apply
+            font-medium
+            text-white
+        }
+
+        .dcp_sel-date {
+            @apply
+            font-bold
+            tracking-tight
+        }
+    }
+
+    &.dp__open {
+        @apply
+        delay-0
+        !opacity-100;
+
+        .dudp__wrapper {
+            @apply
+            !translate-none
+            [clip-path:inset(0%_round_0.5rem)]
+        }
+    }
+}

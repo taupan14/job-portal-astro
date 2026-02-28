@@ -1,0 +1,26 @@
+@layer components {
+    .avatar {
+        @apply
+        relative
+        isolate
+        shrink-0
+        flex
+        items-center
+        justify-center
+        size-11
+        rounded-lg
+        overflow-clip
+        bg-dark-200;
+
+        img {
+            @apply
+            size-full
+            object-cover
+        }
+    }
+
+    .avatar-lg {
+        @apply
+        size-14
+    }
+}

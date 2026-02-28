@@ -1,0 +1,36 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const error = Astro.url.searchParams.get("error");
+const redirectTo = Astro.url.searchParams.get("redirect") ?? "/";
+const apiUrl = import.meta.env.PUBLIC_API_URL;
+---
+
+<BaseLayout title="Login">
+  <!--
+    Form action langsung ke Express backend.
+    Express menangani login, set cookie session, lalu redirect balik ke Astro.
+    Sesuaikan action URL dengan endpoint login di Express kamu.
+  -->
+  <form method="POST" action={`${apiUrl}/api/auth/login`}>
+    <!--
+      Setelah login sukses, Express harus redirect ke URL ini.
+      Tambahkan handling redirect di Express:
+        const redirectTo = req.body.redirect || '/';
+        res.redirect(redirectTo);
+    -->
+    <input
+      type="hidden"
+      name="redirect"
+      value={`${Astro.url.origin}${redirectTo}`}
+    />
+
+    {error && <div class="text-red-600">{error}</div>}
+
+    <input type="email" name="email" placeholder="Email" required />
+    <input type="password" name="password" placeholder="Password" required />
+    <button type="submit">Masuk</button>
+
+    <a href="/signup">Belum punya akun? Daftar</a>
+  </form>
+</BaseLayout>

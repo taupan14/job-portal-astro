@@ -1,0 +1,38 @@
+[
+    {
+        "avatar": "./assets/images/avatar/ava01.jpg",
+        "quotes": "Sangat membantu dalam menemukan pekerjaan yang sesuai dengan keahlian saya. Prosesnya cepat, mudah dipahami, dan saya merasa didukung sepenuhnya oleh tim yang profesional.",
+        "name": "Andi Pratama",
+        "job_title": "Software Engineer"
+    },
+    {
+        "avatar": "./assets/images/avatar/ava02.jpg",
+        "quotes": "Website ini memberikan banyak pilihan lowongan kerja dari berbagai perusahaan ternama. Saya sangat puas dengan pelayanannya yang ramah dan responsif, serta fitur-fitur yang lengkap.",
+        "name": "Rina Wijaya",
+        "job_title": "Marketing Manager"
+    },
+    {
+        "avatar": "./assets/images/avatar/ava03.jpg",
+        "quotes": "Saya berhasil mendapatkan pekerjaan impian saya berkat website ini. Proses dari awal hingga akhir sangat lancar, dan saya merasa terbantu dengan panduan yang disediakan.",
+        "name": "Dewi Lestari",
+        "job_title": "Data Analyst"
+    },
+    {
+        "avatar": "./assets/images/avatar/ava04.jpg",
+        "quotes": "Fitur pencarian kerja yang sangat user-friendly dan informatif. Saya merekomendasikan website ini kepada semua teman saya karena pengalaman yang positif dan hasil yang memuaskan.",
+        "name": "Budi Santoso",
+        "job_title": "Graphic Designer"
+    },
+    {
+        "avatar": "./assets/images/avatar/ava05.jpg",
+        "quotes": "Proses melamar kerja menjadi lebih efisien dan terorganisir. Saya sangat terbantu dengan adanya website ini, terutama dengan fitur pelacakan aplikasi yang sangat berguna.",
+        "name": "Eko Nugroho",
+        "job_title": "Project Manager"
+    },
+    {
+        "avatar": "./assets/images/avatar/ava06.jpg",
+        "quotes": "Website ini tidak hanya membantu saya menemukan pekerjaan, tetapi juga memberikan tips dan saran karir yang sangat berguna. Saya merasa lebih percaya diri dalam menghadapi dunia kerja.",
+        "name": "Fitriani Sari",
+        "job_title": "HR Consultant"
+    }
+]

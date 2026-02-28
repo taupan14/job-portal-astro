@@ -1,0 +1,32 @@
+[
+    {
+        "img": "./assets/images/thumbnails/img01.webp",
+        "title": "Software HRIS",
+        "subtitle": "Software HRIS Sistem yang Efisien dan Responsif untuk Mengelola SDM."
+    },
+    {
+        "img": "./assets/images/thumbnails/img02.webp",
+        "title": "Software ERP",
+        "subtitle": "Software ERP dapat Mengintegrasikan Berbagai Proses Bisnis."
+    },
+    {
+        "img": "./assets/images/thumbnails/img03.webp",
+        "title": "Software Parkir",
+        "subtitle": "Software Parkir yang Memudahkan Proses Bisnis Parkir."
+    },
+    {
+        "img": "./assets/images/thumbnails/img04.webp",
+        "title": "Online Travel Agent",
+        "subtitle": "Online Travel Agent Memudahkan Pengalaman Anda untuk Travelingr."
+    },
+    {
+        "img": "./assets/images/thumbnails/img05.webp",
+        "title": "Software Cash Collect",
+        "subtitle": "Software Cash Collect Mempermudah Proses Penarikan Uang Tunai."
+    },
+    {
+        "img": "./assets/images/thumbnails/img06.webp",
+        "title": "Software Recruitment",
+        "subtitle": "Software Recruitment Mempermudah Proses Pencarian Karyawan."
+    }
+]

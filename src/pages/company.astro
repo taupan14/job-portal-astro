@@ -1,0 +1,688 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { apiGet } from "../lib/api";
+
+// Fetch data dari Express saat server render (SSR)
+// Cookie diteruskan agar Express tahu siapa yang request
+const cookieHeader = Astro.request.headers.get("cookie") ?? "";
+
+// Fetch data provinsi saat SSR — dirender langsung di template tanpa fetch ulang di browser
+const provinces =
+  (await apiGet<{ id: string; name: string }[]>(
+    "/api/wai/provinces",
+    cookieHeader,
+  )) ?? [];
+---
+
+<BaseLayout title="Pasang Loker">
+  <!-- Paste HTML dari index.html di sini -->
+  <div id="app">
+    <!-- @components sectionHeader -->
+
+    <main id="section-main" data-barba="wrapper">
+      <div
+        data-hero-scheme="light"
+        data-barba="container"
+        data-barba-namespace="auth-signup-add-job"
+      >
+        <section id="page-content" class="relative pt-(--space-header)">
+          <div class="py-16 | lg:pb-24">
+            <div class="max-container">
+              <div class="grid gap-16 mb-16 | lg:grid-cols-[18rem_1fr]">
+                <div class="flex flex-col gap-4 | lg:gap-6">
+                  <div
+                    class="relative aspect-square rounded-lg overflow-clip flex items-center justify-center bg-dark-100 shrink-0"
+                    data-photo
+                  >
+                    <svg
+                      class="icon icon-fill size-14 text-primary-600"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        opacity="0.4"
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M20.1129 7.78312C19.6979 7.36808 19.0964 7.11438 17.8757 6.9943L18.0715 5.00391C19.4675 5.14123 20.6275 5.46925 21.5272 6.36891C22.3335 7.1752 22.6805 8.19058 22.8428 9.39768C22.9992 10.5606 22.9991 12.0394 22.9991 13.8748V14.0212C22.9991 15.8567 22.9992 17.3355 22.8428 18.4984C22.6805 19.7055 22.3335 20.7209 21.5272 21.5272C20.7209 22.3335 19.7055 22.6805 18.4984 22.8428C17.3355 22.9992 15.8567 22.9991 14.0212 22.9991H13.8748C12.0394 22.9991 10.5606 22.9992 9.39768 22.8428C8.19058 22.6805 7.1752 22.3335 6.36891 21.5272C5.46925 20.6275 5.14123 19.4675 5.00391 18.0715L6.9943 17.8757C7.11438 19.0964 7.36808 19.6979 7.78312 20.1129C8.15588 20.4857 8.67885 20.7282 9.66417 20.8606C10.6783 20.997 12.0221 20.9991 13.948 20.9991C15.874 20.9991 17.2178 20.997 18.2319 20.8606C19.2172 20.7282 19.7402 20.4857 20.1129 20.1129C20.4857 19.7402 20.7282 19.2172 20.8606 18.2319C20.997 17.2178 20.9991 15.874 20.9991 13.948C20.9991 12.0221 20.997 10.6783 20.8606 9.66417C20.7282 8.67885 20.4857 8.15588 20.1129 7.78312Z"
+                        fill="#141B34"></path>
+                      <path
+                        opacity="0.4"
+                        d="M11.6363 12.4162C9.4301 10.9618 6.68031 10.2023 3.87635 10.2523C3.2166 10.2512 2.55784 10.2921 1.90597 10.3744C1.53026 10.4219 1.24888 10.742 1.25 11.1207C1.25458 12.6661 1.28026 13.8928 1.45316 14.8725C1.63123 15.8815 1.97481 16.6895 2.64946 17.3603C3.40134 18.1079 4.35431 18.4395 5.53219 18.5969C6.67735 18.75 8.14081 18.75 9.98955 18.75L10.1393 18.75C12.2827 18.7501 13.9178 18.7501 15.1501 18.4985C15.3602 18.4556 15.5419 18.3248 15.6492 18.1391C15.7566 17.9535 15.7794 17.7308 15.7118 17.5272C15.0373 15.4965 13.6026 13.7125 11.6363 12.4162Z"
+                        fill="#141B34"></path>
+                      <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M9.92684 1H10.0732C11.8966 0.999973 13.3664 0.999951 14.5223 1.15537C15.7225 1.31672 16.733 1.66191 17.5355 2.46447C18.3381 3.26702 18.6833 4.27752 18.8446 5.47767C19.0001 6.63362 19 8.10336 19 9.9268V10.0732C19 11.8966 19.0001 13.3664 18.8446 14.5223C18.6833 15.7225 18.3381 16.733 17.5355 17.5355C16.733 18.3381 15.7225 18.6833 14.5223 18.8446C13.3664 19.0001 11.8966 19 10.0732 19H9.9268C8.10336 19 6.63362 19.0001 5.47767 18.8446C4.27752 18.6833 3.26702 18.3381 2.46447 17.5355C1.66191 16.733 1.31672 15.7225 1.15537 14.5223C0.999951 13.3664 0.999973 11.8966 1 10.0732V9.92684C0.999973 8.10338 0.999951 6.63362 1.15537 5.47767C1.31672 4.27752 1.66191 3.26702 2.46447 2.46447C3.26702 1.66191 4.27752 1.31672 5.47767 1.15537C6.63362 0.999951 8.10338 0.999973 9.92684 1ZM5.74416 3.13753C4.76579 3.26907 4.2477 3.50966 3.87868 3.87868C3.50966 4.2477 3.26907 4.76579 3.13753 5.74416C3.00213 6.7513 3 8.08611 3 10C3 11.9139 3.00213 13.2487 3.13753 14.2558C3.26907 15.2342 3.50966 15.7523 3.87868 16.1213C4.2477 16.4903 4.76579 16.7309 5.74416 16.8625C6.7513 16.9979 8.08611 17 10 17C11.9139 17 13.2487 16.9979 14.2558 16.8625C15.2342 16.7309 15.7523 16.4903 16.1213 16.1213C16.4903 15.7523 16.7309 15.2342 16.8625 14.2558C16.9979 13.2487 17 11.9139 17 10C17 8.08611 16.9979 6.7513 16.8625 5.74416C16.7309 4.76579 16.4903 4.2477 16.1213 3.87868C15.7523 3.50966 15.2342 3.26907 14.2558 3.13753C13.2487 3.00213 11.9139 3 10 3C8.08611 3 6.7513 3.00213 5.74416 3.13753Z"
+                        fill="#141B34"></path>
+                      <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M12 6.75C12 6.05964 12.5571 5.5 13.2444 5.5C13.9268 5.5 14.5 6.05988 14.5 6.75C14.5 7.44012 13.9268 8 13.2444 8C12.5571 8 12 7.44036 12 6.75Z"
+                        fill="#141B34"></path>
+                    </svg>
+                    <label
+                      for="input-photo-profile"
+                      class="absolute isolate inset-0 cursor-pointer flex justify-end p-2 group"
+                    >
+                      <input
+                        type="file"
+                        name="photo-profile"
+                        id="input-photo-profile"
+                        accept="image/png, image/gif, image/jpeg, image/svg, image/gif"
+                        hidden
+                        data-input-photo
+                      />
+                      <div
+                        class="btn btn-icon btn-dark opacity-0 group-hover:opacity-100"
+                      >
+                        <svg
+                          class="icon icon-stroke"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M5 21C9.20998 16.2487 13.9412 9.9475 21 14.6734"
+                            stroke="#141B34"
+                            stroke-width="1.5"></path>
+                          <path
+                            d="M14 3.00231C13.5299 3 12.0307 3 11.5 3C7.02166 3 4.78249 3 3.39124 4.39124C2 5.78249 2 8.02166 2 12.5C2 16.9783 2 19.2175 3.39124 20.6088C4.78249 22 7.02166 22 11.5 22C15.9783 22 18.2175 22 19.6088 20.6088C20.9472 19.2703 20.998 17.147 20.9999 13"
+                            stroke="#141B34"
+                            stroke-width="1.5"
+                            stroke-linecap="round"></path>
+                          <path
+                            d="M17 7.5C17.4915 8.0057 18.7998 10 19.5 10M22 7.5C21.5085 8.0057 20.2002 10 19.5 10M19.5 10V2"
+                            stroke="#141B34"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                        </svg>
+                      </div>
+                    </label>
+                  </div>
+                  <div class="w-full text-xs font-medium">
+                    Besar file: maksimum 10.000.000 bytes (10 MB). Ekstensi file
+                    yang diperbolehkan: .JPG .JPEG .PNG
+                  </div>
+                </div>
+                <div class="grid gap-8">
+                  <h5>Informasi Perusahaan</h5>
+                  <div class="grid gap-6">
+                    <div class="c-form-wrapper">
+                      <div class="c-form c-form-default">
+                        <label for="input-brand" class="c-label"
+                          >Nama Merek / Perusahaan</label
+                        >
+                        <input
+                          type="text"
+                          name="brand"
+                          id="input-brand"
+                          class="c-input"
+                          placeholder="Masukan nama merek *"
+                        />
+                      </div>
+                    </div>
+                    <div class="c-form-wrapper">
+                      <div class="c-form c-form-default">
+                        <label for="input-name" class="c-label"
+                          >Nama Legalitas</label
+                        >
+                        <input
+                          type="text"
+                          name="name"
+                          id="input-name"
+                          class="c-input"
+                          placeholder="Masukan nama PT *"
+                        />
+                      </div>
+                    </div>
+                    <div class="c-form-wrapper">
+                      <div class="c-form c-form-default">
+                        <label for="input-sector" class="c-label"
+                          >Bidang Usaha</label
+                        >
+                        <input
+                          type="text"
+                          name="sector"
+                          id="input-sector"
+                          class="c-input"
+                          placeholder="Masukan bidang usaha *"
+                        />
+                      </div>
+                    </div>
+                    <div class="c-form-wrapper">
+                      <div class="c-form c-form-default">
+                        <label for="input-since" class="c-label"
+                          >Berdiri Sejak</label
+                        >
+                        <input
+                          type="text"
+                          name="since"
+                          id="input-since"
+                          class="c-input"
+                          placeholder="Pilih tanggal *"
+                        />
+                      </div>
+                      <!-- <div class="text-xs mt-1 text-dark-400">please fill out this field</div> -->
+                    </div>
+                    <div class="c-form-wrapper">
+                      <div class="c-form c-form-default">
+                        <label for="input-website" class="c-label"
+                          >Website (Opsional)</label
+                        >
+                        <input
+                          type="text"
+                          name="website"
+                          id="input-website"
+                          class="c-input"
+                          placeholder="Alamat website"
+                        />
+                      </div>
+                      <!-- <div class="text-xs mt-1 text-dark-400">please fill out this field</div> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid gap-16">
+                <div class="grid gap-8">
+                  <h5>Informasi Kontak</h5>
+                  <div class="grid gap-6 | lg:grid-cols-2">
+                    <div class="col-span-full | lg:col-span-1">
+                      <div class="c-form-wrapper">
+                        <div class="c-form c-form-default">
+                          <label for="input-pic" class="c-label">Nama PIC</label
+                          >
+                          <input
+                            type="text"
+                            name="pic"
+                            id="input-pic"
+                            class="c-input"
+                            placeholder="Masukan nama PIC *"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-1">
+                      <div class="c-form-wrapper">
+                        <div class="c-form c-form-default">
+                          <label for="input-position" class="c-label"
+                            >Posisi PIC</label
+                          >
+                          <input
+                            type="text"
+                            name="position"
+                            id="input-position"
+                            class="c-input"
+                            placeholder="Masukan posisi PIC *"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-1">
+                      <div class="c-form-wrapper">
+                        <div class="c-form c-form-default">
+                          <label for="input-nohp" class="c-label"
+                            >Nomor Handphone</label
+                          >
+                          <input
+                            type="number"
+                            inputmode="numeric"
+                            name="nohp"
+                            id="input-nohp"
+                            class="c-input"
+                            placeholder="Masukan nomor HP *"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-1">
+                      <div class="c-form-wrapper">
+                        <div class="c-form c-form-default">
+                          <label for="input-email" class="c-label"
+                            >Alamat Email</label
+                          >
+                          <input
+                            type="email"
+                            name="email"
+                            id="input-email"
+                            class="c-input"
+                            placeholder="Masukan email *"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid gap-8">
+                  <h5>Informasi Alamat</h5>
+                  <div class="grid gap-6 | lg:grid-cols-2">
+                    <div class="col-span-full">
+                      <div class="c-form-wrapper">
+                        <div class="c-form c-form-default">
+                          <label for="input-address" class="c-label"
+                            >Alamat Lengkap</label
+                          >
+                          <textarea
+                            name="address"
+                            id="input-address"
+                            class="c-input c-textarea"
+                            placeholder="Masukan alamat lengkap *"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-1">
+                      <div class="c-form-wrapper">
+                        <div class="c-form c-form-default">
+                          <label for="select-province" class="c-label"
+                            >Provinsi</label
+                          >
+                          <select
+                            name="province"
+                            id="select-province"
+                            class="c-input c-select"
+                          >
+                            <option value="" disabled selected
+                              >Pilih provinsi *</option
+                            >
+                            {
+                              provinces.map((p) => (
+                                <option value={p.id}>{p.name}</option>
+                              ))
+                            }
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-1">
+                      <div class="c-form-wrapper">
+                        <div class="c-form c-form-default">
+                          <label for="select-cityreg" class="c-label"
+                            >Kota/Kab.</label
+                          >
+                          <select
+                            name="cityreg"
+                            id="select-cityreg"
+                            class="c-input c-select"
+                            disabled
+                          >
+                            <option value="" disabled selected
+                              >Pilih kota/kabupaten *</option
+                            ></select
+                          >
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-1">
+                      <div class="c-form-wrapper">
+                        <div class="c-form c-form-default">
+                          <label for="select-subdistrict" class="c-label"
+                            >Kecamatan</label
+                          >
+                          <select
+                            name="subdistrict"
+                            id="select-subdistrict"
+                            class="c-input c-select"
+                            disabled
+                          >
+                            <option value="" disabled selected
+                              >Pilih kecamatan *</option
+                            ></select
+                          >
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-1">
+                      <div class="c-form-wrapper">
+                        <div class="c-form c-form-default">
+                          <label for="select-ward" class="c-label"
+                            >Kelurahan</label
+                          >
+                          <select
+                            name="ward"
+                            id="select-ward"
+                            class="c-input c-select"
+                            disabled
+                          >
+                            <option value="" disabled selected
+                              >Pilih kelurahan *</option
+                            ></select
+                          >
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-1">
+                      <div class="c-form-wrapper">
+                        <div class="c-form c-form-default">
+                          <label for="input-postalcode" class="c-label"
+                            >Kodepos</label
+                          >
+                          <input
+                            type="number"
+                            inputmode="numeric"
+                            name="postalcode"
+                            id="input-postalcode"
+                            class="c-input"
+                            placeholder="Masukan kodepos *"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid gap-6 mt-16 | lg:grid-cols-2">
+                <div class="col-span-full | lg:col-span-1 lg:col-start-2">
+                  <div
+                    class="flex flex-col items-center text-center gap-8 | lg:text-start lg:items-start lg:justify-between lg:flex-row"
+                  >
+                    <p class="text-sm text-balance text-dark-400">
+                      Dengan menekan tombol <b>Daftar Sekarang</b>, Anda telah
+                      menyetujuai <a
+                        href="#!"
+                        class="link font-semibold text-primary-600"
+                        >Syarat & Ketentuan</a
+                      > yang berlaku.
+                    </p>
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-4 shrink-0"
+                      data-hover-group
+                      data-submit-company
+                    >
+                      <div
+                        class="link font-semibold text-dark-950"
+                        data-hover-effect
+                      >
+                        Daftar Sekarang
+                      </div>
+                      <div class="btn btn-icon btn-primary" data-hover-effect>
+                        <svg
+                          class="icon icon-stroke icon-up-right"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M17.5 6.5L6 18"
+                            stroke="#141B34"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                          <path
+                            d="M8 6H18V16"
+                            stroke="#141B34"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                        </svg>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div><!-- data-barba container -->
+    </main>
+
+    <!-- Modal Sukses Daftar Perusahaan -->
+    <div
+      id="modal-company-success"
+      class="fixed top-0 inset-x-0 z-[999] invisible"
+      data-modal
+    >
+      <div
+        class="relative w-full h-dvh flex flex-col overflow-auto"
+        data-lenis-prevent
+      >
+        <div
+          class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
+        >
+          <div class="grow w-full flex flex-col max-container">
+            <div class="grid gap-4 | lg:grid-cols-12">
+              <div
+                class="grid-item col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
+              >
+                <div
+                  class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
+                  data-modal-content
+                >
+                  <div class="shrink-0 px-6 py-6 | lg:py-8">
+                    <div class="flex flex-col gap-4 items-center text-center">
+                      <div
+                        class="flex items-center justify-center size-16 rounded-full bg-primary-50"
+                      >
+                        <svg
+                          class="icon icon-stroke size-8 text-primary-600"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M5 13L9 17L19 7"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                        </svg>
+                      </div>
+                      <div
+                        class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
+                      >
+                        Pendaftaran Berhasil
+                      </div>
+                      <h4 class="w-full font-bold leading-none text-balance">
+                        Selamat! Data Perusahaan Anda Telah Kami Terima
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="shrink-0 px-6 pb-8 | lg:pb-10">
+                    <div class="flex flex-col gap-6">
+                      <p
+                        class="text-sm text-dark-400 text-center text-balance leading-relaxed"
+                      >
+                        Data perusahaan Anda telah berhasil kami simpan dan saat
+                        ini sedang dalam proses profiling. Mohon menunggu hingga
+                        proses tersebut selesai. Informasi selanjutnya akan kami
+                        sampaikan melalui email.
+                      </p>
+                      <a href="/" class="btn btn-primary" data-hover-effect>
+                        Kembali ke Beranda
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- #app -->
+
+  <svg
+    width="0"
+    height="0"
+    class="absolute hidden"
+    color-interpolation-filters="sRGB"
+  >
+    <defs>
+      <filter id="gooey-content">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"
+        ></feGaussianBlur>
+        <feColorMatrix
+          in="blur"
+          mode="matrix"
+          values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 11 -6"
+          result="gooey-content"></feColorMatrix>
+        <feComposite in="SourceGraphic" in2="gooey-content" operator="atop"
+        ></feComposite>
+        <feBlend in="SourceGraphic" in2="gooey-content"></feBlend>
+      </filter>
+    </defs>
+  </svg>
+
+  <div id="preloader">
+    <div id="preloader-spinner">
+      <img src="./assets/images/logo/logo-icon.png" alt="" />
+    </div>
+    <div id="preloader-transition"></div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</BaseLayout>
+
+<script>
+  import { initFormCompany } from "../scripts/form/formCompany";
+  import Splide from "@splidejs/splide";
+  import TomSelect from "tom-select";
+
+  const el = document.querySelector("#splide-hero") as HTMLElement | null;
+  if (el) {
+    new Splide(el).mount();
+  }
+
+  const BASE_URL = `${import.meta.env.PUBLIC_API_URL}/api/wai`;
+
+  async function populateSelect(
+    url: string,
+    select: HTMLSelectElement,
+    placeholder: string,
+  ): Promise<void> {
+    const ts = (select as any).tomselect as TomSelect | undefined;
+
+    // Reset & disable via TomSelect API
+    if (ts) {
+      ts.clear(true);
+      ts.clearOptions();
+      ts.disable();
+      ts.addOption({ value: "", text: placeholder });
+      ts.setValue("", true);
+    } else {
+      select.innerHTML = `<option value="" disabled selected>${placeholder}</option>`;
+      select.disabled = true;
+    }
+
+    try {
+      // console.log(url);
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+
+      const data: { id: string; name: string }[] = await res.json();
+      // console.log(data);
+      if (ts) {
+        ts.clearOptions();
+        ts.addOption({ value: "", text: placeholder });
+        data.forEach((item) => {
+          ts.addOption({ value: item.id, text: item.name });
+        });
+        ts.refreshOptions(false);
+        ts.enable(); // ← enable via TomSelect API
+        ts.setValue("", true);
+      } else {
+        data.forEach((item) => {
+          const option = document.createElement("option");
+          option.value = item.id;
+          option.textContent = item.name;
+          select.appendChild(option);
+        });
+        select.disabled = false;
+      }
+    } catch (err) {
+      console.error(`Gagal memuat data dari ${url}:`, err);
+    }
+  }
+
+  function resetSelect(select: HTMLSelectElement, placeholder: string): void {
+    const ts = (select as any).tomselect as TomSelect | undefined;
+
+    if (ts) {
+      ts.clear(true);
+      ts.clearOptions();
+      ts.addOption({ value: "", text: placeholder });
+      ts.setValue("", true);
+      ts.disable(); // ← disable via TomSelect API
+    } else {
+      select.innerHTML = `<option value="" disabled selected>${placeholder}</option>`;
+      select.disabled = true;
+    }
+  }
+
+  const selectProvince = document.getElementById(
+    "select-province",
+  ) as HTMLSelectElement | null;
+  const selectCityreg = document.getElementById(
+    "select-cityreg",
+  ) as HTMLSelectElement | null;
+  const selectSubdistrict = document.getElementById(
+    "select-subdistrict",
+  ) as HTMLSelectElement | null;
+  const selectWard = document.getElementById(
+    "select-ward",
+  ) as HTMLSelectElement | null;
+
+  if (selectProvince && selectCityreg && selectSubdistrict && selectWard) {
+    // ── 2. Provinsi dipilih → load regency ──────────────────────────────────
+    selectProvince.addEventListener("change", () => {
+      const provinceId = selectProvince.value;
+
+      resetSelect(selectCityreg, "Pilih kota/kabupaten *");
+      resetSelect(selectSubdistrict, "Pilih kecamatan *");
+      resetSelect(selectWard, "Pilih kelurahan *");
+
+      if (!provinceId) return;
+
+      populateSelect(
+        `${BASE_URL}/regencies/${provinceId}`,
+        selectCityreg,
+        "Pilih kota/kabupaten *",
+      );
+    });
+
+    // ── 3. Regency dipilih → load district ───────────────────────────────────
+    selectCityreg.addEventListener("change", () => {
+      const regencyId = selectCityreg.value;
+
+      resetSelect(selectSubdistrict, "Pilih kecamatan *");
+      resetSelect(selectWard, "Pilih kelurahan *");
+
+      if (!regencyId) return;
+
+      populateSelect(
+        `${BASE_URL}/districts/${regencyId}`,
+        selectSubdistrict,
+        "Pilih kecamatan *",
+      );
+    });
+
+    // ── 4. District dipilih → load village ───────────────────────────────────
+    selectSubdistrict.addEventListener("change", () => {
+      const districtId = selectSubdistrict.value;
+
+      resetSelect(selectWard, "Pilih kelurahan *");
+
+      if (!districtId) return;
+
+      populateSelect(
+        `${BASE_URL}/villages/${districtId}`,
+        selectWard,
+        "Pilih kelurahan *",
+      );
+    });
+  }
+
+  initFormCompany();
+</script>

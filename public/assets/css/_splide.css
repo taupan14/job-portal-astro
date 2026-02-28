@@ -1,0 +1,24 @@
+@layer components {
+    .splide__pagination_fraction {
+        @apply
+        flex
+        items-center
+        gap-3;
+
+        .line {
+            @apply
+            w-16
+            h-px
+            bg-primary-600
+            shrink-0
+        }
+
+        .label {
+            @apply
+            text-sm
+            uppercase
+            font-semibold
+            text-dark-950
+        }
+    }
+}
