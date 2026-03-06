@@ -3,12 +3,26 @@
 
 const API_URL = import.meta.env.PUBLIC_API_URL;
 
-// Opsi default untuk semua request ke backend
+// ── Ekstrak JWT token dari cookie string ──────────────────────────────────────
+// Dipanggil saat SSR — baca token dari cookie browser yang diteruskan Astro
+function extractTokenFromCookie(cookie?: string): string | null {
+  if (!cookie) return null;
+  const match = cookie
+    .split(";")
+    .map((c) => c.trim())
+    .find((c) => c.startsWith("auth_token="));
+  return match ? decodeURIComponent(match.slice("auth_token=".length)) : null;
+}
+
+// ── Opsi default untuk semua request ke backend ───────────────────────────────
+// Meneruskan token JWT sebagai Authorization Bearer (sesuai authMiddleware.ts)
+// sekaligus meneruskan cookie asli (untuk endpoint yang masih pakai cookie)
 function defaultOptions(cookie?: string): RequestInit {
+  const token = extractTokenFromCookie(cookie);
   return {
     headers: {
       "Content-Type": "application/json",
-      // Forward cookie dari browser ke Express (untuk auth session)
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(cookie ? { Cookie: cookie } : {}),
     },
     credentials: "include",
@@ -17,8 +31,8 @@ function defaultOptions(cookie?: string): RequestInit {
 
 /**
  * GET request ke Express backend.
- * @param path   - Endpoint path, contoh: '/api/user/profile'
- * @param cookie - Cookie string dari Astro request (untuk SSR auth)
+ * @param path   - Endpoint path, contoh: '/api/applicants/1'
+ * @param cookie - Cookie string dari Astro.request (untuk SSR auth)
  */
 export async function apiGet<T>(
   path: string,
@@ -38,9 +52,9 @@ export async function apiGet<T>(
 
 /**
  * POST request ke Express backend.
- * @param path - Endpoint path
- * @param body - Data yang dikirim (akan di-JSON.stringify)
- * @param cookie - Cookie string dari Astro request
+ * @param path   - Endpoint path
+ * @param body   - Data yang dikirim (akan di-JSON.stringify)
+ * @param cookie - Cookie string dari Astro.request
  */
 export async function apiPost<T>(
   path: string,
@@ -52,6 +66,51 @@ export async function apiPost<T>(
       ...defaultOptions(cookie),
       method: "POST",
       body: JSON.stringify(body),
+    });
+    const data = res.ok ? await res.json() : null;
+    return { data, ok: res.ok, status: res.status };
+  } catch {
+    return { data: null, ok: false, status: 500 };
+  }
+}
+
+/**
+ * PUT request ke Express backend.
+ * @param path   - Endpoint path
+ * @param body   - Data yang dikirim
+ * @param cookie - Cookie string dari Astro.request
+ */
+export async function apiPut<T>(
+  path: string,
+  body: unknown,
+  cookie?: string,
+): Promise<{ data: T | null; ok: boolean; status: number }> {
+  try {
+    const res = await fetch(`${API_URL}${path}`, {
+      ...defaultOptions(cookie),
+      method: "PUT",
+      body: JSON.stringify(body),
+    });
+    const data = res.ok ? await res.json() : null;
+    return { data, ok: res.ok, status: res.status };
+  } catch {
+    return { data: null, ok: false, status: 500 };
+  }
+}
+
+/**
+ * DELETE request ke Express backend.
+ * @param path   - Endpoint path
+ * @param cookie - Cookie string dari Astro.request
+ */
+export async function apiDelete<T>(
+  path: string,
+  cookie?: string,
+): Promise<{ data: T | null; ok: boolean; status: number }> {
+  try {
+    const res = await fetch(`${API_URL}${path}`, {
+      ...defaultOptions(cookie),
+      method: "DELETE",
     });
     const data = res.ok ? await res.json() : null;
     return { data, ok: res.ok, status: res.status };

@@ -1538,7 +1538,7 @@ const jobs = await apiGet<{ id: string; title: string; company: string }[]>(
                     class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
                     data-modal-content
                   >
-                    <div class="absolute top-0 right-0">
+                    <div class="absolute top-2 right-2">
                       <button
                         type="button"
                         class="btn btn-sm btn-icon btn-dark"
@@ -1567,7 +1567,7 @@ const jobs = await apiGet<{ id: string; title: string; company: string }[]>(
                           Cari Loker
                         </div>
                         <h4 class="w-full font-bold leading-none text-balance">
-                          Apakah Anda Sudah Memiliki Id Number ?
+                          Apakah Anda Sudah Memiliki Akun ?
                         </h4>
                       </div>
                     </div>
@@ -1577,23 +1577,38 @@ const jobs = await apiGet<{ id: string; title: string; company: string }[]>(
                                 </article>
                             </div> -->
                     <div class="shrink-0 px-6 py-4 | lg:py-6">
-                      <form action="index-login.html">
+                      <form action="index-login.html" data-login-form>
                         <div class="grid gap-6">
                           <div class="c-form-wrapper">
                             <div class="c-form">
-                              <label for="input-idnumber" class="c-label"
-                                >Masukan ID Number</label
+                              <label for="input-email" class="c-label"
+                                >Masukan Alamat Email</label
                               >
                               <input
-                                type="number"
-                                name="input-idnumber"
-                                inputmode="numeric"
+                                type="email"
+                                name="input-email"
                                 class="c-input"
-                                placeholder="Masuan id number"
+                                placeholder="..."
                               />
                             </div>
                             <div class="text-xs mt-1 text-dark-400">
-                              please fill out this field
+                              silahkan masukan alamat email yang terdaftar
+                            </div>
+                          </div>
+                          <div class="c-form-wrapper">
+                            <div class="c-form">
+                              <label for="input-password" class="c-label"
+                                >Masukan Password</label
+                              >
+                              <input
+                                type="password"
+                                name="input-password"
+                                class="c-input"
+                                placeholder="..."
+                              />
+                            </div>
+                            <div class="text-xs mt-1 text-dark-400">
+                              password sudah dikirimkan melalui email
                             </div>
                           </div>
                           <button
@@ -1615,13 +1630,6 @@ const jobs = await apiGet<{ id: string; title: string; company: string }[]>(
                           <a href="/applicant" class="btn" data-hover-effect
                             >Daftar Sekarang</a
                           >
-                          <!-- <button
-                            type="button"
-                            class="btn"
-                            data-hover-effect
-                            data-barba-navigate="/applicant"
-                            >Daftar Sekarang</button
-                          > -->
                         </div>
                       </form>
                     </div>
@@ -1654,7 +1662,7 @@ const jobs = await apiGet<{ id: string; title: string; company: string }[]>(
                     class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
                     data-modal-content
                   >
-                    <div class="absolute top-0 right-0">
+                    <div class="absolute top-2 right-2">
                       <button
                         type="button"
                         class="btn btn-sm btn-icon btn-dark"

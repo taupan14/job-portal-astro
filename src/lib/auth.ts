@@ -1,26 +1,31 @@
-// src/lib/auth.ts
-import { apiGet } from "./api";
+import jwt from "jsonwebtoken";
 
-export interface UserSession {
-  id: string;
+const JWT_SECRET = import.meta.env.JWT_SECRET ?? process.env.JWT_SECRET ?? "";
+
+export interface AuthUser {
+  id: number;
+  refid: string;
   name: string;
   email: string;
-  role: string; // 'user' | 'employer' | 'admin'
-  // Tambahkan field lain sesuai response Express kamu
+  avatar?: string;
+  role: "applicant" | "company" | "admin";
 }
 
-/**
- * Ambil user yang sedang login dengan cara mengirim cookie ke Express.
- * Express yang memutuskan apakah session valid atau tidak.
- *
- * @param cookie - Cookie header dari Astro.request (diteruskan ke Express)
- * @returns UserSession jika valid, null jika tidak login / session expired
- */
 export async function getCurrentUser(
-  cookie: string,
-): Promise<UserSession | null> {
-  // Endpoint ini harus ada di Express: GET /api/auth/me
-  // Response: { id, name, email, role } jika valid
-  // Response: 401 jika tidak login
-  return apiGet<UserSession>("/api/auth/me", cookie);
+  cookieHeader: string,
+): Promise<AuthUser | null> {
+  if (!cookieHeader) return null;
+  const match = cookieHeader
+    .split(";")
+    .map((c) => c.trim())
+    .find((c) => c.startsWith("auth_token="));
+  const token = match
+    ? decodeURIComponent(match.slice("auth_token=".length))
+    : null;
+  if (!token) return null;
+  try {
+    return jwt.verify(token, JWT_SECRET) as AuthUser;
+  } catch {
+    return null;
+  }
 }

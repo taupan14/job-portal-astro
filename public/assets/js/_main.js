@@ -3,6 +3,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import CustomEase from "gsap/CustomEase";
 import Splitting from "splitting";
+import { initProfilePage } from "@scripts/form/_profile.js";
+import { initDatepicker } from "@js/_datepicker.js";
 // import SplitType from "split-type";
 
 import { navigate } from "astro:transitions/client";
@@ -172,9 +174,10 @@ const initHeader = async () => {
   document.querySelectorAll("[data-barba-active]").forEach((barbaActive) => {
     const link = barbaActive.querySelector("a");
     const linkHref = link?.getAttribute("href");
-    const currentPath =
-      window.location.pathname.split("/").pop() || "index.html";
-    const hoverEffect = barbaActive.querySelector(".btn-hover");
+
+    // Support both: static HTML (page-profile.html) and Astro paths (/profile)
+    const rawPath = window.location.pathname;
+    const currentPath = rawPath.split("/").pop() || "index.html";
 
     barbaActive.classList.remove("is-active");
 
@@ -184,13 +187,19 @@ const initHeader = async () => {
 
     const isActive =
       hasMatchingChild ||
-      linkHref === currentPath ||
+      linkHref === currentPath || // static: "page-profile.html"
+      linkHref === rawPath || // Astro exact: "/profile"
+      (linkHref !== "/" &&
+        linkHref !== "/profile" &&
+        rawPath.startsWith(linkHref ?? "")) || // Astro sub: "/profile/document"
       (linkHref === "./" && currentPath === "index.html");
 
     if (isActive) {
       barbaActive.classList.add("is-active");
+      const hoverEffect = barbaActive.querySelector(".btn-hover");
       hoverEffect?.classList.add("!translate-y-0", "!rounded-none");
     } else {
+      const hoverEffect = barbaActive.querySelector(".btn-hover");
       hoverEffect?.classList.remove("!translate-y-0", "!rounded-none");
     }
   });
@@ -889,6 +898,7 @@ barba.init({
 
       async beforeEnter(data) {
         document.documentElement.classList.remove("is-active-menu");
+
         // Sembunyikan container dulu agar tidak terlihat acak-acakan
         data.next.container.style.visibility = "hidden";
         await initMobileMenu();
@@ -915,8 +925,10 @@ barba.init({
 
         // Tampilkan container setelah semua init selesai
         data.next.container.style.visibility = "visible";
-
         await pageTransitionOut(data.next.container);
+
+        await initDatepicker();
+        await initProfilePage();
       },
 
       async once(data) {
@@ -938,6 +950,10 @@ barba.init({
 
         await initHeader();
         await pageTransitionOnce(data.next.container);
+
+        await initDatepicker();
+        // Baru jalankan profile page init
+        await initProfilePage();
       },
     },
   ],

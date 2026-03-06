@@ -536,6 +536,14 @@ export const initFormApplicant = () => {
       if (json.token) {
         localStorage.setItem("auth_token", json.token);
         localStorage.setItem("auth_user", JSON.stringify(json.applicant));
+        document.cookie = `auth_token=${json.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+
+        // ── Simpan avatar cache jika ada ─────────────────────────────────
+        // Dibutuhkan agar sectionHeader langsung tampilkan foto yang benar
+        if (json.applicant?.avatar) {
+          localStorage.setItem("avatar_cache", json.applicant.avatar);
+          document.cookie = `avatar_cache=${json.applicant.avatar}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+        }
       }
 
       completeProgress();

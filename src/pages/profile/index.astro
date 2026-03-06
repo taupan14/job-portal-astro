@@ -1,0 +1,1795 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { apiGet } from "../../lib/api";
+
+const cookieHeader = Astro.request.headers.get("cookie") ?? "";
+
+// ── Decode user dari cookie untuk ambil ID ────────────────────────────────
+function getUserFromCookie(cookie: string) {
+  const match = cookie
+    .split(";")
+    .map((c) => c.trim())
+    .find((c) => c.startsWith("auth_token="));
+  if (!match) return null;
+  try {
+    const token = decodeURIComponent(match.slice("auth_token=".length));
+    const payload = token.split(".")[1];
+    return JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+  } catch {
+    return null;
+  }
+}
+
+const currentUser = getUserFromCookie(cookieHeader);
+if (!currentUser?.id) return Astro.redirect("/login?redirect=/profile");
+
+// ── Fetch semua data paralel via SSR ─────────────────────────────────────
+const [profileData, educations, provinces] = await Promise.all([
+  apiGet<any>(`/api/applicants/${currentUser.id}`, cookieHeader),
+  apiGet<{ id: number; name: string }[]>("/api/educations", cookieHeader),
+  apiGet<{ id: string; name: string }[]>("/api/wai/provinces", cookieHeader),
+]);
+
+// ── Resolve province ID berdasarkan nama ──────────────────────────────────
+const provMatch = profileData?.province
+  ? (provinces ?? []).find(
+      (p) =>
+        p.name === profileData.province ||
+        String(p.id) === String(profileData.province),
+    )
+  : null;
+
+// ── Helper data ───────────────────────────────────────────────────────────
+const formalEdu = profileData?.education?.[0] ?? null;
+const nonformalEdu = profileData?.nonformal?.[0] ?? null;
+const experiences = profileData?.experience ?? [];
+
+const avatarUrl = profileData?.avatar
+  ? `${import.meta.env.PUBLIC_API_URL}/pubs/uploads/avatar/${profileData.avatar}`
+  : null;
+
+const formattedDob = "";
+// const formattedDob = profileData?.date_of_birth
+//   ? new Date(profileData.date_of_birth).toLocaleDateString("id-ID", {
+//       day: "2-digit",
+//       month: "long",
+//       year: "numeric",
+//     })
+//   : "";
+
+// console.log("profileData.province:", profileData?.province);
+// console.log("provinces sample:", provinces?.slice(0, 3));
+// console.log("provMatch:", provMatch);
+---
+
+<BaseLayout title="Profil Saya">
+  <div id="app">
+    <!-- @components sectionHeader -->
+
+    <main id="section-main" data-barba="wrapper">
+      <div
+        data-hero-scheme="light"
+        data-barba="container"
+        data-barba-namespace="profile"
+      >
+        <section id="page-content" class="relative">
+          <div class="pt-(--space-header)">
+            <div class="py-16 | lg:pb-24">
+              <div class="max-container">
+                <div class="grid gap-8 | lg:grid-cols-12 lg:gap-16">
+                  <!-- ── Sidebar (desktop only) ───────────────────────────── -->
+                  <div class="col-span-full | not-lg:hidden | lg:col-span-3">
+                    <div
+                      class="flex flex-col | lg:sticky lg:top-(--space-header) lg:pt-8 lg:-mt-8"
+                    >
+                      <ul
+                        class="flex flex-col divide-y divide-dark-300 | lg:py-16"
+                      >
+                        <li class="py-4 first:pt-0 last:pb-0" data-barba-active>
+                          <a
+                            href="/profile"
+                            class="flex items-center gap-4"
+                            data-hover-group
+                          >
+                            <svg
+                              class="icon icon-fill size-5 text-dark-400"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M17.8751 11.875C18.4274 11.875 18.8751 12.3227 18.8751 12.875V13.2736C19.6155 13.4438 20.2848 13.7991 20.8263 14.289L21.3343 13.9624C21.7989 13.6637 22.4176 13.7982 22.7163 14.2628C23.0149 14.7274 22.8804 15.3461 22.4159 15.6447L21.9517 15.9432C22.1176 16.39 22.2084 16.8723 22.2084 17.375C22.2084 17.8778 22.1176 18.3602 21.9516 18.807L22.4155 19.1053C22.88 19.4039 23.0145 20.0226 22.7158 20.4872C22.4172 20.9518 21.7985 21.0863 21.3339 20.7876L20.8262 20.4612C20.2847 20.951 19.6154 21.3062 18.8751 21.4764V21.875C18.8751 22.4273 18.4274 22.875 17.8751 22.875C17.3228 22.875 16.8751 22.4273 16.8751 21.875V21.4764C16.1348 21.3062 15.4655 20.951 14.9241 20.4612L14.4163 20.7876C13.9517 21.0863 13.333 20.9518 13.0344 20.4872C12.7357 20.0226 12.8702 19.4039 13.3348 19.1053L13.7986 18.807C13.6326 18.3602 13.5418 17.8778 13.5418 17.375C13.5418 16.8723 13.6326 16.39 13.7985 15.9432L13.3343 15.6447C12.8698 15.3461 12.7353 14.7274 13.0339 14.2628C13.3326 13.7982 13.9513 13.6637 14.4159 13.9624L14.9239 14.289C15.4654 13.7991 16.1347 13.4438 16.8751 13.2736V12.875C16.8751 12.3227 17.3228 11.875 17.8751 11.875ZM17.8751 15.1607C17.0502 15.1607 16.3365 15.5648 15.9233 16.1613C15.6807 16.5116 15.5418 16.9276 15.5418 17.375C15.5418 17.8225 15.6807 18.2385 15.9234 18.5888C16.3366 19.1852 17.0503 19.5893 17.8751 19.5893C18.6999 19.5893 19.4136 19.1852 19.8268 18.5888C20.0695 18.2385 20.2084 17.8225 20.2084 17.375C20.2084 16.9276 20.0695 16.5116 19.8269 16.1613C19.4137 15.5648 18.7 15.1607 17.8751 15.1607Z"
+                                fill="#141B34"></path>
+                              <g opacity="0.4">
+                                <path
+                                  d="M10.875 1.125C7.97552 1.125 5.62502 3.4755 5.62502 6.375C5.62502 9.27449 7.97552 11.625 10.875 11.625C13.7745 11.625 16.125 9.27449 16.125 6.375C16.125 3.4755 13.7745 1.125 10.875 1.125Z"
+                                  fill="#141B34"></path>
+                                <path
+                                  d="M9.26996 13.2375C10.0534 13.127 10.8465 13.0979 11.6351 13.1502C11.7785 13.1597 11.8497 13.3307 11.7719 13.4516C11.1823 14.3687 11.2679 15.526 11.9018 16.34C12.0023 16.4691 12.0526 16.5336 12.0687 16.5884C12.0848 16.6432 12.0781 16.7164 12.0648 16.8627C12.0494 17.0316 12.0415 17.2025 12.0415 17.375C12.0415 17.5477 12.0494 17.7187 12.0648 17.8877C12.0781 18.034 12.0848 18.1071 12.0688 18.1619C12.0527 18.2167 12.0024 18.2813 11.902 18.4103C11.2683 19.2243 11.1829 20.3814 11.7723 21.2984C11.8252 21.3805 11.882 21.4602 11.9424 21.537C12.4535 22.1873 12.7091 22.5124 12.6818 22.5687C12.6544 22.625 12.2974 22.625 11.5834 22.625H6.46557C4.64726 22.625 3.24148 21.7306 2.07003 20.6146C1.39101 19.9677 1.05255 19.2396 1.13736 18.4638C1.2171 17.7342 1.65575 17.1387 2.11742 16.6868C2.85559 15.9643 3.9332 15.3563 4.64602 14.9542C4.80862 14.8625 4.95229 14.7814 5.06857 14.7122C6.37341 13.9352 7.80548 13.4441 9.26996 13.2375Z"
+                                  fill="#141B34"></path>
+                              </g>
+                            </svg>
+                            <div
+                              class="font-semibold [--text-hover:var(--color-primary-600)] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover)"
+                              data-hover-effect
+                            >
+                              Informasi Pribadi
+                            </div>
+                          </a>
+                        </li>
+                        <li class="py-4 first:pt-0 last:pb-0" data-barba-active>
+                          <a
+                            href="/profile/document"
+                            class="flex items-center gap-4"
+                            data-hover-group
+                          >
+                            <svg
+                              class="icon icon-fill size-5 text-dark-400"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                opacity="0.4"
+                                d="M13.1374 22.5827C12.662 22.7514 12.1575 22.7507 11.5875 22.75C10.0618 22.75 8.65416 22.7499 7.67541 22.635C6.66272 22.5162 5.79501 22.2632 5.05999 21.6674C4.79018 21.4488 4.54441 21.2017 4.32687 20.9305C3.73424 20.1917 3.48254 19.3195 3.36431 18.3015C3.25003 17.3177 3.25004 16.0812 3.25006 14.5475V9.97392C3.25004 8.19195 3.25002 6.75558 3.40111 5.62592C3.55798 4.45306 3.89358 3.46554 4.67383 2.68123C5.45408 1.89692 6.43649 1.55958 7.60328 1.40189C8.72711 1.25001 10.2982 1.25003 12.071 1.25006C13.8438 1.25003 15.2727 1.25001 16.3966 1.40189C17.5634 1.55958 18.5458 1.89692 19.326 2.68123C20.1063 3.46554 20.4419 4.45306 20.5987 5.62592C20.7498 6.7556 20.7498 8.19195 20.7498 9.97396L20.7499 13.4482C20.7509 14.1116 20.7518 14.7003 20.5278 15.2441C20.3037 15.7879 19.8889 16.2035 19.4216 16.6719L14.6387 21.4795C14.2363 21.8852 13.88 22.2442 13.4252 22.4629C13.3314 22.508 13.2354 22.548 13.1374 22.5827Z"
+                                fill="#141B34"></path>
+                              <path
+                                d="M13.1375 22.5828C13.2354 22.548 13.3315 22.508 13.4252 22.463C13.8801 22.2443 14.2363 21.8852 14.6388 21.4796L19.4216 16.6719C19.889 16.2036 20.3038 15.7879 20.5278 15.2442C20.6266 15.0044 20.6817 14.756 20.7123 14.4962H18.7315C17.3639 14.4962 16.7153 14.497 15.8484 14.6135C14.9483 14.7346 14.1904 14.9935 13.5885 15.5954C12.9866 16.1973 12.7277 16.9552 12.6066 17.8553C12.4903 18.7205 12.4903 19.3765 12.4904 20.7384V22.7214C12.7137 22.6984 12.9284 22.657 13.1375 22.5828Z"
+                                fill="#141B34"></path>
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M16.7501 7.00006C16.7501 7.41427 16.4143 7.75006 16.0001 7.75006L8.00006 7.75006C7.58585 7.75006 7.25006 7.41428 7.25006 7.00006C7.25006 6.58585 7.58585 6.25006 8.00006 6.25006L16.0001 6.25006C16.4143 6.25006 16.7501 6.58585 16.7501 7.00006Z"
+                                fill="#141B34"></path>
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M12.7501 11.0001C12.7501 11.4143 12.4143 11.7501 12.0001 11.7501L8.00006 11.7501C7.58585 11.7501 7.25006 11.4143 7.25006 11.0001C7.25006 10.5858 7.58585 10.2501 8.00006 10.2501L12.0001 10.2501C12.4143 10.2501 12.7501 10.5858 12.7501 11.0001Z"
+                                fill="#141B34"></path>
+                            </svg>
+                            <div
+                              class="font-semibold [--text-hover:var(--color-primary-600)] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover)"
+                              data-hover-effect
+                            >
+                              Dokumen
+                            </div>
+                          </a>
+                        </li>
+                        <li class="py-4 first:pt-0 last:pb-0" data-barba-active>
+                          <a
+                            href="/profile/status"
+                            class="flex items-center gap-4"
+                            data-hover-group
+                          >
+                            <svg
+                              class="icon icon-fill size-5 text-dark-400"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M14.4038 14.0251C15.098 13.2945 16.0976 12.75 17.25 12.75C18.4024 12.75 19.402 13.2945 20.0962 14.0251C20.7838 14.7486 21.25 15.7359 21.25 16.75V19.75C21.25 20.3023 20.8023 20.75 20.25 20.75C19.6977 20.75 19.25 20.3023 19.25 19.75L19.25 16.75C19.25 16.3346 19.0447 15.8219 18.6464 15.4028C18.2549 14.9908 17.7544 14.75 17.25 14.75C16.7456 14.75 16.2451 14.9908 15.8536 15.4028C15.4553 15.8219 15.25 16.3346 15.25 16.75V20.25C15.25 20.5261 15.4739 20.75 15.75 20.75C16.0261 20.75 16.25 20.5261 16.25 20.25V16.75C16.25 16.1977 16.6977 15.75 17.25 15.75C17.8023 15.75 18.25 16.1977 18.25 16.75V20.25C18.25 21.6307 17.1307 22.75 15.75 22.75C14.3693 22.75 13.25 21.6307 13.25 20.25L13.25 16.75C13.25 15.7359 13.7162 14.7486 14.4038 14.0251Z"
+                                fill="#141B34"></path>
+                              <g opacity="0.4">
+                                <path
+                                  d="M16.989 1.40314C15.8497 1.24997 14.3941 1.24998 12.5564 1.25H11.4436C9.60588 1.24998 8.15026 1.24997 7.01105 1.40313C5.83864 1.56076 4.8897 1.89287 4.14133 2.64123C3.39297 3.38958 3.06085 4.33852 2.90321 5.51094C2.75004 6.65014 2.75004 8.10576 2.75004 9.94351L2.75 14.5489C2.74998 16.1511 2.74996 17.4205 2.86865 18.4247C2.9905 19.4557 3.24632 20.3044 3.82812 21.0133C4.02552 21.2539 4.24609 21.4744 4.48664 21.6718C5.19558 22.2536 6.04427 22.5095 7.07523 22.6313C8.07942 22.75 9.34874 22.75 10.9509 22.75H12.5563C12.6912 22.75 12.8241 22.75 12.9548 22.7499C12.3611 22.0865 12 21.2104 12 20.25V16.75C12 15.3611 12.6299 14.0773 13.4976 13.1641C14.3804 12.2351 15.6916 11.5 17.25 11.5C18.8084 11.5 20.1196 12.2351 21.0024 13.1641C21.0873 13.2534 21.1699 13.3464 21.2499 13.4426V9.94359C21.25 8.10585 21.25 6.65018 21.0968 5.51098C20.9392 4.33856 20.6071 3.38961 19.8587 2.64124C19.1103 1.89288 18.1614 1.56076 16.989 1.40314Z"
+                                  fill="#141B34"></path>
+                              </g>
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M6.75 6C6.75 5.58579 7.08579 5.25 7.5 5.25H16.5C16.9142 5.25 17.25 5.58579 17.25 6C17.25 6.41421 16.9142 6.75 16.5 6.75H7.5C7.08579 6.75 6.75 6.41421 6.75 6Z"
+                                fill="#141B34"></path>
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M6.75 10C6.75 9.58579 7.08579 9.25 7.5 9.25H13.5C13.9142 9.25 14.25 9.58579 14.25 10C14.25 10.4142 13.9142 10.75 13.5 10.75H7.5C7.08579 10.75 6.75 10.4142 6.75 10Z"
+                                fill="#141B34"></path>
+                            </svg>
+                            <div
+                              class="font-semibold [--text-hover:var(--color-primary-600)] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover)"
+                              data-hover-effect
+                            >
+                              Status Lamaran
+                            </div>
+                          </a>
+                        </li>
+                        <li class="py-4 first:pt-0 last:pb-0" data-barba-active>
+                          <a
+                            href="/profile/vacancy"
+                            class="flex items-center gap-4"
+                            data-hover-group
+                          >
+                            <svg
+                              class="icon icon-fill size-5 text-dark-400"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                opacity="0.4"
+                                d="M9.52635 2.04882C10.3521 1.54948 11.1264 1.25 12.0001 1.25C12.8738 1.25 13.648 1.54948 14.4738 2.04882C15.2736 2.53243 16.1876 3.2459 17.3351 4.14158L18.5185 5.06519C19.8944 6.13845 20.7838 6.83222 21.2675 7.82476C21.7511 8.81691 21.7507 9.9466 21.7501 11.6956L21.7501 14.0277C21.7501 15.8724 21.7501 17.3329 21.597 18.4758C21.4395 19.6516 21.1077 20.6031 20.3598 21.3536C19.6115 22.1046 18.6624 22.438 17.4895 22.5963C16.3501 22.75 14.8943 22.75 13.0567 22.75H10.9435C9.10587 22.75 7.65009 22.75 6.51071 22.5963C5.3378 22.438 4.38864 22.1046 3.64038 21.3536C2.89249 20.6031 2.56069 19.6516 2.40317 18.4758C2.25005 17.3329 2.25006 15.8724 2.25008 14.0278L2.25004 11.6956C2.24947 9.9466 2.2491 8.8169 2.73262 7.82476C3.21633 6.83222 4.10576 6.13845 5.4817 5.06519L6.66505 4.14157C7.81252 3.2459 8.72657 2.53243 9.52635 2.04882Z"
+                                fill="#141B34"></path>
+                              <path
+                                d="M15.7495 22.725C14.9597 22.7505 14.0656 22.7505 13.0562 22.7505H10.943C9.93378 22.7505 9.03973 22.7505 8.25 22.725L8.25177 17.9723C8.25193 17.5285 8.25206 17.158 8.2729 16.8538C8.2946 16.5371 8.34123 16.238 8.4613 15.948C8.74055 15.2735 9.27652 14.7378 9.9511 14.4588C10.2412 14.3388 10.5403 14.2923 10.8569 14.2707C11.1611 14.25 11.5821 14.25 12.0259 14.25C12.4698 14.25 12.8405 14.25 13.1447 14.2707C13.4615 14.2923 13.7607 14.3389 14.0508 14.4589C14.7255 14.738 15.2615 15.274 15.5407 15.9487C15.6607 16.2388 15.7072 16.5381 15.7288 16.8548C15.7495 17.1591 15.7495 17.5297 15.7495 17.9737V22.725Z"
+                                fill="#141B34"></path>
+                            </svg>
+                            <div
+                              class="font-semibold [--text-hover:var(--color-primary-600)] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover)"
+                              data-hover-effect
+                            >
+                              Lowongan Kerja
+                            </div>
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <!-- ── Main Content ─────────────────────────────────────── -->
+                  <div class="col-span-full | lg:col-span-9">
+                    <div
+                      class="relative isolate | lg:py-16 lg:pl-16 lg:-ml-16 lg:min-h-full"
+                      data-tabs
+                    >
+                      <!-- Tab Navigation -->
+                      <div
+                        class="relative isolate flex overflow-auto mb-16"
+                        data-tab-scroll
+                      >
+                        <ul
+                          class="relative isolate flex items-center flex-nowrap whitespace-nowrap gap-8 | lg:gap-16"
+                          data-slider
+                        >
+                          <li class="shrink-0">
+                            <button
+                              type="button"
+                              class="inline-flex pb-4 transition-colors duration-800 ease-custom text-sm font-bold uppercase tracking-wide [&.is-active]:text-dark-950 is-active"
+                              data-slider-nav
+                              data-tab-target="tab-informasi"
+                              >Informasi Pribadi</button
+                            >
+                          </li>
+                          <li class="shrink-0">
+                            <button
+                              type="button"
+                              class="inline-flex pb-4 transition-colors duration-800 ease-custom text-sm font-bold uppercase tracking-wide [&.is-active]:text-dark-950"
+                              data-slider-nav
+                              data-tab-target="tab-pendidikan"
+                              >Pendidikan</button
+                            >
+                          </li>
+                          <li class="shrink-0">
+                            <button
+                              type="button"
+                              class="inline-flex pb-4 transition-colors duration-800 ease-custom text-sm font-bold uppercase tracking-wide [&.is-active]:text-dark-950"
+                              data-slider-nav
+                              data-tab-target="tab-pengalaman"
+                              >Pengalaman Kerja</button
+                            >
+                          </li>
+                        </ul>
+                        <div
+                          class="absolute inset-x-0 bottom-0 h-px bg-dark-200 -z-2"
+                        >
+                        </div>
+                      </div>
+
+                      <div class="relative" data-tabs-content>
+                        <!-- ── TAB 1: Informasi Pribadi ─────────────────── -->
+                        <div
+                          id="tab-informasi"
+                          class="hidden [&.is-active]:block is-active"
+                          data-tab-content
+                          aria-hidden="false"
+                        >
+                          <div class="grid gap-16">
+                            <!-- Foto Profil -->
+                            <div class="flex flex-col gap-4 | lg:gap-6 lg:w-72">
+                              <div
+                                class="relative aspect-square rounded-lg overflow-clip flex items-center justify-center bg-dark-100 shrink-0"
+                                data-photo
+                              >
+                                <img
+                                  id="preview-photo"
+                                  class:list={[
+                                    "absolute top-0 left-0 size-full object-cover",
+                                    { hidden: !avatarUrl },
+                                  ]}
+                                  src={avatarUrl ?? ""}
+                                  alt="Foto Profil"
+                                  data-original={profileData?.avatar ?? ""}
+                                />
+                                <svg
+                                  class="icon icon-fill size-14 text-primary-600"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    opacity="0.4"
+                                    fill-rule="evenodd"
+                                    clip-rule="evenodd"
+                                    d="M20.1129 7.78312C19.6979 7.36808 19.0964 7.11438 17.8757 6.9943L18.0715 5.00391C19.4675 5.14123 20.6275 5.46925 21.5272 6.36891C22.3335 7.1752 22.6805 8.19058 22.8428 9.39768C22.9992 10.5606 22.9991 12.0394 22.9991 13.8748V14.0212C22.9991 15.8567 22.9992 17.3355 22.8428 18.4984C22.6805 19.7055 22.3335 20.7209 21.5272 21.5272C20.7209 22.3335 19.7055 22.6805 18.4984 22.8428C17.3355 22.9992 15.8567 22.9991 14.0212 22.9991H13.8748C12.0394 22.9991 10.5606 22.9992 9.39768 22.8428C8.19058 22.6805 7.1752 22.3335 6.36891 21.5272C5.46925 20.6275 5.14123 19.4675 5.00391 18.0715L6.9943 17.8757C7.11438 19.0964 7.36808 19.6979 7.78312 20.1129C8.15588 20.4857 8.67885 20.7282 9.66417 20.8606C10.6783 20.997 12.0221 20.9991 13.948 20.9991C15.874 20.9991 17.2178 20.997 18.2319 20.8606C19.2172 20.7282 19.7402 20.4857 20.1129 20.1129C20.4857 19.7402 20.7282 19.2172 20.8606 18.2319C20.997 17.2178 20.9991 15.874 20.9991 13.948C20.9991 12.0221 20.997 10.6783 20.8606 9.66417C20.7282 8.67885 20.4857 8.15588 20.1129 7.78312Z"
+                                    fill="#141B34"></path>
+                                  <path
+                                    opacity="0.4"
+                                    d="M11.6363 12.4162C9.4301 10.9618 6.68031 10.2023 3.87635 10.2523C3.2166 10.2512 2.55784 10.2921 1.90597 10.3744C1.53026 10.4219 1.24888 10.742 1.25 11.1207C1.25458 12.6661 1.28026 13.8928 1.45316 14.8725C1.63123 15.8815 1.97481 16.6895 2.64946 17.3603C3.40134 18.1079 4.35431 18.4395 5.53219 18.5969C6.67735 18.75 8.14081 18.75 9.98955 18.75L10.1393 18.75C12.2827 18.7501 13.9178 18.7501 15.1501 18.4985C15.3602 18.4556 15.5419 18.3248 15.6492 18.1391C15.7566 17.9535 15.7794 17.7308 15.7118 17.5272C15.0373 15.4965 13.6026 13.7125 11.6363 12.4162Z"
+                                    fill="#141B34"></path>
+                                  <path
+                                    fill-rule="evenodd"
+                                    clip-rule="evenodd"
+                                    d="M9.92684 1H10.0732C11.8966 0.999973 13.3664 0.999951 14.5223 1.15537C15.7225 1.31672 16.733 1.66191 17.5355 2.46447C18.3381 3.26702 18.6833 4.27752 18.8446 5.47767C19.0001 6.63362 19 8.10336 19 9.9268V10.0732C19 11.8966 19.0001 13.3664 18.8446 14.5223C18.6833 15.7225 18.3381 16.733 17.5355 17.5355C16.733 18.3381 15.7225 18.6833 14.5223 18.8446C13.3664 19.0001 11.8966 19 10.0732 19H9.9268C8.10336 19 6.63362 19.0001 5.47767 18.8446C4.27752 18.6833 3.26702 18.3381 2.46447 17.5355C1.66191 16.733 1.31672 15.7225 1.15537 14.5223C0.999951 13.3664 0.999973 11.8966 1 10.0732V9.92684C0.999973 8.10338 0.999951 6.63362 1.15537 5.47767C1.31672 4.27752 1.66191 3.26702 2.46447 2.46447C3.26702 1.66191 4.27752 1.31672 5.47767 1.15537C6.63362 0.999951 8.10338 0.999973 9.92684 1Z"
+                                    fill="#141B34"></path>
+                                  <path
+                                    fill-rule="evenodd"
+                                    clip-rule="evenodd"
+                                    d="M12 6.75C12 6.05964 12.5571 5.5 13.2444 5.5C13.9268 5.5 14.5 6.05988 14.5 6.75C14.5 7.44012 13.9268 8 13.2444 8C12.5571 8 12 7.44036 12 6.75Z"
+                                    fill="#141B34"></path>
+                                </svg>
+                                <label
+                                  for="input-photo-profile"
+                                  class="absolute isolate inset-0 cursor-pointer flex justify-end p-2 group"
+                                >
+                                  <input
+                                    type="file"
+                                    name="photo-profile"
+                                    id="input-photo-profile"
+                                    accept="image/png,image/jpeg,image/jpg"
+                                    hidden
+                                    data-input-photo
+                                  />
+                                  <div
+                                    class="btn btn-icon btn-dark opacity-0 group-hover:opacity-100"
+                                  >
+                                    <svg
+                                      class="icon icon-stroke"
+                                      width="24"
+                                      height="24"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        d="M5 21C9.20998 16.2487 13.9412 9.9475 21 14.6734"
+                                        stroke="#141B34"
+                                        stroke-width="1.5"></path>
+                                      <path
+                                        d="M14 3.00231C13.5299 3 12.0307 3 11.5 3C7.02166 3 4.78249 3 3.39124 4.39124C2 5.78249 2 8.02166 2 12.5C2 16.9783 2 19.2175 3.39124 20.6088C4.78249 22 7.02166 22 11.5 22C15.9783 22 18.2175 22 19.6088 20.6088C20.9472 19.2703 20.998 17.147 20.9999 13"
+                                        stroke="#141B34"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"></path>
+                                      <path
+                                        d="M17 7.5C17.4915 8.0057 18.7998 10 19.5 10M22 7.5C21.5085 8.0057 20.2002 10 19.5 10M19.5 10V2"
+                                        stroke="#141B34"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"></path>
+                                    </svg>
+                                  </div>
+                                </label>
+                              </div>
+                              <div class="w-full text-xs font-medium">
+                                Besar file: maksimum 10.000.000 bytes (10MB).
+                                Ekstensi file yang diperbolehkan: .JPG .JPEG
+                                .PNG
+                              </div>
+                            </div>
+
+                            <!-- Form Informasi Pribadi -->
+                            <div class="grid gap-8">
+                              <h5>Informasi Pribadi</h5>
+                              <div class="grid gap-6 | lg:grid-cols-2">
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label for="input-name" class="c-label"
+                                        >Nama Pribadi</label
+                                      >
+                                      <input
+                                        type="text"
+                                        name="name"
+                                        id="input-name"
+                                        class="c-input"
+                                        placeholder="Masukan nama lengkap *"
+                                        value={profileData?.name ?? ""}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label
+                                        for="input-birthdate"
+                                        class="c-label">Tanggal Lahir</label
+                                      >
+                                      <input
+                                        type="text"
+                                        name="birthdate"
+                                        id="input-birthdate"
+                                        class="c-input"
+                                        placeholder="Pilih tanggal *"
+                                        data-datepicker
+                                        data-value={profileData?.date_of_birth ??
+                                          ""}
+                                        readonly
+                                        value={formattedDob}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label for="select-gender" class="c-label"
+                                        >Jenis Kelamin</label
+                                      >
+                                      <select
+                                        name="gender"
+                                        id="select-gender"
+                                        class="c-input c-select"
+                                        data-selected-gender={profileData?.gender ??
+                                          ""}
+                                      >
+                                        <option
+                                          value=""
+                                          disabled
+                                          selected={!profileData?.gender}
+                                          >Pilih jenis kelamin *</option
+                                        >
+                                        <option
+                                          value="Laki-laki"
+                                          selected={profileData?.gender ===
+                                            "Laki-laki"}>Laki-laki</option
+                                        >
+                                        <option
+                                          value="Perempuan"
+                                          selected={profileData?.gender ===
+                                            "Perempuan"}>Perempuan</option
+                                        >
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label
+                                        for="input-place-of-birth"
+                                        class="c-label">Tempat Lahir</label
+                                      >
+                                      <input
+                                        type="text"
+                                        name="place_of_birth"
+                                        id="input-place-of-birth"
+                                        class="c-input"
+                                        placeholder="Masukan tempat lahir *"
+                                        value={profileData?.place_of_birth ??
+                                          ""}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label for="input-nik" class="c-label"
+                                        >NIK</label
+                                      >
+                                      <input
+                                        type="text"
+                                        inputmode="numeric"
+                                        name="nik"
+                                        id="input-nik"
+                                        class="c-input"
+                                        placeholder="Masukan NIK *"
+                                        value={profileData?.ktp_number ?? ""}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label for="input-email" class="c-label"
+                                        >Email</label
+                                      >
+                                      <input
+                                        type="email"
+                                        name="email"
+                                        id="input-email"
+                                        class="c-input"
+                                        placeholder="Masukan email *"
+                                        value={profileData?.email ?? ""}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label for="input-nohp" class="c-label"
+                                        >Nomor HP</label
+                                      >
+                                      <input
+                                        type="text"
+                                        inputmode="numeric"
+                                        name="phone_number"
+                                        id="input-nohp"
+                                        class="c-input"
+                                        placeholder="Masukan nomor HP *"
+                                        value={profileData?.phone_number ?? ""}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <!-- Form Alamat -->
+                            <div class="grid gap-8">
+                              <h5>Informasi Alamat</h5>
+                              <div class="grid gap-6 | lg:grid-cols-2">
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label
+                                        for="select-province"
+                                        class="c-label">Provinsi</label
+                                      >
+                                      <!-- 
+                                        Simpan nama regency/district/village sebagai data-* 
+                                        agar bisa di-restore client-side saat cascade populate
+                                      -->
+                                      <select
+                                        name="province"
+                                        id="select-province"
+                                        class="c-input c-select"
+                                        data-selected-province={profileData?.province ??
+                                          ""}
+                                        data-selected-regency={profileData?.regency ??
+                                          ""}
+                                        data-selected-district={profileData?.district ??
+                                          ""}
+                                        data-selected-village={profileData?.village ??
+                                          ""}
+                                      >
+                                        <option
+                                          value=""
+                                          disabled
+                                          selected={!provMatch}
+                                          >Pilih provinsi *</option
+                                        >
+                                        {
+                                          (provinces ?? []).map((p) => (
+                                            <option
+                                              value={p.id}
+                                              selected={
+                                                String(p.id) ===
+                                                String(provMatch?.id)
+                                              }
+                                            >
+                                              {p.name}
+                                            </option>
+                                          ))
+                                        }
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label
+                                        for="select-cityreg"
+                                        class="c-label">Kota / Kabupaten</label
+                                      >
+                                      <select
+                                        name="regency"
+                                        id="select-cityreg"
+                                        class="c-input c-select"
+                                      >
+                                        <option value="" selected
+                                          >Pilih kota/kabupaten *</option
+                                        >
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label
+                                        for="select-subdistrict"
+                                        class="c-label">Kecamatan</label
+                                      >
+                                      <select
+                                        name="district"
+                                        id="select-subdistrict"
+                                        class="c-input c-select"
+                                      >
+                                        <option value="" selected
+                                          >Pilih kecamatan *</option
+                                        >
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label for="select-ward" class="c-label"
+                                        >Kelurahan</label
+                                      >
+                                      <select
+                                        name="village"
+                                        id="select-ward"
+                                        class="c-input c-select"
+                                      >
+                                        <option value="" selected
+                                          >Pilih kelurahan *</option
+                                        >
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label
+                                        for="input-postalcode"
+                                        class="c-label">Kode Pos</label
+                                      >
+                                      <input
+                                        type="text"
+                                        inputmode="numeric"
+                                        name="poscode"
+                                        id="input-postalcode"
+                                        class="c-input"
+                                        placeholder="Masukan kode pos *"
+                                        value={profileData?.poscode ?? ""}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label for="input-address" class="c-label"
+                                        >Alamat Lengkap</label
+                                      >
+                                      <textarea
+                                        name="address"
+                                        id="input-address"
+                                        class="c-input c-textarea"
+                                        placeholder="Masukan alamat lengkap *"
+                                        >{profileData?.address ?? ""}</textarea
+                                      >
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="flex mt-16 | not-lg:justify-center">
+                            <button
+                              type="button"
+                              class="inline-flex items-center gap-4 shrink-0"
+                              data-hover-group
+                              data-save-informasi
+                            >
+                              <div
+                                class="link font-semibold text-dark-950"
+                                data-hover-effect
+                              >
+                                Simpan Perubahan
+                              </div>
+                              <div
+                                class="btn btn-icon btn-primary"
+                                data-hover-effect
+                              >
+                                <svg
+                                  class="icon icon-stroke icon-up-right"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M17.5 6.5L6 18"
+                                    stroke="#141B34"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                                  <path
+                                    d="M8 6H18V16"
+                                    stroke="#141B34"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                                </svg>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+
+                        <!-- ── TAB 2: Pendidikan ────────────────────────── -->
+                        <div
+                          id="tab-pendidikan"
+                          class="hidden [&.is-active]:block"
+                          data-tab-content
+                          aria-hidden="true"
+                        >
+                          <div class="grid gap-16">
+                            <!-- Pendidikan Formal -->
+                            <div class="grid gap-8">
+                              <h5>Informasi Formal</h5>
+                              <div class="grid gap-6 | lg:grid-cols-2">
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label
+                                        for="select-last-education"
+                                        class="c-label"
+                                        >Pendidikan Terakhir</label
+                                      >
+                                      <select
+                                        name="last_education"
+                                        id="select-last-education"
+                                        class="c-input c-select"
+                                        data-selected-education={formalEdu?.last_education
+                                          ? String(formalEdu.last_education)
+                                          : ""}
+                                      >
+                                        <option
+                                          value=""
+                                          disabled
+                                          selected={!formalEdu?.last_education}
+                                          >Pilih pendidikan terakhir *</option
+                                        >
+                                        {
+                                          (educations ?? []).map((e) => (
+                                            <option
+                                              value={String(e.id)}
+                                              selected={
+                                                formalEdu?.last_education ===
+                                                e.id
+                                              }
+                                            >
+                                              {e.name}
+                                            </option>
+                                          ))
+                                        }
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label for="input-sekolah" class="c-label"
+                                        >Sekolah / Universitas</label
+                                      >
+                                      <input
+                                        type="text"
+                                        name="school_name"
+                                        id="input-sekolah"
+                                        class="c-input"
+                                        placeholder="Masukan nama sekolah / universitas *"
+                                        value={formalEdu?.school_name ?? ""}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label
+                                        for="formal-from-date"
+                                        class="c-label">Tanggal Mulai</label
+                                      >
+                                      <input
+                                        type="text"
+                                        class="c-input"
+                                        name="formal_start_date"
+                                        id="formal-from-date"
+                                        placeholder="dd mmmm, yyyy"
+                                        readonly
+                                        value={formalEdu?.start_date ?? ""}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label
+                                        for="formal-to-date"
+                                        class="c-label">Tanggal Selesai</label
+                                      >
+                                      <input
+                                        type="text"
+                                        class="c-input"
+                                        name="formal_finish_date"
+                                        id="formal-to-date"
+                                        placeholder="dd mmmm, yyyy"
+                                        readonly
+                                        value={formalEdu?.finish_date ?? ""}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div id="formal-datepicker" class="hidden">
+                                  <div data-rangepicker></div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label for="input-jurusan" class="c-label"
+                                        >Jurusan / Program Studi</label
+                                      >
+                                      <input
+                                        type="text"
+                                        name="study_name"
+                                        id="input-jurusan"
+                                        class="c-input"
+                                        placeholder="Masukan jurusan *"
+                                        value={formalEdu?.study_name ?? ""}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <!-- Pendidikan Non-Formal -->
+                            <div class="grid gap-8">
+                              <div class="flex items-center gap-4">
+                                <h5>Informasi Non-Formal</h5>
+                                <span
+                                  class="text-xs font-medium text-dark-400 bg-dark-100 px-2 py-1 rounded-full"
+                                  >Opsional</span
+                                >
+                              </div>
+                              <div class="grid gap-6 | lg:grid-cols-2">
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label
+                                        for="input-bidang-pelajaran"
+                                        class="c-label">Bidang Pelajaran</label
+                                      >
+                                      <input
+                                        type="text"
+                                        name="nonformal_study"
+                                        id="input-bidang-pelajaran"
+                                        class="c-input"
+                                        placeholder="Masukan bidang pelajaran"
+                                        value={nonformalEdu?.study_name ?? ""}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label
+                                        for="input-lembaga-pendidikan"
+                                        class="c-label"
+                                        >Nama Lembaga Pendidikan</label
+                                      >
+                                      <input
+                                        type="text"
+                                        name="nonformal_school"
+                                        id="input-lembaga-pendidikan"
+                                        class="c-input"
+                                        placeholder="Masukan nama lembaga"
+                                        value={nonformalEdu?.school_name ?? ""}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label
+                                        for="nonformal-from-date"
+                                        class="c-label">Tanggal Mulai</label
+                                      >
+                                      <input
+                                        type="text"
+                                        class="c-input"
+                                        name="nonformal_start_date"
+                                        id="nonformal-from-date"
+                                        placeholder="dd mmmm, yyyy"
+                                        readonly
+                                        value={nonformalEdu?.start_date ?? ""}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-span-full | lg:col-span-1">
+                                  <div class="c-form-wrapper">
+                                    <div class="c-form c-form-default">
+                                      <label
+                                        for="nonformal-to-date"
+                                        class="c-label">Tanggal Selesai</label
+                                      >
+                                      <input
+                                        type="text"
+                                        class="c-input"
+                                        name="nonformal_finish_date"
+                                        id="nonformal-to-date"
+                                        placeholder="dd mmmm, yyyy"
+                                        readonly
+                                        value={nonformalEdu?.finish_date ?? ""}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div id="nonformal-datepicker" class="hidden">
+                                  <div data-rangepicker></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="flex mt-16 | not-lg:justify-center">
+                            <button
+                              type="button"
+                              class="inline-flex items-center gap-4 shrink-0"
+                              data-hover-group
+                              data-save-pendidikan
+                              data-formal-id={formalEdu?.id ?? ""}
+                              data-nonformal-id={nonformalEdu?.id ?? ""}
+                            >
+                              <div
+                                class="link font-semibold text-dark-950"
+                                data-hover-effect
+                              >
+                                Simpan Perubahan
+                              </div>
+                              <div
+                                class="btn btn-icon btn-primary"
+                                data-hover-effect
+                              >
+                                <svg
+                                  class="icon icon-stroke icon-up-right"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M17.5 6.5L6 18"
+                                    stroke="#141B34"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                                  <path
+                                    d="M8 6H18V16"
+                                    stroke="#141B34"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                                </svg>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+
+                        <!-- ── TAB 3: Pengalaman Kerja ──────────────────── -->
+                        <div
+                          id="tab-pengalaman"
+                          class="hidden [&.is-active]:block"
+                          data-tab-content
+                          aria-hidden="true"
+                        >
+                          <div class="grid gap-16">
+                            <div class="grid gap-8">
+                              <h5>Informasi Pengalaman</h5>
+                              <div
+                                class="relative flex flex-col gap-12"
+                                data-experience
+                                id="experience-container"
+                              >
+                                {
+                                  experiences.length === 0 ? (
+                                    <div class="text-sm text-dark-400">
+                                      Belum ada data pengalaman kerja.
+                                    </div>
+                                  ) : (
+                                    experiences.map((exp: any, i: number) => (
+                                      <div
+                                        class="relative grid gap-6"
+                                        data-experience-item
+                                        data-exp-id={exp.id}
+                                      >
+                                        <div class="flex items-center gap-4">
+                                          <h5 class="text-xl text-balance tracking-normal">
+                                            Pengalaman{" "}
+                                            {String(i + 1).padStart(2, "0")}.
+                                          </h5>
+                                          <div class="grow h-px bg-dark-300" />
+                                        </div>
+                                        <div class="grid gap-6 | lg:grid-cols-2">
+                                          <div class="col-span-full | lg:col-span-1">
+                                            <div class="c-form-wrapper">
+                                              <div class="c-form c-form-default">
+                                                <label class="c-label">
+                                                  Nama Perusahaan
+                                                </label>
+                                                <input
+                                                  type="text"
+                                                  class="c-input"
+                                                  value={exp.company_name ?? ""}
+                                                  data-exp-field="company_name"
+                                                />
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div class="col-span-full | lg:col-span-1">
+                                            <div class="c-form-wrapper">
+                                              <div class="c-form c-form-default">
+                                                <label class="c-label">
+                                                  Jabatan
+                                                </label>
+                                                <input
+                                                  type="text"
+                                                  class="c-input"
+                                                  value={exp.position ?? ""}
+                                                  data-exp-field="position"
+                                                />
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div class="col-span-full | lg:col-span-1">
+                                            <div class="c-form-wrapper">
+                                              <div class="c-form c-form-default">
+                                                <label class="c-label">
+                                                  Tanggal Mulai
+                                                </label>
+                                                <input
+                                                  type="text"
+                                                  class="c-input"
+                                                  value={exp.start_date ?? ""}
+                                                  id={`pengalaman-from-date-${i + 1}`}
+                                                  data-exp-field="start_date"
+                                                  readonly
+                                                  placeholder="dd mmmm, yyyy"
+                                                />
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div class="col-span-full | lg:col-span-1">
+                                            <div class="c-form-wrapper">
+                                              <div class="c-form c-form-default">
+                                                <label class="c-label">
+                                                  Tanggal Selesai
+                                                </label>
+                                                <input
+                                                  type="text"
+                                                  class="c-input"
+                                                  value={exp.finish_date ?? ""}
+                                                  id={`pengalaman-to-date-${i + 1}`}
+                                                  data-exp-field="finish_date"
+                                                  readonly
+                                                  placeholder="dd mmmm, yyyy"
+                                                />
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div
+                                            id={`pengalaman-datepicker-${i + 1}`}
+                                            class="hidden"
+                                          >
+                                            <div data-rangepicker />
+                                          </div>
+                                          <div class="col-span-full">
+                                            <div class="c-form-wrapper">
+                                              <div class="c-form c-form-default">
+                                                <label class="c-label">
+                                                  Keterangan
+                                                </label>
+                                                <textarea
+                                                  class="c-input c-textarea"
+                                                  data-exp-field="description"
+                                                  set:text={
+                                                    exp.description ?? ""
+                                                  }
+                                                />
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div class="col-span-full | lg:col-span-1">
+                                            <div class="c-form-wrapper">
+                                              <div class="c-form c-form-default">
+                                                <label class="c-label">
+                                                  Gaji /bulan
+                                                </label>
+                                                <input
+                                                  type="text"
+                                                  inputmode="numeric"
+                                                  class="c-input"
+                                                  value={
+                                                    exp.salary
+                                                      ? `Rp ${Number(exp.salary).toLocaleString("id-ID")}`
+                                                      : ""
+                                                  }
+                                                  data-exp-field="salary"
+                                                  data-salary-input
+                                                />
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ))
+                                  )
+                                }
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="flex mt-16 | not-lg:justify-center">
+                            <button
+                              type="button"
+                              class="inline-flex items-center gap-4 shrink-0"
+                              data-hover-group
+                              data-save-pengalaman
+                            >
+                              <div
+                                class="link font-semibold text-dark-950"
+                                data-hover-effect
+                              >
+                                Simpan Perubahan
+                              </div>
+                              <div
+                                class="btn btn-icon btn-primary"
+                                data-hover-effect
+                              >
+                                <svg
+                                  class="icon icon-stroke icon-up-right"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M17.5 6.5L6 18"
+                                    stroke="#141B34"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                                  <path
+                                    d="M8 6H18V16"
+                                    stroke="#141B34"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                                </svg>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+                      </div><!-- /data-tabs-content -->
+
+                      <div
+                        class="absolute inset-y-0 left-0 w-dvw bg-dark-50 rounded-l-lg -z-1 | not-lg:hidden"
+                      >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Floating Menu Mobile ────────────────────────────────────────── -->
+        <div
+          id="floating-menu"
+          class="fixed inset-x-0 bottom-0 z-10 | lg:hidden"
+        >
+          <div
+            class="grid grid-cols-4 bg-white shadow-[0_-0.5rem_2rem_-0.25rem] shadow-dark-950/15"
+          >
+            <div data-barba-active>
+              <a
+                href="/profile"
+                class="relative flex items-center justify-center aspect-square"
+              >
+                <svg
+                  class="icon icon-fill size-7 text-dark-400 [.is-active_&]:text-primary-600"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M17.8751 11.875C18.4274 11.875 18.8751 12.3227 18.8751 12.875V13.2736C19.6155 13.4438 20.2848 13.7991 20.8263 14.289L21.3343 13.9624C21.7989 13.6637 22.4176 13.7982 22.7163 14.2628C23.0149 14.7274 22.8804 15.3461 22.4159 15.6447L21.9517 15.9432C22.1176 16.39 22.2084 16.8723 22.2084 17.375C22.2084 17.8778 22.1176 18.3602 21.9516 18.807L22.4155 19.1053C22.88 19.4039 23.0145 20.0226 22.7158 20.4872C22.4172 20.9518 21.7985 21.0863 21.3339 20.7876L20.8262 20.4612C20.2847 20.951 19.6154 21.3062 18.8751 21.4764V21.875C18.8751 22.4273 18.4274 22.875 17.8751 22.875C17.3228 22.875 16.8751 22.4273 16.8751 21.875V21.4764C16.1348 21.3062 15.4655 20.951 14.9241 20.4612L14.4163 20.7876C13.9517 21.0863 13.333 20.9518 13.0344 20.4872C12.7357 20.0226 12.8702 19.4039 13.3348 19.1053L13.7986 18.807C13.6326 18.3602 13.5418 17.8778 13.5418 17.375C13.5418 16.8723 13.6326 16.39 13.7985 15.9432L13.3343 15.6447C12.8698 15.3461 12.7353 14.7274 13.0339 14.2628C13.3326 13.7982 13.9513 13.6637 14.4159 13.9624L14.9239 14.289C15.4654 13.7991 16.1347 13.4438 16.8751 13.2736V12.875C16.8751 12.3227 17.3228 11.875 17.8751 11.875Z"
+                    fill="#141B34"></path>
+                  <g opacity="0.4">
+                    <path
+                      d="M10.875 1.125C7.97552 1.125 5.62502 3.4755 5.62502 6.375C5.62502 9.27449 7.97552 11.625 10.875 11.625C13.7745 11.625 16.125 9.27449 16.125 6.375C16.125 3.4755 13.7745 1.125 10.875 1.125Z"
+                      fill="#141B34"></path>
+                    <path
+                      d="M9.26996 13.2375C10.0534 13.127 10.8465 13.0979 11.6351 13.1502C11.7785 13.1597 11.8497 13.3307 11.7719 13.4516C11.1823 14.3687 11.2679 15.526 11.9018 16.34C12.0023 16.4691 12.0526 16.5336 12.0687 16.5884C12.0848 16.6432 12.0781 16.7164 12.0648 16.8627C12.0494 17.0316 12.0415 17.2025 12.0415 17.375C12.0415 17.5477 12.0494 17.7187 12.0648 17.8877C12.0781 18.034 12.0848 18.1071 12.0688 18.1619C12.0527 18.2167 12.0024 18.2813 11.902 18.4103C11.2683 19.2243 11.1829 20.3814 11.7723 21.2984C11.8252 21.3805 11.882 21.4602 11.9424 21.537C12.4535 22.1873 12.7091 22.5124 12.6818 22.5687C12.6544 22.625 12.2974 22.625 11.5834 22.625H6.46557C4.64726 22.625 3.24148 21.7306 2.07003 20.6146C1.39101 19.9677 1.05255 19.2396 1.13736 18.4638C1.2171 17.7342 1.65575 17.1387 2.11742 16.6868C2.85559 15.9643 3.9332 15.3563 4.64602 14.9542C4.80862 14.8625 4.95229 14.7814 5.06857 14.7122C6.37341 13.9352 7.80548 13.4441 9.26996 13.2375Z"
+                      fill="#141B34"></path>
+                  </g>
+                </svg>
+                <div
+                  class="absolute inset-x-0 top-0 h-px bg-primary-600 hidden [.is-active_&]:block"
+                >
+                </div>
+              </a>
+            </div>
+            <div data-barba-active>
+              <a
+                href="/profile/document"
+                class="relative flex items-center justify-center aspect-square"
+              >
+                <svg
+                  class="icon icon-fill size-7 text-dark-400 [.is-active_&]:text-primary-600"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    opacity="0.4"
+                    d="M13.1374 22.5827C12.662 22.7514 12.1575 22.7507 11.5875 22.75C10.0618 22.75 8.65416 22.7499 7.67541 22.635C6.66272 22.5162 5.79501 22.2632 5.05999 21.6674C4.79018 21.4488 4.54441 21.2017 4.32687 20.9305C3.73424 20.1917 3.48254 19.3195 3.36431 18.3015C3.25003 17.3177 3.25004 16.0812 3.25006 14.5475V9.97392C3.25004 8.19195 3.25002 6.75558 3.40111 5.62592C3.55798 4.45306 3.89358 3.46554 4.67383 2.68123C5.45408 1.89692 6.43649 1.55958 7.60328 1.40189C8.72711 1.25001 10.2982 1.25003 12.071 1.25006C13.8438 1.25003 15.2727 1.25001 16.3966 1.40189C17.5634 1.55958 18.5458 1.89692 19.326 2.68123C20.1063 3.46554 20.4419 4.45306 20.5987 5.62592C20.7498 6.7556 20.7498 8.19195 20.7498 9.97396L20.7499 13.4482C20.7509 14.1116 20.7518 14.7003 20.5278 15.2441C20.3037 15.7879 19.8889 16.2035 19.4216 16.6719L14.6387 21.4795C14.2363 21.8852 13.88 22.2442 13.4252 22.4629C13.3314 22.508 13.2354 22.548 13.1374 22.5827Z"
+                    fill="#141B34"></path>
+                  <path
+                    d="M13.1375 22.5828C13.2354 22.548 13.3315 22.508 13.4252 22.463C13.8801 22.2443 14.2363 21.8852 14.6388 21.4796L19.4216 16.6719C19.889 16.2036 20.3038 15.7879 20.5278 15.2442C20.6266 15.0044 20.6817 14.756 20.7123 14.4962H18.7315C17.3639 14.4962 16.7153 14.497 15.8484 14.6135C14.9483 14.7346 14.1904 14.9935 13.5885 15.5954C12.9866 16.1973 12.7277 16.9552 12.6066 17.8553C12.4903 18.7205 12.4903 19.3765 12.4904 20.7384V22.7214C12.7137 22.6984 12.9284 22.657 13.1375 22.5828Z"
+                    fill="#141B34"></path>
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M16.7501 7.00006C16.7501 7.41427 16.4143 7.75006 16.0001 7.75006L8.00006 7.75006C7.58585 7.75006 7.25006 7.41428 7.25006 7.00006C7.25006 6.58585 7.58585 6.25006 8.00006 6.25006L16.0001 6.25006C16.4143 6.25006 16.7501 6.58585 16.7501 7.00006Z"
+                    fill="#141B34"></path>
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M12.7501 11.0001C12.7501 11.4143 12.4143 11.7501 12.0001 11.7501L8.00006 11.7501C7.58585 11.7501 7.25006 11.4143 7.25006 11.0001C7.25006 10.5858 7.58585 10.2501 8.00006 10.2501L12.0001 10.2501C12.4143 10.2501 12.7501 10.5858 12.7501 11.0001Z"
+                    fill="#141B34"></path>
+                </svg>
+                <div
+                  class="absolute inset-x-0 top-0 h-px bg-primary-600 hidden [.is-active_&]:block"
+                >
+                </div>
+              </a>
+            </div>
+            <div data-barba-active>
+              <a
+                href="/profile/status"
+                class="relative flex items-center justify-center aspect-square"
+              >
+                <svg
+                  class="icon icon-fill size-7 text-dark-400 [.is-active_&]:text-primary-600"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M14.4038 14.0251C15.098 13.2945 16.0976 12.75 17.25 12.75C18.4024 12.75 19.402 13.2945 20.0962 14.0251C20.7838 14.7486 21.25 15.7359 21.25 16.75V19.75C21.25 20.3023 20.8023 20.75 20.25 20.75C19.6977 20.75 19.25 20.3023 19.25 19.75L19.25 16.75C19.25 16.3346 19.0447 15.8219 18.6464 15.4028C18.2549 14.9908 17.7544 14.75 17.25 14.75C16.7456 14.75 16.2451 14.9908 15.8536 15.4028C15.4553 15.8219 15.25 16.3346 15.25 16.75V20.25C15.25 20.5261 15.4739 20.75 15.75 20.75C16.0261 20.75 16.25 20.5261 16.25 20.25V16.75C16.25 16.1977 16.6977 15.75 17.25 15.75C17.8023 15.75 18.25 16.1977 18.25 16.75V20.25C18.25 21.6307 17.1307 22.75 15.75 22.75C14.3693 22.75 13.25 21.6307 13.25 20.25L13.25 16.75C13.25 15.7359 13.7162 14.7486 14.4038 14.0251Z"
+                    fill="#141B34"></path>
+                  <g opacity="0.4">
+                    <path
+                      d="M16.989 1.40314C15.8497 1.24997 14.3941 1.24998 12.5564 1.25H11.4436C9.60588 1.24998 8.15026 1.24997 7.01105 1.40313C5.83864 1.56076 4.8897 1.89287 4.14133 2.64123C3.39297 3.38958 3.06085 4.33852 2.90321 5.51094C2.75004 6.65014 2.75004 8.10576 2.75004 9.94351L2.75 14.5489C2.74998 16.1511 2.74996 17.4205 2.86865 18.4247C2.9905 19.4557 3.24632 20.3044 3.82812 21.0133C4.02552 21.2539 4.24609 21.4744 4.48664 21.6718C5.19558 22.2536 6.04427 22.5095 7.07523 22.6313C8.07942 22.75 9.34874 22.75 10.9509 22.75H12.5563C12.6912 22.75 12.8241 22.75 12.9548 22.7499C12.3611 22.0865 12 21.2104 12 20.25V16.75C12 15.3611 12.6299 14.0773 13.4976 13.1641C14.3804 12.2351 15.6916 11.5 17.25 11.5C18.8084 11.5 20.1196 12.2351 21.0024 13.1641C21.0873 13.2534 21.1699 13.3464 21.2499 13.4426V9.94359C21.25 8.10585 21.25 6.65018 21.0968 5.51098C20.9392 4.33856 20.6071 3.38961 19.8587 2.64124C19.1103 1.89288 18.1614 1.56076 16.989 1.40314Z"
+                      fill="#141B34"></path>
+                  </g>
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M6.75 6C6.75 5.58579 7.08579 5.25 7.5 5.25H16.5C16.9142 5.25 17.25 5.58579 17.25 6C17.25 6.41421 16.9142 6.75 16.5 6.75H7.5C7.08579 6.75 6.75 6.41421 6.75 6Z"
+                    fill="#141B34"></path>
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M6.75 10C6.75 9.58579 7.08579 9.25 7.5 9.25H13.5C13.9142 9.25 14.25 9.58579 14.25 10C14.25 10.4142 13.9142 10.75 13.5 10.75H7.5C7.08579 10.75 6.75 10.4142 6.75 10Z"
+                    fill="#141B34"></path>
+                </svg>
+                <div
+                  class="absolute inset-x-0 top-0 h-px bg-primary-600 hidden [.is-active_&]:block"
+                >
+                </div>
+              </a>
+            </div>
+            <div data-barba-active>
+              <a
+                href="/profile/vacancy"
+                class="relative flex items-center justify-center aspect-square"
+              >
+                <svg
+                  class="icon icon-fill size-7 text-dark-400 [.is-active_&]:text-primary-600"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    opacity="0.4"
+                    d="M9.52635 2.04882C10.3521 1.54948 11.1264 1.25 12.0001 1.25C12.8738 1.25 13.648 1.54948 14.4738 2.04882C15.2736 2.53243 16.1876 3.2459 17.3351 4.14158L18.5185 5.06519C19.8944 6.13845 20.7838 6.83222 21.2675 7.82476C21.7511 8.81691 21.7507 9.9466 21.7501 11.6956L21.7501 14.0277C21.7501 15.8724 21.7501 17.3329 21.597 18.4758C21.4395 19.6516 21.1077 20.6031 20.3598 21.3536C19.6115 22.1046 18.6624 22.438 17.4895 22.5963C16.3501 22.75 14.8943 22.75 13.0567 22.75H10.9435C9.10587 22.75 7.65009 22.75 6.51071 22.5963C5.3378 22.438 4.38864 22.1046 3.64038 21.3536C2.89249 20.6031 2.56069 19.6516 2.40317 18.4758C2.25005 17.3329 2.25006 15.8724 2.25008 14.0278L2.25004 11.6956C2.24947 9.9466 2.2491 8.8169 2.73262 7.82476C3.21633 6.83222 4.10576 6.13845 5.4817 5.06519L6.66505 4.14157C7.81252 3.2459 8.72657 2.53243 9.52635 2.04882Z"
+                    fill="#141B34"></path>
+                  <path
+                    d="M15.7495 22.725C14.9597 22.7505 14.0656 22.7505 13.0562 22.7505H10.943C9.93378 22.7505 9.03973 22.7505 8.25 22.725L8.25177 17.9723C8.25193 17.5285 8.25206 17.158 8.2729 16.8538C8.2946 16.5371 8.34123 16.238 8.4613 15.948C8.74055 15.2735 9.27652 14.7378 9.9511 14.4588C10.2412 14.3388 10.5403 14.2923 10.8569 14.2707C11.1611 14.25 11.5821 14.25 12.0259 14.25C12.4698 14.25 12.8405 14.25 13.1447 14.2707C13.4615 14.2923 13.7607 14.3389 14.0508 14.4589C14.7255 14.738 15.2615 15.274 15.5407 15.9487C15.6607 16.2388 15.7072 16.5381 15.7288 16.8548C15.7495 17.1591 15.7495 17.5297 15.7495 17.9737V22.725Z"
+                    fill="#141B34"></path>
+                </svg>
+                <div
+                  class="absolute inset-x-0 top-0 h-px bg-primary-600 hidden [.is-active_&]:block"
+                >
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div><!-- /data-barba container -->
+    </main>
+
+    <!-- ── Modal Sukses Simpan ───────────────────────────────────────────────── -->
+    <div
+      id="modal-save-success"
+      class="fixed top-0 inset-x-0 z-[999] invisible"
+      data-modal
+    >
+      <div
+        class="relative w-full h-dvh flex flex-col overflow-auto"
+        data-lenis-prevent
+      >
+        <div
+          class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
+        >
+          <div class="grow w-full flex flex-col max-container">
+            <div class="grid gap-4 | lg:grid-cols-12">
+              <div
+                class="grid-item col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
+              >
+                <div
+                  class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
+                  data-modal-content
+                >
+                  <div class="shrink-0 px-6 py-6 | lg:py-8">
+                    <div class="flex flex-col gap-4 items-center text-center">
+                      <div
+                        class="flex items-center justify-center size-16 rounded-full bg-primary-50"
+                      >
+                        <svg
+                          class="icon icon-stroke size-8 text-primary-600"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M5 13L9 17L19 7"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                        </svg>
+                      </div>
+                      <div
+                        class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
+                      >
+                        Berhasil Disimpan
+                      </div>
+                      <h4 class="w-full font-bold leading-none text-balance">
+                        Data Berhasil Diperbarui
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="shrink-0 px-6 pb-8 | lg:pb-10">
+                    <div class="flex flex-col gap-6">
+                      <p
+                        class="text-sm text-dark-400 text-center text-balance leading-relaxed"
+                      >
+                        Perubahan data Anda telah berhasil disimpan.
+                      </p>
+                      <button
+                        type="button"
+                        class="btn btn-primary"
+                        data-hover-effect
+                        data-modal-hide
+                      >
+                        Tutup
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- @components sectionFooter -->
+  </div><!-- /#app -->
+
+  <svg
+    width="0"
+    height="0"
+    class="absolute hidden"
+    color-interpolation-filters="sRGB"
+  >
+    <defs>
+      <filter id="gooey-content">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"
+        ></feGaussianBlur>
+        <feColorMatrix
+          in="blur"
+          mode="matrix"
+          values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 11 -6"
+          result="gooey-content"></feColorMatrix>
+        <feComposite in="SourceGraphic" in2="gooey-content" operator="atop"
+        ></feComposite>
+        <feBlend in="SourceGraphic" in2="gooey-content"></feBlend>
+      </filter>
+    </defs>
+  </svg>
+
+  <div id="preloader">
+    <div id="preloader-spinner">
+      <img src="/assets/images/logo/logo-icon.png" alt="" />
+    </div>
+    <div id="preloader-transition"></div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</BaseLayout>
+
+<!-- <script>
+  declare global {
+    interface Window {
+      initCascadeLocation?: () => Promise<void>;
+    }
+  }
+
+  const API_URL = import.meta.env.PUBLIC_API_URL;
+  const BASE_URL = `${API_URL}/api/wai`;
+
+  const token = localStorage.getItem("auth_token");
+  if (!token) window.location.href = "/";
+
+  let currentUser: { id?: number; refid?: string } = {};
+  try {
+    const p = token!.split(".")[1];
+    currentUser = JSON.parse(atob(p.replace(/-/g, "+").replace(/_/g, "/")));
+  } catch {
+    window.location.href = "/";
+  }
+
+  const $ = (id: string) => document.getElementById(id);
+
+  // ── Preview foto saat file dipilih ────────────────────────────────────────
+  ($("input-photo-profile") as HTMLInputElement | null)?.addEventListener(
+    "change",
+    (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      const previewPhoto = $("preview-photo") as HTMLImageElement | null;
+      if (previewPhoto) {
+        previewPhoto.src = URL.createObjectURL(file);
+        previewPhoto.classList.remove("hidden");
+      }
+    },
+  );
+
+  // ── Helper: populate select dari API ─────────────────────────────────────
+  async function populateSelect(
+    url: string,
+    select: HTMLSelectElement,
+    placeholder: string,
+    selectedValue?: string,
+  ) {
+    try {
+      const res = await fetch(url);
+      const data: { id: string; name: string }[] = await res.json();
+      select.innerHTML = `<option value="" disabled>${placeholder}</option>`;
+      data.forEach((item) => {
+        const opt = document.createElement("option");
+        opt.value = item.id;
+        opt.textContent = item.name;
+        if (
+          selectedValue &&
+          (item.id === selectedValue || item.name === selectedValue)
+        ) {
+          opt.selected = true;
+        }
+        select.appendChild(opt);
+      });
+      select.disabled = false;
+      // Jika tidak ada yang terpilih, set placeholder sebagai selected
+      if (!select.value) {
+        (select.querySelector("option") as HTMLOptionElement).selected = true;
+      }
+    } catch (err) {
+      console.error(`Gagal load ${url}:`, err);
+    }
+  }
+
+  const selProvince = $("select-province") as HTMLSelectElement | null;
+  const selCityreg = $("select-cityreg") as HTMLSelectElement | null;
+  const selSubdistrict = $("select-subdistrict") as HTMLSelectElement | null;
+  const selWard = $("select-ward") as HTMLSelectElement | null;
+
+  // ── Auto-populate cascade saat halaman pertama load ───────────────────────
+  async function initCascadeLocation() {
+    if (!selProvince || !selCityreg || !selSubdistrict || !selWard) return;
+
+    const selectedProvince = selProvince.dataset.selectedProvince ?? "";
+    const selectedRegency = selProvince.dataset.selectedRegency ?? "";
+    const selectedDistrict = selProvince.dataset.selectedDistrict ?? "";
+    const selectedVillage = selProvince.dataset.selectedVillage ?? "";
+
+    console.log(
+      "selectedProvince",
+      selectedProvince,
+      "selectedRegency",
+      selectedRegency,
+      "selectedDistrict",
+      selectedDistrict,
+      "selectedVillage",
+      selectedVillage,
+    );
+
+    if (!selectedRegency) return; // Tidak ada data lokasi sama sekali
+
+    // Set province select by name match
+    if (selectedProvince) {
+      const provOption = Array.from(selProvince.options).find(
+        (opt) =>
+          opt.text === selectedProvince || opt.value === selectedProvince,
+      );
+      if (provOption) {
+        provOption.selected = true;
+      }
+    }
+
+    const provinceId = selProvince.value;
+    if (!provinceId) return;
+
+    // Populate regencies
+    await populateSelect(
+      `${BASE_URL}/regencies/${provinceId}`,
+      selCityreg,
+      "Pilih kota/kabupaten *",
+      selectedRegency,
+    );
+
+    if (!selCityreg.value) return;
+
+    // Populate districts
+    await populateSelect(
+      `${BASE_URL}/districts/${selCityreg.value}`,
+      selSubdistrict,
+      "Pilih kecamatan *",
+      selectedDistrict,
+    );
+
+    if (!selSubdistrict.value) return;
+
+    // Populate villages
+    await populateSelect(
+      `${BASE_URL}/villages/${selSubdistrict.value}`,
+      selWard,
+      "Pilih kelurahan *",
+      selectedVillage,
+    );
+  }
+
+  // Jalankan cascade otomatis saat load
+  document.addEventListener("DOMContentLoaded", () => {
+    console.log("Init cascade location >>>>");
+    initCascadeLocation();
+  });
+
+  // ── Cascade lokasi manual (saat user ubah pilihan) ────────────────────────
+  if (selProvince && selCityreg && selSubdistrict && selWard) {
+    selProvince.addEventListener("change", async () => {
+      selCityreg.innerHTML = `<option value="" disabled selected>Pilih kota/kabupaten *</option>`;
+      selSubdistrict.innerHTML = `<option value="" disabled selected>Pilih kecamatan *</option>`;
+      selWard.innerHTML = `<option value="" disabled selected>Pilih kelurahan *</option>`;
+      selCityreg.disabled = selSubdistrict.disabled = selWard.disabled = true;
+      if (selProvince.value) {
+        await populateSelect(
+          `${BASE_URL}/regencies/${selProvince.value}`,
+          selCityreg,
+          "Pilih kota/kabupaten *",
+        );
+      }
+    });
+
+    selCityreg.addEventListener("change", async () => {
+      selSubdistrict.innerHTML = `<option value="" disabled selected>Pilih kecamatan *</option>`;
+      selWard.innerHTML = `<option value="" disabled selected>Pilih kelurahan *</option>`;
+      selSubdistrict.disabled = selWard.disabled = true;
+      if (selCityreg.value) {
+        await populateSelect(
+          `${BASE_URL}/districts/${selCityreg.value}`,
+          selSubdistrict,
+          "Pilih kecamatan *",
+        );
+      }
+    });
+
+    selSubdistrict.addEventListener("change", async () => {
+      selWard.innerHTML = `<option value="" disabled selected>Pilih kelurahan *</option>`;
+      selWard.disabled = true;
+      if (selSubdistrict.value) {
+        await populateSelect(
+          `${BASE_URL}/villages/${selSubdistrict.value}`,
+          selWard,
+          "Pilih kelurahan *",
+        );
+      }
+    });
+  }
+
+  // ── Helpers form ──────────────────────────────────────────────────────────
+  const getVal = (id: string) =>
+    ($(`${id}`) as HTMLInputElement | null)?.value?.trim() ?? "";
+  const getSelText = (id: string) => {
+    const s = $(`${id}`) as HTMLSelectElement | null;
+    return s?.options[s.selectedIndex]?.text ?? "";
+  };
+
+  // ── Simpan Informasi Pribadi ──────────────────────────────────────────────
+  document
+    .querySelector("[data-save-informasi]")
+    ?.addEventListener("click", async () => {
+      const photoFile =
+        ($("input-photo-profile") as HTMLInputElement | null)?.files?.[0] ??
+        null;
+      let avatarFilename =
+        ($("preview-photo") as HTMLImageElement | null)?.dataset.original ?? "";
+
+      if (photoFile) {
+        const fd = new FormData();
+        fd.append("file", photoFile);
+        try {
+          const r = await fetch(`${API_URL}/api/upload?folder=avatar`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+            body: fd,
+          });
+          const j = await r.json();
+          if (r.ok) avatarFilename = j.filename;
+        } catch (err) {
+          console.error("Gagal upload foto:", err);
+        }
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/api/applicants/${currentUser.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            avatar: avatarFilename,
+            name: getVal("input-name"),
+            ktp_number: getVal("input-nik"),
+            place_of_birth: getVal("input-place-of-birth"),
+            date_of_birth: getVal("input-birthdate"),
+            gender: getVal("select-gender"),
+            email: getVal("input-email"),
+            phone_number: getVal("input-nohp"),
+            province: getSelText("select-province"),
+            regency: getSelText("select-cityreg"),
+            district: getSelText("select-subdistrict"),
+            village: getSelText("select-ward"),
+            poscode: getVal("input-postalcode"),
+            address: getVal("input-address"),
+          }),
+        });
+        if (!res.ok) throw new Error("Gagal menyimpan");
+        alert("Informasi pribadi berhasil disimpan!");
+      } catch (err) {
+        console.error(err);
+        alert("Terjadi kesalahan saat menyimpan.");
+      }
+    });
+
+  // ── Simpan Pendidikan ─────────────────────────────────────────────────────
+  document
+    .querySelector("[data-save-pendidikan]")
+    ?.addEventListener("click", async () => {
+      const formalId =
+        document.querySelector<HTMLElement>("[data-formal-id]")?.dataset
+          .formalId;
+      const nonformalId = document.querySelector<HTMLElement>(
+        "[data-nonformal-id]",
+      )?.dataset.nonformalId;
+
+      try {
+        if (formalId) {
+          await fetch(`${API_URL}/api/education/formal/${formalId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              last_education: getVal("select-last-education"),
+              school_name: getVal("input-sekolah"),
+              start_date: getVal("formal-from-date"),
+              finish_date: getVal("formal-to-date"),
+              study_name: getVal("input-jurusan"),
+            }),
+          });
+        }
+
+        const nfSchool = getVal("input-lembaga-pendidikan");
+        const nfStudy = getVal("input-bidang-pelajaran");
+        if (nfSchool && nfStudy) {
+          const nfBody = {
+            school_name: nfSchool,
+            study_name: nfStudy,
+            start_date: getVal("nonformal-from-date"),
+            finish_date: getVal("nonformal-to-date"),
+          };
+          const endpoint = nonformalId
+            ? `${API_URL}/api/education/nonformal/${nonformalId}`
+            : `${API_URL}/api/education/nonformal`;
+          await fetch(endpoint, {
+            method: nonformalId ? "PUT" : "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(
+              nonformalId
+                ? nfBody
+                : { ...nfBody, applicant_refid: currentUser.refid },
+            ),
+          });
+        }
+        alert("Data pendidikan berhasil disimpan!");
+      } catch (err) {
+        console.error(err);
+        alert("Terjadi kesalahan saat menyimpan.");
+      }
+    });
+
+  console.log("Assigning initCascadeLocation to window");
+  // Expose ke window agar bisa dipanggil dari main.js (Barba)
+  window.initCascadeLocation = initCascadeLocation;
+
+  // Tetap panggil untuk hard refresh / first load
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => initCascadeLocation());
+  } else {
+    initCascadeLocation();
+  }
+</script> -->
