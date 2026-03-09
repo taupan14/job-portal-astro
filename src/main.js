@@ -2,7 +2,7 @@
 import "@scripts/sectionHeader";
 import "@scripts/sectionFooter";
 // import '@scripts/listSlideServices'
-import "@scripts/listSlideJobs";
+// import "@scripts/listSlideJobs";
 import "@scripts/listSlideEmployes";
 import "@scripts/listSlideTestimonialsAvatar";
 import "@scripts/listSlideTestimonials";

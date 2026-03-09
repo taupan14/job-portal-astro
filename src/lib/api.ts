@@ -39,13 +39,24 @@ export async function apiGet<T>(
   cookie?: string,
 ): Promise<T | null> {
   try {
-    const res = await fetch(`${API_URL}${path}`, {
+    const url = `${API_URL}${path}`;
+    //console.log("[apiGet] fetch:", url);           // ← cek URL yang dihit
+    
+    const res = await fetch(url, {
       ...defaultOptions(cookie),
       method: "GET",
     });
-    if (!res.ok) return null;
+
+    // console.log("[apiGet] status:", res.status, path); // ← cek status response
+    
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("[apiGet] error body:", text);  // ← cek pesan error
+      return null;
+    }
     return res.json() as Promise<T>;
-  } catch {
+  } catch (err) {
+    console.error("[apiGet] exception:", err);      // ← cek exception
     return null;
   }
 }

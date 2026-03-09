@@ -2,7 +2,7 @@ import barba from '@barba/core'
 
 const fetchCategories = async () => {
     try {
-        const response = await fetch('./assets/json/list-blog-categories.json')
+        const response = await fetch('/assets/json/list-blog-categories.json')
         if (!response.ok) {
             throw new Error('Network response was not ok')
         }

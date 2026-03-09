@@ -1,0 +1,467 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { apiGet } from "../../lib/api";
+
+const cookieHeader = Astro.request.headers.get("cookie") ?? "";
+
+// ── Query params dari URL ─────────────────────────────────────────────────────
+const q        = Astro.url.searchParams.get("q") ?? "";
+const province = Astro.url.searchParams.get("province") ?? "";
+const category = Astro.url.searchParams.get("category") ?? "";
+const page     = Math.max(1, Number(Astro.url.searchParams.get("page") ?? "1"));
+const limit    = 12;
+
+// ── Build query string ke backend ─────────────────────────────────────────────
+const backendParams = new URLSearchParams();
+backendParams.set("page", String(page));
+backendParams.set("limit", String(limit));
+if (q)        backendParams.set("q", q);
+if (province) backendParams.set("province", province);
+if (category) backendParams.set("category", category);
+
+// ── SSR fetch paralel ─────────────────────────────────────────────────────────
+const [vacancyRes, provinces, categories] = await Promise.all([
+  apiGet<{
+    data: Array<{
+      id: number;
+      slug: string;
+      job_title: string;
+      job_type: number;
+      job_type_label: string;
+      sallary_formatted: string;
+      description: string;
+      location: string;
+      company: { name: string; logo: string | null };
+      category: string;
+    }>;
+    total: number;
+    page: number;
+    totalPages: number;
+  }>(`/api/vacancies?${backendParams.toString()}`, cookieHeader),
+  apiGet<{ id: string; name: string }[]>("/api/wai/provinces", cookieHeader),
+  apiGet<{ id: number; name: string }[]>("/api/categories", cookieHeader),
+]);
+
+const jobs       = vacancyRes?.data ?? [];
+const total      = vacancyRes?.total ?? 0;
+const totalPages = vacancyRes?.totalPages ?? 1;
+
+// ── Decode user untuk cek login (like button) ─────────────────────────────────
+function getUserFromCookie(cookie: string) {
+  const match = cookie.split(";").map((c) => c.trim()).find((c) => c.startsWith("auth_token="));
+  if (!match) return null;
+  try {
+    const token = decodeURIComponent(match.slice("auth_token=".length));
+    const payload = token.split(".")[1];
+    return JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+  } catch { return null; }
+}
+
+const currentUser = getUserFromCookie(cookieHeader);
+
+const likedIds: number[] = currentUser?.id
+  ? (await apiGet<number[]>(`/api/vacancies/liked?applicant_id=${currentUser.id}`, cookieHeader)) ?? []
+  : [];
+
+const API_URL = import.meta.env.PUBLIC_API_URL;
+
+const JOB_TYPE_CLASS: Record<number, string> = {
+  0: "badge-primary",
+  1: "badge-dark",
+  2: "badge-default",
+  3: "badge-default",
+};
+
+// ── Helper: build URL dengan params baru ──────────────────────────────────────
+const buildUrl = (overrides: Record<string, string | number>) => {
+  const p = new URLSearchParams();
+  if (q)        p.set("q", q);
+  if (province) p.set("province", province);
+  if (category) p.set("category", category);
+  p.set("page", String(page));
+  Object.entries(overrides).forEach(([k, v]) => p.set(k, String(v)));
+  return `/jobs?${p.toString()}`;
+};
+---
+
+<BaseLayout title="Lowongan Kerja">
+  <div id="app">
+    <!-- @components sectionHeader -->
+
+    <main id="section-main" data-barba="wrapper">
+      <div
+        data-hero-scheme="light"
+        data-barba="container"
+        data-barba-namespace="jobs"
+      >
+
+        <!-- ── Page Header ──────────────────────────────────────────────────── -->
+        <section id="page-header" class="relative pt-(--space-header)">
+          <div class="relative py-16 | lg:pt-24">
+            <div class="max-container">
+              <div class="grid gap-8 | lg:grid-cols-12">
+                <div class="col-span-full | lg:col-span-8 lg:col-start-3">
+                  <div class="flex flex-col gap-6 items-center text-center">
+                    <div class="inline-flex items-center gap-3">
+                      <div class="size-1.5 rounded-full bg-primary-600 shrink-0"></div>
+                      <div class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950">Loker</div>
+                    </div>
+                    <h1 class="leading-none text-balance">Jelajahi Karirmu</h1>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="absolute inset-0 flex justify-center -z-1 pointer-events-none select-none">
+              <h1 class="shrink-0 text-transparent [-webkit-text-stroke:1px_var(--color-dark-100)] leading-[0.8] uppercase whitespace-nowrap [--min-size:10rem] [--val-size:22vw] [--max-size:22rem]">Loker</h1>
+            </div>
+          </div>
+
+          <!-- ── Form Filter ────────────────────────────────────────────────── -->
+          <div class="relative pb-8">
+            <div class="max-container">
+              <div class="relative flex gap-6 py-8 | not-lg:flex-col">
+                <form
+                  class="grow grid gap-6 | lg:grid-cols-12"
+                  data-search-jobs
+                >
+                  <div class="col-span-full | lg:col-span-4">
+                    <div class="c-from-wrapper">
+                      <div class="c-form c-form-default">
+                        <label for="input-keyword" class="c-label">Pencarian</label>
+                        <input
+                          id="input-keyword"
+                          type="text"
+                          class="c-input"
+                          placeholder="Masukan kata kunci"
+                          value={q}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-span-full | lg:col-span-4">
+                    <div class="c-from-wrapper">
+                      <div class="c-form c-form-default">
+                        <label for="select-province" class="c-label">Lokasi Pekerjaan</label>
+                        <select id="select-province" class="c-input c-select">
+                          <option value="">Semua Lokasi</option>
+                          {(provinces ?? []).map((prov) => (
+                            <option value={prov.name} selected={prov.name === province}>
+                              {prov.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-span-full | lg:col-span-4">
+                    <div class="c-from-wrapper">
+                      <div class="c-form c-form-default">
+                        <label for="select-category" class="c-label">Bidang Pekerjaan</label>
+                        <select id="select-category" class="c-input c-select">
+                          <option value="">Semua Bidang</option>
+                          {(categories ?? []).map((cat) => (
+                            <option value={cat.id} selected={String(cat.id) === category}>
+                              {cat.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Submit button (mobile: full width, desktop: absolute) -->
+                  <div class="col-span-full flex justify-end | lg:hidden">
+                    <button type="submit" class="btn btn-lg btn-dark" data-hover-effect>
+                      Cari Loker
+                      <svg class="icon icon-stroke" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.5 17.5L22 22" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M20 11C20 6.02944 15.9706 2 11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C15.9706 20 20 15.9706 20 11Z" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </form>
+
+                <!-- Submit button desktop -->
+                <button
+                  type="submit"
+                  form="__jobs-form-desktop"
+                  class="btn btn-lg btn-icon btn-dark size-11.5 shrink-0 mt-5 | not-lg:hidden"
+                  data-hover-effect
+                  data-search-jobs-submit
+                >
+                  <svg class="icon icon-stroke icon-up" width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.5 17.5L22 22" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M20 11C20 6.02944 15.9706 2 11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C15.9706 20 20 15.9706 20 11Z" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+
+                <div class="absolute inset-y-0 right-9.5 bg-dark-50 w-screen rounded-r-lg -z-1 | not-lg:hidden"></div>
+              </div>
+
+              <!-- Active filters -->
+              {(q || province || category) && (
+                <div class="flex flex-wrap items-center gap-2 pb-4">
+                  <span class="text-xs text-dark-400">Filter aktif:</span>
+                  {q && (
+                    <a href={buildUrl({ q: "", page: 1 })} class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-50 text-primary-600 text-xs font-semibold">
+                      {q}
+                      <svg class="size-3" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </a>
+                  )}
+                  {province && (
+                    <a href={buildUrl({ province: "", page: 1 })} class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-50 text-primary-600 text-xs font-semibold">
+                      {province}
+                      <svg class="size-3" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </a>
+                  )}
+                  {category && (
+                    <a href={buildUrl({ category: "", page: 1 })} class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-50 text-primary-600 text-xs font-semibold">
+                      {(categories ?? []).find(c => String(c.id) === category)?.name ?? category}
+                      <svg class="size-3" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </a>
+                  )}
+                  <a href="/jobs" class="text-xs text-dark-400 hover:text-dark-950 underline">Reset semua</a>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Job Grid ────────────────────────────────────────────────────── -->
+        <section id="page-content" class="relative">
+          <div class="py-16 | lg:py-24">
+            <div class="max-container">
+
+              <!-- Result count -->
+              <div class="mb-8 flex items-center justify-between">
+                <p class="text-sm text-dark-400">
+                  {total > 0
+                    ? `Menampilkan ${(page - 1) * limit + 1}–${Math.min(page * limit, total)} dari ${total} lowongan`
+                    : "Tidak ada lowongan ditemukan"}
+                </p>
+              </div>
+
+              {jobs.length === 0 ? (
+                <!-- Empty state -->
+                <div class="flex flex-col items-center justify-center gap-4 py-24 text-center">
+                  <div class="flex items-center justify-center size-16 rounded-full bg-dark-100">
+                    <svg class="icon icon-stroke size-8 text-dark-400" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M17.5 17.5L22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      <path d="M20 11C20 6.02944 15.9706 2 11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C15.9706 20 20 15.9706 20 11Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <p class="text-sm text-dark-400">Tidak ada lowongan yang cocok dengan filter Anda.</p>
+                  <a href="/jobs" class="btn btn-primary btn-sm mt-2">Lihat Semua Lowongan</a>
+                </div>
+              ) : (
+                <div class="grid gap-4 | lg:grid-cols-3 lg:gap-6 | 2xl:grid-cols-4">
+                  {jobs.map((job) => (
+                    <div
+                      class="relative isolate flex flex-col bg-dark-50 ring-inset ring-1 ring-dark-200 rounded-lg overflow-clip"
+                      data-hover-group
+                    >
+                      <!-- Badge job type -->
+                      <div class="relative flex flex-col items-start gap-4 px-4 | lg:px-6">
+                        <div class="w-full flex items-start justify-end">
+                          <div class:list={["badge rounded-t-none", JOB_TYPE_CLASS[job.job_type] ?? "badge-default"]}>
+                            <span>{job.job_type_label}</span>
+                          </div>
+                        </div>
+                        <div class="w-full flex flex-col items-start gap-1">
+                          <div class="w-full text-sm font-medium truncate text-primary-600">{job.category}</div>
+                          <h5 class="text-balance tracking-normal line-clamp-2">{job.job_title}</h5>
+                        </div>
+                      </div>
+
+                      <!-- Deskripsi -->
+                      <div class="px-4 py-6 | lg:px-6">
+                        <p class="text-sm font-medium line-clamp-3">{job.description}</p>
+                      </div>
+
+                      <!-- Footer: salary + lokasi + company + like -->
+                      <div class="flex flex-col mt-auto">
+                        <div class="flex flex-col divide-y divide-dark-200 p-4 | lg:p-6">
+                          <div class="flex items-baseline justify-between gap-4 pt-6 pb-3 first:pt-0 last:pb-0">
+                            <div class="h6 text-dark-400 shrink-0">Salary</div>
+                            <div class="text-sm font-semibold text-dark-950 basis-2/3 text-end">{job.sallary_formatted}</div>
+                          </div>
+                          <div class="flex items-baseline justify-between gap-4 pt-6 pb-3 first:pt-0 last:pb-0">
+                            <div class="h6 text-dark-400 shrink-0">Lokasi</div>
+                            <div class="text-sm font-semibold text-dark-950 basis-2/3 text-end">{job.location}</div>
+                          </div>
+                        </div>
+
+                        <!-- Company bar -->
+                        <div class="flex items-center gap-4 p-4 bg-dark-100 rounded-lg | lg:p-6">
+                          <div class="grow flex items-center gap-4">
+                            <div class="avatar">
+                              {job.company.logo ? (
+                                <picture>
+                                  <img
+                                    src={`${API_URL}/pubs/uploads/avatar/${job.company.logo}`}
+                                    alt={job.company.name}
+                                    loading="lazy"
+                                    decoding="async"
+                                    class="size-full object-contain"
+                                  />
+                                </picture>
+                              ) : (
+                                <svg class="icon icon-fill size-5 text-dark-950" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" clip-rule="evenodd" d="M13.3292 3.46341C13.9961 3.65696 14.5602 3.82069 15.0046 4.01016C15.4784 4.21221 15.888 4.47174 16.199 4.89716C16.5082 5.3201 16.6358 5.7919 16.6946 6.31017C16.7502 6.80094 16.7502 7.40489 16.7502 8.12649V22.0002C16.7502 22.4144 16.4144 22.7502 16.0002 22.7502H3.00019C2.58597 22.7502 2.25018 22.4144 2.25018 22.0002L2.25018 6.659C2.25016 5.45328 2.25014 4.46853 2.35635 3.71083C2.46632 2.92626 2.70926 2.22577 3.32744 1.7391C3.95235 1.24713 4.68464 1.19025 5.45696 1.29365C6.19444 1.39238 7.11291 1.65901 8.22733 1.98252L13.3292 3.46341ZM7.25019 8.00008C7.25019 7.58587 7.58597 7.25008 8.00019 7.25008H11.0002C11.4144 7.25008 11.7502 7.58587 11.7502 8.00008C11.7502 8.4143 11.4144 8.75008 11.0002 8.75008H8.00019C7.58597 8.75008 7.25019 8.4143 7.25019 8.00008ZM7.25019 12.0001C7.25019 11.5859 7.58597 11.2501 8.00019 11.2501H11.0002C11.4144 11.2501 11.7502 11.5859 11.7502 12.0001C11.7502 12.4143 11.4144 12.7501 11.0002 12.7501H8.00019C7.58597 12.7501 7.25019 12.4143 7.25019 12.0001Z" fill="#141B34"/>
+                                  <path fill-rule="evenodd" clip-rule="evenodd" d="M1.00018 21.7501C1.00018 21.1978 1.4479 20.7501 2.00018 20.7501H22.0002C22.5525 20.7501 23.0002 21.1978 23.0002 21.7501C23.0002 22.3024 22.5525 22.7501 22.0002 22.7501H2.00018C1.4479 22.7501 1.00018 22.3024 1.00018 21.7501Z" fill="#141B34"/>
+                                </svg>
+                              )}
+                            </div>
+                            <div class="grow flex flex-col gap-1">
+                              <div class="text-sm font-semibold text-dark-950 truncate">{job.company.name}</div>
+                              <div class="h6 truncate">{job.location}</div>
+                            </div>
+                          </div>
+
+                          <!-- Like button -->
+                          <button
+                            type="button"
+                            class:list={[
+                              "btn btn-icon btn-like transition-colors duration-800 ease-custom [&.is-liked]:bg-primary-600 z-10",
+                              { "is-liked": likedIds.includes(job.id) }
+                            ]}
+                            data-tooltip="Like"
+                            data-vacancy-id={job.id}
+                            data-liked={likedIds.includes(job.id) ? "true" : "false"}
+                          >
+                            <div class="flex flex-col size-4.5 overflow-clip [.is-liked_&>*]:-translate-y-full">
+                              <svg class="icon icon-stroke transition-transform duration-800 ease-custom" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19.4626 3.99415C16.7809 2.34923 14.4404 3.01211 13.0344 4.06801C12.4578 4.50096 12.1696 4.71743 12 4.71743C11.8304 4.71743 11.5422 4.50096 10.9656 4.06801C9.55962 3.01211 7.21909 2.34923 4.53744 3.99415C1.01807 6.15294 0.221721 13.2749 8.33953 19.2834C9.88572 20.4278 10.6588 21 12 21C13.3412 21 14.1143 20.4278 15.6605 19.2834C23.7783 13.2749 22.9819 6.15294 19.4626 3.99415Z" stroke="#141B34" stroke-width="1.5" stroke-linecap="round"/>
+                              </svg>
+                              <svg class="icon icon-fill text-white transition-transform duration-800 ease-custom" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4.1449 3.35515C7.12587 1.52662 9.8001 2.25537 11.4156 3.46861C11.6814 3.6682 11.8638 3.8048 11.9996 3.89704C12.1354 3.8048 12.3178 3.6682 12.5836 3.46861C14.1991 2.25537 16.8734 1.52662 19.8543 3.35515C21.9156 4.61952 23.0754 7.2606 22.6684 10.2951C22.2595 13.3443 20.2859 16.7929 16.1063 19.8865C14.6549 20.9614 13.5897 21.7503 11.9996 21.7503C10.4095 21.7503 9.34433 20.9614 7.89294 19.8865C3.71334 16.7929 1.73976 13.3443 1.33081 10.2951C0.923824 7.2606 2.08365 4.61952 4.1449 3.35515Z" fill="#141B34"/>
+                              </svg>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Full card link -->
+                      <a href={`/jobs/${job.slug}`} class="block absolute inset-0"></a>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <!-- ── Pagination ──────────────────────────────────────────── -->
+              {totalPages > 1 && (
+                <div class="flex items-center justify-between gap-4 pt-12 border-t border-dark-200 mt-12">
+                  <p class="text-xs text-dark-400">
+                    Halaman {page} dari {totalPages}
+                  </p>
+                  <div class="flex items-center gap-2">
+                    {page > 1 ? (
+                      <a href={buildUrl({ page: page - 1 })} class="btn btn-icon btn-xs btn-dark" aria-label="Sebelumnya">
+                        <svg class="icon icon-stroke size-4" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </a>
+                    ) : (
+                      <span class="btn btn-icon btn-xs btn-dark opacity-30 pointer-events-none">
+                        <svg class="icon icon-stroke size-4" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    )}
+
+                    <div class="flex items-center gap-1">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                        <a
+                          href={buildUrl({ page: p })}
+                          class:list={[
+                            "inline-flex items-center justify-center size-8 rounded-lg text-xs font-semibold transition-colors duration-200",
+                            p === page ? "bg-primary-600 text-white" : "hover:bg-dark-100 text-dark-600",
+                          ]}
+                        >{p}</a>
+                      ))}
+                    </div>
+
+                    {page < totalPages ? (
+                      <a href={buildUrl({ page: page + 1 })} class="btn btn-icon btn-xs btn-dark" aria-label="Berikutnya">
+                        <svg class="icon icon-stroke size-4" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </a>
+                    ) : (
+                      <span class="btn btn-icon btn-xs btn-dark opacity-30 pointer-events-none">
+                        <svg class="icon icon-stroke size-4" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /data-barba container -->
+    </main>
+
+    <!-- @components sectionFooter -->
+  </div><!-- /#app -->
+
+  <svg width="0" height="0" class="absolute hidden" color-interpolation-filters="sRGB">
+    <defs>
+      <filter id="gooey-content">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"></feGaussianBlur>
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 11 -6" result="gooey-content"></feColorMatrix>
+        <feComposite in="SourceGraphic" in2="gooey-content" operator="atop"></feComposite>
+        <feBlend in="SourceGraphic" in2="gooey-content"></feBlend>
+      </filter>
+    </defs>
+  </svg>
+
+  <div id="preloader">
+    <div id="preloader-spinner">
+      <img src="/assets/images/logo/logo-icon.png" alt="" />
+    </div>
+    <div id="preloader-transition"></div>
+  </div>
+
+  <script>
+
+    // Init form search di halaman jobs (reuse logic yang sama)
+    const initJobsSearch = () => {
+      const form = document.querySelector<HTMLFormElement>("[data-search-jobs]");
+      const submitBtn = document.querySelector("[data-search-jobs-submit]");
+      if (!form) return;
+
+      // Tombol search desktop trigger submit form
+      submitBtn?.addEventListener("click", () => form.requestSubmit());
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const params = new URLSearchParams();
+        const keyword  = (form.querySelector<HTMLInputElement>("#input-keyword"))?.value.trim() ?? "";
+        const province = (form.querySelector<HTMLSelectElement>("#select-province"))?.value ?? "";
+        const category = (form.querySelector<HTMLSelectElement>("#select-category"))?.value ?? "";
+
+        if (keyword)  params.set("q", keyword);
+        if (province) params.set("province", province);
+        if (category) params.set("category", category);
+        params.set("page", "1"); // reset ke halaman 1 saat search baru
+
+        const query = params.toString();
+        window.location.href = `/jobs${query ? `?${query}` : ""}`;
+      });
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initJobsSearch);
+    } else {
+      initJobsSearch();
+    }
+    window.addEventListener("barba:after", initJobsSearch);
+  </script>
+
+  <script type="module" src="/src/main.js"></script>
+</BaseLayout>

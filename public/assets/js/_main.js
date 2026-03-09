@@ -561,17 +561,64 @@ const initAccordion = async () => {
 
 // Button Like
 const initBtnLike = async () => {
-  const init = [];
+  const API_URL = import.meta.env.PUBLIC_API_URL;
+  const token = localStorage.getItem("auth_token");
+  const isLoggedIn = !!token;
 
   document.querySelectorAll(".btn-like").forEach((btnLike) => {
-    btnLike.addEventListener("click", () => {
-      btnLike.classList.toggle("is-liked");
+    // Clone untuk hapus event listener lama (hindari double-bind saat Barba navigate)
+    const fresh = btnLike.cloneNode(true);
+    btnLike.parentNode.replaceChild(fresh, btnLike);
+
+    fresh.addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Belum login → buka modal login
+      if (!isLoggedIn) {
+        const trigger = document.querySelector('[data-modal-target="modal-cari-loker"]');
+        trigger?.click();
+        return;
+      }
+
+      // Tombol like dari card vacancy (data-like-btn + data-vacancy-id)
+      // Tombol like lain (tanpa data-vacancy-id) tetap toggle biasa
+      const vacancyId = fresh.dataset.vacancyId;
+      if (!vacancyId) {
+        fresh.classList.toggle("is-liked");
+        return;
+      }
+
+      const isLiked = fresh.dataset.liked === "true";
+
+      // Optimistic update
+      fresh.classList.toggle("is-liked", !isLiked);
+      fresh.dataset.liked = String(!isLiked);
+
+      try {
+        const res = await fetch(`${API_URL}/api/vacancies/${vacancyId}/like`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Gagal toggle like");
+
+        const { liked } = await res.json();
+
+        // Sinkronisasi dengan response server
+        fresh.classList.toggle("is-liked", liked);
+        fresh.dataset.liked = String(liked);
+      } catch (err) {
+        console.error("[like]", err);
+        // Rollback kalau gagal
+        fresh.classList.toggle("is-liked", isLiked);
+        fresh.dataset.liked = String(isLiked);
+      }
     });
-
-    init.push(btnLike);
   });
-
-  return init;
 };
 
 // Input Photo Profile
@@ -980,31 +1027,4 @@ document.addEventListener("click", (e) => {
   }, 550); // sesuaikan dengan durasi animasi close modal kamu
 });
 
-// document.addEventListener("click", (e) => {
-//   const target = e.target.closest("[data-barba-navigate]");
-//   if (!target) return;
-//   e.preventDefault();
 
-//   const path = target.getAttribute("data-barba-navigate");
-//   const parentModal = target.closest("[data-modal]");
-
-//   // console.log("path:", path);
-//   // console.log("parentModal:", parentModal);
-//   // console.log("target tag:", target.tagName);
-//   // console.log("target type:", target.type);
-
-//   if (parentModal) {
-//     parentModal.classList.add("invisible");
-//     parentModal.classList.remove("visible");
-//     document.documentElement.classList.remove("is-open-modal");
-
-//     const backdrop = document.querySelector(
-//       ".fixed.bg-gradient-to-b.backdrop-blur",
-//     );
-//     if (backdrop) backdrop.remove();
-
-//     barba.go(path);
-//   } else {
-//     barba.go(path);
-//   }
-// });

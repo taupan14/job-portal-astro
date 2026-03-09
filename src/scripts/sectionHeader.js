@@ -22,7 +22,7 @@ export const initSectionHeader = async () => {
                 <div class="col-span-full | not-lg:absolute not-lg:inset-0 not-lg:size-min not-lg:m-auto | lg:col-span-2">
                     <a href="/" data-barba-navigate="/" class="flex items-center flex-nowrap gap-3 w-min">
                         <div class="size-9 shrink-0 | lg:size-11">
-                            <img src="./assets/images/logo/logo-icon.png" alt="RUN8" class="size-full object-contain">
+                            <img src="/assets/images/logo/logo-icon.png" alt="RUN8" class="size-full object-contain">
                         </div>
                         <div class="flex flex-col leading-none uppercase font-extrabold whitespace-nowrap text-dark-950 transition-colors duration-800 ease-custom | [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&,.is-active-menu_&)]:text-white | not-lg:text-sm">
                             <div>Radar Utama</div>

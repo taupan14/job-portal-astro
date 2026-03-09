@@ -1,0 +1,768 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { apiGet } from "../../lib/api";
+
+const { slug } = Astro.params;
+const cookieHeader = Astro.request.headers.get("cookie") ?? "";
+
+// ── Decode user dari cookie ───────────────────────────────────────────────────
+function getUserFromCookie(cookie: string) {
+  const match = cookie.split(";").map((c) => c.trim()).find((c) => c.startsWith("auth_token="));
+  if (!match) return null;
+  try {
+    const token = decodeURIComponent(match.slice("auth_token=".length));
+    const payload = token.split(".")[1];
+    return JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+  } catch { return null; }
+}
+const currentUser = getUserFromCookie(cookieHeader);
+
+// ── SSR fetch paralel ─────────────────────────────────────────────────────────
+const job = await apiGet<{
+  id: number;
+  slug: string;
+  job_title: string;
+  job_type: number;
+  job_type_label: string;
+  sallary: number;
+  sallary_formatted: string;
+  description: string;
+  responsibility: string;
+  requirement: string;
+  qualification: string;
+  skill_experience: string;
+  location: string;
+  location_province: string;
+  location_city: string;
+  company: { name: string; logo: string | null };
+  category: string;
+  created_at: string;
+}>(`/api/vacancies/${slug}`, cookieHeader);
+
+if (!job) return Astro.redirect("/jobs");
+
+const [applicantsRes, likedIds, relatedRes] = await Promise.all([
+  apiGet<{ total: number; applicants: { refid: string; name: string; photo: string | null }[] }>(
+    `/api/applies/${job.id}/applicants`, cookieHeader
+  ),
+  currentUser?.id
+    ? apiGet<number[]>(`/api/vacancies/liked?applicant_id=${currentUser.id}`, cookieHeader)
+    : Promise.resolve([]),
+  apiGet<{ data: Array<{ id: number; slug: string; job_title: string; job_type: number; job_type_label: string; sallary_formatted: string; description: string; location: string; company: { name: string; logo: string | null }; category: string }> }>(
+    `/api/vacancies?limit=6&category_raw=${job.category}`, cookieHeader
+  ),
+]);
+
+const applicants    = applicantsRes?.applicants ?? [];
+const totalApplied  = applicantsRes?.total ?? 0;
+const isLiked       = (likedIds ?? []).includes(job.id);
+const relatedJobs   = (relatedRes?.data ?? []).filter((r) => r.slug !== slug).slice(0, 6);
+
+// Cek sudah apply belum (via applications list)
+const myApplications = currentUser?.id
+  ? await apiGet<{ data: Array<{ vacancy_id: number }> }>(
+      `/api/vacancies/applications?applicant_id=${currentUser.id}&limit=100`, cookieHeader
+    )
+  : null;
+const alreadyApplied = myApplications?.data?.some((a) => a.vacancy_id === job.id) ?? false;
+
+const API_URL = import.meta.env.PUBLIC_API_URL;
+
+const JOB_TYPE_CLASS: Record<number, string> = {
+  0: "badge-primary",
+  1: "badge-dark",
+  2: "badge-info",
+  3: "badge-default",
+};
+
+const pageUrl   = Astro.url.href;
+const pageTitle = `${job.job_title} — ${job.company.name}`;
+---
+
+<BaseLayout title={pageTitle}>
+  <div id="app">
+    <!-- @components sectionHeader -->
+
+    <main id="section-main" data-barba="wrapper">
+      <div
+        data-hero-scheme="light"
+        data-barba="container"
+        data-barba-namespace="jobs-detail"
+        data-vacancy-id={job.id}
+        data-vacancy-slug={job.slug}
+        data-is-liked={isLiked ? "true" : "false"}
+        data-already-applied={alreadyApplied ? "true" : "false"}
+        data-logged-in={currentUser ? "true" : "false"}
+        data-page-url={pageUrl}
+        data-page-title={pageTitle}
+      >
+
+        <!-- ── Page Header ────────────────────────────────────────────────── -->
+        <section id="page-header" class="relative pt-(--space-header)">
+          <div class="relative py-16 | lg:pt-24">
+            <div class="max-container">
+              <div class="grid gap-8 mb-16 | lg:grid-cols-12 lg:items-end">
+                <div class="col-span-full | lg:col-span-8">
+                  <div class="flex flex-col gap-6 items-center text-center | lg:items-start lg:text-start">
+                    <div class="inline-flex items-center gap-3">
+                      <div class="size-1.5 rounded-full bg-primary-600 shrink-0"></div>
+                      <a href="/jobs" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950 link">
+                        {job.category}
+                      </a>
+                    </div>
+                    <h1 class="leading-none text-balance">{job.job_title}</h1>
+                  </div>
+                </div>
+                <div class="col-span-full | lg:col-span-4 lg:text-end">
+                  <div class="flex items-center gap-2 | lg:justify-end">
+                    <button
+                      type="button"
+                      class="btn btn-outline btn-circle-primary"
+                      data-hover-effect
+                      data-scroll-to="section-apply"
+                    >
+                      Apply Now
+                      <svg class="icon icon-stroke circle-icon circle-left icon-up-right" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M17.5 6.5L6 18" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 6H18V16" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                    <div class="flex items-center gap-2 | not-lg:ml-auto">
+                      <!-- Like button -->
+                      <button
+                        type="button"
+                        class:list={[
+                          "btn btn-icon btn-outline btn-like transition-all duration-800 ease-custom [&.is-liked]:!bg-primary-50 [&.is-liked]:ring-transparent",
+                          { "is-liked": isLiked }
+                        ]}
+                        data-tooltip="Like"
+                        data-like-btn
+                        data-vacancy-id={job.id}
+                        data-liked={isLiked ? "true" : "false"}
+                      >
+                        <div class="flex flex-col size-4.5 overflow-clip [.is-liked_&>*]:-translate-y-full">
+                          <svg class="icon icon-stroke transition-transform duration-800 ease-custom" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M19.4626 3.99415C16.7809 2.34923 14.4404 3.01211 13.0344 4.06801C12.4578 4.50096 12.1696 4.71743 12 4.71743C11.8304 4.71743 11.5422 4.50096 10.9656 4.06801C9.55962 3.01211 7.21909 2.34923 4.53744 3.99415C1.01807 6.15294 0.221721 13.2749 8.33953 19.2834C9.88572 20.4278 10.6588 21 12 21C13.3412 21 14.1143 20.4278 15.6605 19.2834C23.7783 13.2749 22.9819 6.15294 19.4626 3.99415Z" stroke="#141B34" stroke-width="1.5" stroke-linecap="round"/>
+                          </svg>
+                          <svg class="icon icon-fill text-primary-600 transition-transform duration-800 ease-custom" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M4.1449 3.35515C7.12587 1.52662 9.8001 2.25537 11.4156 3.46861C11.6814 3.6682 11.8638 3.8048 11.9996 3.89704C12.1354 3.8048 12.3178 3.6682 12.5836 3.46861C14.1991 2.25537 16.8734 1.52662 19.8543 3.35515C21.9156 4.61952 23.0754 7.2606 22.6684 10.2951C22.2595 13.3443 20.2859 16.7929 16.1063 19.8865C14.6549 20.9614 13.5897 21.7503 11.9996 21.7503C10.4095 21.7503 9.34433 20.9614 7.89294 19.8865C3.71334 16.7929 1.73976 13.3443 1.33081 10.2951C0.923824 7.2606 2.08365 4.61952 4.1449 3.35515Z" fill="#141B34"/>
+                          </svg>
+                        </div>
+                      </button>
+                      <!-- Share button -->
+                      <button
+                        type="button"
+                        class="btn btn-icon btn-outline"
+                        data-tooltip="Share"
+                        data-hover-effect
+                        data-share-btn
+                      >
+                        <svg class="icon icon-stroke icon-up" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M11.0065 21.0001H9.60546C6.02021 21.0001 4.22759 21.0001 3.11379 19.8652C2 18.7302 2 16.9035 2 13.2501C2 9.59674 2 7.77004 3.11379 6.63508C4.22759 5.50012 6.02021 5.50012 9.60546 5.50012H13.4082C16.9934 5.50012 18.7861 5.50012 19.8999 6.63508C20.4571 7.20291 20.7356 7.94388 20.8747 9.00012" stroke="#141B34" stroke-width="1.5" stroke-linecap="round"/>
+                          <path d="M19.1581 19.829C19.0569 20.0309 19 20.2588 19 20.5C19 21.3284 19.6716 22 20.5 22C21.3284 22 22 21.3284 22 20.5C22 19.6716 21.3284 19 20.5 19C19.9128 19 19.4043 19.3375 19.1581 19.829ZM19.1581 19.829L15.8419 18.171M19.1581 15.171C19.4043 15.6625 19.9128 16 20.5 16C21.3284 16 22 15.3284 22 14.5C22 13.6716 21.3284 13 20.5 13C19.6716 13 19 13.6716 19 14.5C19 14.7412 19.0569 14.9691 19.1581 15.171ZM19.1581 15.171L15.8419 16.829M15.8419 16.829C15.5957 16.3375 15.0872 16 14.5 16C13.6716 16 13 16.6716 13 17.5C13 18.3284 13.6716 19 14.5 19C15.0872 19 15.5957 18.6625 15.8419 18.171M15.8419 16.829C15.9431 17.0309 16 17.2588 16 17.5C16 17.7412 15.9431 17.9691 15.8419 18.171" stroke="#141B34" stroke-width="1.5"/>
+                          <path d="M15.9998 5.5L15.9004 5.19094C15.4054 3.65089 15.1579 2.88087 14.5686 2.44043C13.9794 2 13.1967 2 11.6313 2H11.3682C9.8028 2 9.02011 2 8.43087 2.44043C7.84162 2.88087 7.59411 3.65089 7.0991 5.19094L6.99976 5.5" stroke="#141B34" stroke-width="1.5"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Meta info bar -->
+              <div class="grid gap-6 grid-cols-2 | lg:gap-8 lg:grid-cols-12">
+                <div class="col-span-full | not-lg:pb-6 not-lg:border-b not-lg:border-dark-300 | lg:col-span-3">
+                  <div class="flex items-center gap-4">
+                    <div class="avatar">
+                      {job.company.logo ? (
+                        <picture>
+                          <img
+                            src={`${API_URL}/pubs/uploads/avatar/${job.company.logo}`}
+                            alt={job.company.name}
+                            loading="lazy"
+                            decoding="async"
+                            class="size-full object-contain"
+                          />
+                        </picture>
+                      ) : (
+                        <svg class="icon icon-fill size-5 text-dark-950" viewBox="0 0 24 24" fill="none">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M13.3292 3.46341C13.9961 3.65696 14.5602 3.82069 15.0046 4.01016C15.4784 4.21221 15.888 4.47174 16.199 4.89716C16.5082 5.3201 16.6358 5.7919 16.6946 6.31017C16.7502 6.80094 16.7502 7.40489 16.7502 8.12649V22.0002C16.7502 22.4144 16.4144 22.7502 16.0002 22.7502H3.00019C2.58597 22.7502 2.25018 22.4144 2.25018 22.0002L2.25018 6.659C2.25016 5.45328 2.25014 4.46853 2.35635 3.71083C2.46632 2.92626 2.70926 2.22577 3.32744 1.7391C3.95235 1.24713 4.68464 1.19025 5.45696 1.29365C6.19444 1.39238 7.11291 1.65901 8.22733 1.98252L13.3292 3.46341Z" fill="#141B34"/>
+                        </svg>
+                      )}
+                    </div>
+                    <div class="grow flex flex-col gap-1">
+                      <div class="font-semibold text-dark-950 truncate">{job.company.name}</div>
+                      <div class="h6 truncate">{job.location}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-span-1 | lg:col-span-3">
+                  <div class="flex flex-col gap-1 | lg:justify-center lg:text-center">
+                    <div class="h6">Lokasi</div>
+                    <div class="font-semibold text-dark-950 truncate">{job.location_province}</div>
+                  </div>
+                </div>
+                <div class="col-span-1 | lg:col-span-3">
+                  <div class="flex flex-col gap-1 items-end | lg:justify-center lg:items-center lg:text-center">
+                    <div class="h6">Jenis Pekerjaan</div>
+                    <div class:list={["badge", JOB_TYPE_CLASS[job.job_type] ?? "badge-default"]}>
+                      <span>{job.job_type_label}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-span-full | not-lg:pt-6 not-lg:border-t not-lg:border-dark-300 | lg:col-span-3">
+                  <div class="flex flex-col gap-1 | lg:justify-end lg:text-end">
+                    <div class="h6">Salary</div>
+                    <div class="font-semibold text-primary-600 truncate">{job.sallary_formatted}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="absolute inset-0 flex justify-center -z-1 pointer-events-none select-none">
+              <h1 class="shrink-0 text-transparent [-webkit-text-stroke:1px_var(--color-dark-100)] leading-[0.8] uppercase whitespace-nowrap">Loker</h1>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Page Content ───────────────────────────────────────────────── -->
+        <section id="page-content" class="relative">
+          <div class="py-16 | lg:py-24">
+            <div class="max-container">
+              <div class="grid gap-8 | lg:grid-cols-12">
+
+                <!-- Sidebar nav -->
+                <div class="col-span-full | not-lg:hidden | lg:col-span-3">
+                  <div class="flex flex-col gap-8 | lg:h-full">
+                    <div class="lg:grow">
+                      <ul class="flex flex-col gap-4 | lg:sticky lg:top-(--space-header) lg:pt-8 lg:mt-8">
+                        <li>
+                          <button type="button" class="text-sm font-bold uppercase tracking-wide link link-reverse text-dark-600 [--text-hover:var(--color-dark-600)] [.is-active_&]:text-primary-600 [.is-active_&]:[--text-hover:var(--color-primary-600)] [.is-active_&]:[--link-from:100%]" data-hover-effect data-scroll-to="section-overview">Overview</button>
+                        </li>
+                        <li>
+                          <button type="button" class="text-sm font-bold uppercase tracking-wide link link-reverse text-dark-600 [--text-hover:var(--color-dark-600)] [.is-active_&]:text-primary-600 [.is-active_&]:[--text-hover:var(--color-primary-600)] [.is-active_&]:[--link-from:100%]" data-hover-effect data-scroll-to="section-qualification">Qualification</button>
+                        </li>
+                        <li>
+                          <button type="button" class="text-sm font-bold uppercase tracking-wide link link-reverse text-dark-600 [--text-hover:var(--color-dark-600)] [.is-active_&]:text-primary-600 [.is-active_&]:[--text-hover:var(--color-primary-600)] [.is-active_&]:[--link-from:100%]" data-hover-effect data-scroll-to="section-responsibility">Responsibility</button>
+                        </li>
+                        <li>
+                          <button type="button" class="text-sm font-bold uppercase tracking-wide link link-reverse text-dark-600 [--text-hover:var(--color-dark-600)] [.is-active_&]:text-primary-600 [.is-active_&]:[--text-hover:var(--color-primary-600)] [.is-active_&]:[--link-from:100%]" data-hover-effect data-scroll-to="section-apply">Apply</button>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="lg:pb-8 lg:-mb-8 lg:sticky lg:bottom-0">
+                      <button type="button" class="btn btn-primary btn-circle-white" data-hover-effect data-scroll-to="section-apply">
+                        Apply Now
+                        <svg class="icon icon-stroke circle-icon circle-right icon-up-right" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M17.5 6.5L6 18" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M8 6H18V16" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Main content -->
+                <div class="col-span-full | lg:col-span-9">
+                  <div class="relative isolate grid | not-lg:pt-16 not-lg:-mt-16 not-lg:bg-gradient-to-b not-lg:from-dark-50 not-lg:to-transparent not-lg:-mx-4 not-lg:px-4 | lg:pointer-events-none lg:py-8 lg:pl-16 lg:-ml-16">
+
+                    <!-- Overview -->
+                    <div class="grid gap-8 py-8 pointer-events-auto" id="section-overview">
+                      <div class="flex items-center gap-4 | lg:gap-6">
+                        <h5>Overview</h5>
+                        <div class="grow h-px bg-dark-300"></div>
+                      </div>
+                      <article class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]" set:html={job.description} />
+                    </div>
+
+                    <!-- Qualification -->
+                    <div class="grid gap-8 py-8 pointer-events-auto" id="section-qualification">
+                      <div class="flex items-center gap-4 | lg:gap-6">
+                        <h5>Qualification</h5>
+                        <div class="grow h-px bg-dark-300"></div>
+                      </div>
+                      <article class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]" set:html={job.qualification} />
+                    </div>
+
+                    <!-- Responsibility -->
+                    <div class="grid gap-8 py-8 pointer-events-auto" id="section-responsibility">
+                      <div class="flex items-center gap-4 | lg:gap-6">
+                        <h5>Responsibility</h5>
+                        <div class="grow h-px bg-dark-300"></div>
+                      </div>
+                      <article class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]" set:html={job.responsibility} />
+                    </div>
+
+                    <!-- ── Apply This Job ──────────────────────────────── -->
+                    <div class="grid gap-8 py-8 pointer-events-auto" id="section-apply">
+                      <div class="flex items-center gap-4 | lg:gap-6">
+                        <h5>Apply This Job</h5>
+                        <div class="grow h-px bg-dark-300"></div>
+                      </div>
+
+                      <!-- Applicant count + avatar grid -->
+                      <div class="flex flex-col gap-6">
+                        <div class="flex items-center gap-4">
+                          <!-- Avatar stack -->
+                          {applicants.length > 0 && (
+                            <div class="flex -space-x-2">
+                              {applicants.slice(0, 8).map((a) => (
+                                <div class="avatar size-9 ring-2 ring-white" data-tooltip={a.name}>
+                                  {a.photo ? (
+                                    <img
+                                      src={`${API_URL}/pubs/uploads/avatar/${a.photo}`}
+                                      alt={a.name}
+                                      loading="lazy"
+                                      decoding="async"
+                                      class="size-full object-cover"
+                                    />
+                                  ) : (
+                                    <span class="text-xs font-bold text-dark-950">
+                                      {a.name.charAt(0).toUpperCase()}
+                                    </span>
+                                  )}
+                                </div>
+                              ))}
+                              {totalApplied > 8 && (
+                                <div class="avatar size-9 ring-2 ring-white bg-dark-100">
+                                  <span class="text-xs font-bold text-dark-600">+{totalApplied - 8}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          <div class="flex flex-col gap-0.5">
+                            <p class="text-sm font-semibold text-dark-950">
+                              {totalApplied > 0
+                                ? `${totalApplied} orang telah melamar`
+                                : "Jadilah yang pertama melamar"}
+                            </p>
+                            {totalApplied > 0 && (
+                              <p class="text-xs text-dark-400">Bersaing dengan {totalApplied} pelamar lainnya</p>
+                            )}
+                          </div>
+                        </div>
+
+                        <!-- Grid avatar semua applicants -->
+                        <!-- {applicants.length > 0 && (
+                          <div class="grid grid-cols-6 gap-3 | lg:grid-cols-10">
+                            {applicants.map((a) => (
+                              <div class="flex flex-col items-center gap-2" data-tooltip={a.name}>
+                                <div class="avatar size-10">
+                                  {a.photo ? (
+                                    <img
+                                      src={`${API_URL}/pubs/uploads/avatar/${a.photo}`}
+                                      alt={a.name}
+                                      loading="lazy"
+                                      decoding="async"
+                                      class="size-full object-cover"
+                                    />
+                                  ) : (
+                                    <span class="text-xs font-bold text-dark-950">
+                                      {a.name.charAt(0).toUpperCase()}
+                                    </span>
+                                  )}
+                                </div>
+                                <p class="text-xs text-dark-400 text-center truncate w-full">{a.name.split(" ")[0]}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )} -->
+
+                        <!-- Apply button -->
+                        {alreadyApplied ? (
+                          <div class="flex items-center gap-3 p-4 rounded-lg bg-primary-50 ring-1 ring-primary-200">
+                            <svg class="icon icon-fill text-primary-600 size-5 shrink-0" viewBox="0 0 24 24" fill="none">
+                              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.25C6.06294 1.25 1.25 6.06294 1.25 12C1.25 17.9371 6.06294 22.75 12 22.75C17.9371 22.75 22.75 17.9371 22.75 12C22.75 6.06294 17.9371 1.25 12 1.25ZM16.5303 10.0303C16.8232 9.73744 16.8232 9.26256 16.5303 8.96967C16.2374 8.67678 15.7626 8.67678 15.4697 8.96967L11 13.4393L8.53033 10.9697C8.23744 10.6768 7.76256 10.6768 7.46967 10.9697C7.17678 11.2626 7.17678 11.7374 7.46967 12.0303L10.4697 15.0303C10.7626 15.3232 11.2374 15.3232 11.5303 15.0303L16.5303 10.0303Z" fill="currentColor"/>
+                            </svg>
+                            <p class="text-sm font-semibold text-primary-600">Anda sudah melamar pekerjaan ini</p>
+                          </div>
+                        ) : (
+                          <div class="flex items-center gap-3">
+                            <button
+                              type="button"
+                              class="btn btn-primary btn-circle-white"
+                              data-hover-effect
+                              data-apply-btn
+                              data-vacancy-id={job.id}
+                              data-vacancy-title={job.job_title}
+                              data-company={job.company.name}
+                            >
+                              Lamar Sekarang
+                              <svg class="icon icon-stroke circle-icon circle-right icon-up-right" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M17.5 6.5L6 18" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 6H18V16" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                              </svg>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div class="absolute inset-y-0 left-0 w-dvw bg-dark-50 rounded-l-lg -z-1 | not-lg:hidden"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Loker Terkait ───────────────────────────────────────────── -->
+          {relatedJobs.length > 0 && (
+            <div class="py-16 | lg:py-24">
+              <div class="max-container">
+                <div class="splide group/slide" data-slide-jobs="6">
+                  <div class="grid gap-8 | lg:grid-cols-12">
+                    <div class="col-span-full | lg:col-span-3">
+                      <div class="flex flex-col gap-8 | lg:h-full">
+                        <div class="flex flex-col items-start gap-6">
+                          <div class="inline-flex items-center gap-3">
+                            <div class="size-1.5 rounded-full bg-primary-600 shrink-0"></div>
+                            <div class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950">Loker</div>
+                          </div>
+                          <h3 class="text-balance leading-none">Kategori Loker Terkait</h3>
+                        </div>
+                        <div class="flex flex-row justify-between gap-4 | lg:grow lg:flex-col lg:items-start">
+                          <a href="/jobs" class="btn btn-sm btn-primary" data-hover-effect>Lainnya</a>
+                          <div class="flex items-center gap-1 mt-auto">
+                            <button type="button" class="btn-splide-prev btn btn-sm btn-icon" data-hover-effect>
+                              <svg class="icon icon-stroke icon-left" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path fill="none" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M4.2,12h16.3"/>
+                                <path fill="none" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M10.6,19.1L3.5,12 l7.1-7.1"/>
+                              </svg>
+                            </button>
+                            <button type="button" class="btn-splide-next btn btn-sm btn-icon" data-hover-effect>
+                              <svg class="icon icon-stroke icon-right" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path fill="none" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M19.8,12H3.5"/>
+                                <path fill="none" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M13.4,4.9l7.1,7.1 l-7.1,7.1"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-9">
+                      <div class="relative | lg:-mr-8 | 2xl:-mr-[calc((100vw-var(--breakpoint-2xl))/2)]">
+                        <div class="splide__track | not-lg:!overflow-visible">
+                          <div class="splide__list [&>*]:w-[calc(1/1.125*100%)] | lg:!mr-8 lg:[&>*]:w-[calc(1/2.75*100%)] | 2xl:[&>*]:w-[calc(1/3.5*100%)]">
+                            {relatedJobs.map((rj) => (
+                              <div class="splide__slide">
+                                <div class="relative isolate flex flex-col bg-dark-50 ring-inset ring-1 ring-dark-200 rounded-lg overflow-clip | lg:h-full" data-hover-group>
+                                  <div class="relative flex flex-col items-start gap-4 px-4 | lg:px-6">
+                                    <div class="w-full flex items-start justify-end">
+                                      <div class:list={["badge rounded-t-none", JOB_TYPE_CLASS[rj.job_type] ?? "badge-default"]}>
+                                        <span>{rj.job_type_label}</span>
+                                      </div>
+                                    </div>
+                                    <div class="w-full flex flex-col items-start gap-1">
+                                      <div class="w-full text-sm font-medium truncate text-primary-600">{rj.category}</div>
+                                      <h5 class="text-balance tracking-normal line-clamp-2">{rj.job_title}</h5>
+                                    </div>
+                                  </div>
+                                  <div class="px-4 py-6 | lg:px-6">
+                                    <p class="text-sm font-medium line-clamp-3">{rj.description}</p>
+                                  </div>
+                                  <div class="flex flex-col mt-auto">
+                                    <div class="flex flex-col divide-y divide-dark-200 p-4 | lg:p-6">
+                                      <div class="flex items-baseline justify-between gap-4 pt-6 pb-3 first:pt-0 last:pb-0">
+                                        <div class="h6 text-dark-400 shrink-0">Sallary</div>
+                                        <div class="text-sm font-semibold text-dark-950 basis-2/3 text-end">{rj.sallary_formatted}</div>
+                                      </div>
+                                      <div class="flex items-baseline justify-between gap-4 pt-6 pb-3 first:pt-0 last:pb-0">
+                                        <div class="h6 text-dark-400 shrink-0">Lokasi</div>
+                                        <div class="text-sm font-semibold text-dark-950 basis-2/3 text-end">{rj.location}</div>
+                                      </div>
+                                    </div>
+                                    <div class="flex items-center gap-4 p-4 bg-dark-100 rounded-lg | lg:p-6">
+                                      <div class="grow flex items-center gap-4">
+                                        <div class="avatar">
+                                          {rj.company.logo ? (
+                                            <picture>
+                                              <img src={`${API_URL}/pubs/uploads/avatar/${rj.company.logo}`} alt={rj.company.name} loading="lazy" decoding="async" class="size-full object-contain"/>
+                                            </picture>
+                                          ) : (
+                                            <svg class="icon icon-fill size-5 text-dark-950" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                              <path fill-rule="evenodd" clip-rule="evenodd" d="M13.3292 3.46341C13.9961 3.65696 14.5602 3.82069 15.0046 4.01016C15.4784 4.21221 15.888 4.47174 16.199 4.89716C16.5082 5.3201 16.6358 5.7919 16.6946 6.31017C16.7502 6.80094 16.7502 7.40489 16.7502 8.12649V22.0002C16.7502 22.4144 16.4144 22.7502 16.0002 22.7502H3.00019C2.58597 22.7502 2.25018 22.4144 2.25018 22.0002L2.25018 6.659C2.25016 5.45328 2.25014 4.46853 2.35635 3.71083C2.46632 2.92626 2.70926 2.22577 3.32744 1.7391C3.95235 1.24713 4.68464 1.19025 5.45696 1.29365C6.19444 1.39238 7.11291 1.65901 8.22733 1.98252L13.3292 3.46341ZM7.25019 8.00008C7.25019 7.58587 7.58597 7.25008 8.00019 7.25008L11.0002 7.25008C11.4144 7.25008 11.7502 7.58587 11.7502 8.00008C11.7502 8.4143 11.4144 8.75008 11.0002 8.75008L8.00019 8.75008C7.58597 8.75008 7.25019 8.4143 7.25019 8.00008ZM7.25019 12.0001C7.25019 11.5859 7.58597 11.2501 8.00019 11.2501L11.0002 11.2501C11.4144 11.2501 11.7502 11.5859 11.7502 12.0001C11.7502 12.4143 11.4144 12.7501 11.0002 12.7501L8.00019 12.7501C7.58597 12.7501 7.25019 12.4143 7.25019 12.0001Z" fill="#141B34"/>
+                                              <path fill-rule="evenodd" clip-rule="evenodd" d="M1.00018 21.7501C1.00018 21.1978 1.4479 20.7501 2.00018 20.7501L22.0002 20.7501C22.5525 20.7501 23.0002 21.1978 23.0002 21.7501C23.0002 22.3024 22.5525 22.7501 22.0002 22.7501L2.00018 22.7501C1.4479 22.7501 1.00018 22.3024 1.00018 21.7501Z" fill="#141B34"/>
+                                            </svg>
+                                          )}
+                                        </div>
+                                        <div class="grow flex flex-col gap-1">
+                                          <div class="text-sm font-semibold text-dark-950 truncate">{rj.company.name}</div>
+                                          <div class="h6 truncate">{rj.location}</div>
+                                        </div>
+                                      </div>
+                                      <button
+                                        type="button"
+                                        class:list={["btn btn-icon btn-like transition-colors duration-800 ease-custom [&.is-liked]:bg-primary-600 z-10", { "is-liked": (likedIds ?? []).includes(rj.id) }]}
+                                        data-tooltip="Like"
+                                        data-vacancy-id={rj.id}
+                                        data-liked={(likedIds ?? []).includes(rj.id) ? "true" : "false"}
+                                      >
+                                        <div class="flex flex-col size-4.5 overflow-clip [.is-liked_&>*]:-translate-y-full">
+                                          <svg class="icon icon-stroke transition-transform duration-800 ease-custom" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M19.4626 3.99415C16.7809 2.34923 14.4404 3.01211 13.0344 4.06801C12.4578 4.50096 12.1696 4.71743 12 4.71743C11.8304 4.71743 11.5422 4.50096 10.9656 4.06801C9.55962 3.01211 7.21909 2.34923 4.53744 3.99415C1.01807 6.15294 0.221721 13.2749 8.33953 19.2834C9.88572 20.4278 10.6588 21 12 21C13.3412 21 14.1143 20.4278 15.6605 19.2834C23.7783 13.2749 22.9819 6.15294 19.4626 3.99415Z" stroke="#141B34" stroke-width="1.5" stroke-linecap="round"/>
+                                          </svg>
+                                          <svg class="icon icon-fill text-white transition-transform duration-800 ease-custom" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M4.1449 3.35515C7.12587 1.52662 9.8001 2.25537 11.4156 3.46861C11.6814 3.6682 11.8638 3.8048 11.9996 3.89704C12.1354 3.8048 12.3178 3.6682 12.5836 3.46861C14.1991 2.25537 16.8734 1.52662 19.8543 3.35515C21.9156 4.61952 23.0754 7.2606 22.6684 10.2951C22.2595 13.3443 20.2859 16.7929 16.1063 19.8865C14.6549 20.9614 13.5897 21.7503 11.9996 21.7503C10.4095 21.7503 9.34433 20.9614 7.89294 19.8865C3.71334 16.7929 1.73976 13.3443 1.33081 10.2951C0.923824 7.2606 2.08365 4.61952 4.1449 3.35515Z" fill="#141B34"/>
+                                          </svg>
+                                        </div>
+                                      </button>
+                                    </div>
+                                  </div>
+                                  <a href={`/jobs/${rj.slug}`} class="block absolute inset-0"></a>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+
+      </div><!-- /data-barba container -->
+    </main>
+    <!-- @components sectionFooter -->
+  </div><!-- /#app -->
+
+  <!-- ── Modal Konfirmasi Apply ───────────────────────────────────────────── -->
+  <div id="modal-apply-confirm" class="fixed top-0 inset-x-0 z-[999] invisible" data-modal>
+    <div class="relative w-full h-dvh flex flex-col overflow-auto" data-lenis-prevent>
+      <div class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto">
+        <div class="grow w-full flex flex-col max-container">
+          <div class="grid gap-4 | lg:grid-cols-12">
+            <div class="grid-item col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5">
+              <div class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg" data-modal-content>
+                <div class="absolute top-2 right-2">
+                  <button type="button" class="btn btn-sm btn-icon btn-dark" data-hover-effect data-modal-hide>
+                    <svg class="icon icon-stroke" viewBox="0 0 24 24" fill="none">
+                      <path d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6" stroke="#141B34" stroke-width="1.5" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+                <div class="shrink-0 px-6 py-6 | lg:py-8">
+                  <div class="flex flex-col gap-4 items-center text-center">
+                    <div class="flex items-center justify-center size-16 rounded-full bg-primary-50">
+                      <svg class="icon icon-stroke size-8 text-primary-600" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M9.00897 19.0001L2.5 12.0001M9.00897 19.0001L22 5.00012M9.00897 19.0001C9.00897 19.0001 9 19 9.00897 19.0001Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                    <div class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600">Konfirmasi Lamaran</div>
+                    <h4 class="w-full font-bold leading-none text-balance" id="modal-apply-title">Yakin ingin melamar?</h4>
+                    <p class="text-sm text-dark-400 text-balance" id="modal-apply-desc">Anda akan mengirimkan lamaran untuk posisi ini.</p>
+                  </div>
+                </div>
+                <div class="shrink-0 px-6 pb-6 | lg:pb-8">
+                  <div class="grid gap-3">
+                    <button
+                      type="button"
+                      class="btn btn-primary"
+                      data-hover-effect
+                      data-apply-confirm-btn
+                    >
+                      Ya, Lamar Sekarang
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline"
+                      data-hover-effect
+                      data-modal-hide
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal Cari Loker (login gate) ───────────────────────────────────── -->
+  <div id="modal-cari-loker" class="fixed top-0 inset-x-0 z-[999] invisible" data-modal>
+    <div class="relative w-full h-dvh flex flex-col overflow-auto" data-lenis-prevent>
+      <div class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto">
+        <div class="grow w-full flex flex-col max-container">
+          <div class="grid gap-4 | lg:grid-cols-12">
+            <div class="grid-item col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5">
+              <div class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg" data-modal-content>
+                <div class="absolute top-0 right-0">
+                  <button type="button" class="btn btn-sm btn-icon btn-dark" data-hover-effect data-modal-hide>
+                    <svg class="icon icon-stroke" viewBox="0 0 24 24" fill="none">
+                      <path d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6" stroke="#141B34" stroke-width="1.5" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+                <div class="shrink-0 px-6 py-4 | lg:py-6">
+                  <div class="flex flex-col gap-4 items-center text-center">
+                    <div class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600">Cari Loker</div>
+                    <h4 class="w-full font-bold leading-none text-balance">Login untuk melanjutkan</h4>
+                  </div>
+                </div>
+                <div class="shrink-0 px-6 py-4 | lg:py-6">
+                  <div class="grid gap-6">
+                    <a href="/auth/login" class="btn btn-primary" data-hover-effect>Login Sekarang</a>
+                    <div class="flex items-center gap-4">
+                      <div class="grow h-px bg-dark-300"></div>
+                      <div class="text-sm leading-none font-bold uppercase tracking-wide">Atau</div>
+                      <div class="grow h-px bg-dark-300"></div>
+                    </div>
+                    <a href="/auth/register" class="btn" data-hover-effect>Daftar Sekarang</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <svg width="0" height="0" class="absolute hidden" color-interpolation-filters="sRGB">
+    <defs>
+      <filter id="gooey-content">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"></feGaussianBlur>
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 11 -6" result="gooey-content"></feColorMatrix>
+        <feComposite in="SourceGraphic" in2="gooey-content" operator="atop"></feComposite>
+        <feBlend in="SourceGraphic" in2="gooey-content"></feBlend>
+      </filter>
+    </defs>
+  </svg>
+
+  <div id="preloader">
+    <div id="preloader-spinner">
+      <img src="/assets/images/logo/logo-icon.png" alt="" />
+    </div>
+    <div id="preloader-transition"></div>
+  </div>
+
+  <script>
+  import { showModal, hideModal } from "../../../public/assets/js/_modal";
+
+  // ── Jobs Detail: Apply + Share ─────────────────────────────────────────────
+  const initJobsDetail = () => {
+    const container = document.querySelector<HTMLElement>('[data-barba-namespace="jobs-detail"]');
+    if (!container) return;
+
+    const API_URL   = import.meta.env.PUBLIC_API_URL;
+    const token     = localStorage.getItem("auth_token");
+    const isLoggedIn = !!token;
+
+    const vacancyId    = container.dataset.vacancyId;
+    const pageUrl      = container.dataset.pageUrl ?? window.location.href;
+    const pageTitle    = container.dataset.pageTitle ?? document.title;
+
+    // ── Apply button ────────────────────────────────────────────────────────
+    const applyBtn = container.querySelector<HTMLElement>("[data-apply-btn]");
+    if (applyBtn) {
+      applyBtn.addEventListener("click", () => {
+        if (!isLoggedIn) {
+          const loginModal = document.getElementById("modal-cari-loker");
+          if (loginModal) showModal(loginModal);
+          return;
+        }
+
+        // Isi detail di modal konfirmasi
+        const title   = applyBtn.dataset.vacancyTitle ?? "";
+        const company = applyBtn.dataset.company ?? "";
+        const modalTitle = document.getElementById("modal-apply-title");
+        const modalDesc  = document.getElementById("modal-apply-desc");
+        if (modalTitle) modalTitle.textContent = `Lamar "${title}"?`;
+        if (modalDesc)  modalDesc.textContent  = `Anda akan melamar posisi ${title} di ${company}. Pastikan data profil Anda sudah lengkap.`;
+
+        // Buka modal konfirmasi
+        const confirmModal = document.getElementById("modal-apply-confirm");
+        if (confirmModal) showModal(confirmModal);
+      });
+    }
+
+    // ── Confirm apply ───────────────────────────────────────────────────────
+    const confirmBtn = document.querySelector("[data-apply-confirm-btn]");
+    if (confirmBtn) {
+      confirmBtn.addEventListener("click", async () => {
+        confirmBtn.textContent = "Mengirim...";
+        confirmBtn.setAttribute("disabled", "true");
+
+        try {
+          const res = await fetch(`${API_URL}/api/applies/${vacancyId}/apply`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          const data = await res.json();
+
+          if (res.ok) {
+            // Tutup modal & tampilkan state sudah apply
+            const confirmModal = document.getElementById("modal-apply-confirm");
+            if (confirmModal) hideModal(confirmModal);
+            // Ganti tombol apply dengan badge sukses
+            const applySection = document.getElementById("section-apply");
+            const btnWrap = applyBtn?.closest("div.flex");
+            if (btnWrap) {
+              btnWrap.innerHTML = `
+                <div class="flex items-center gap-3 p-4 rounded-lg bg-primary-50 ring-1 ring-primary-200">
+                  <svg class="icon icon-fill text-primary-600 size-5 shrink-0" viewBox="0 0 24 24" fill="none">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.25C6.06294 1.25 1.25 6.06294 1.25 12C1.25 17.9371 6.06294 22.75 12 22.75C17.9371 22.75 22.75 17.9371 22.75 12C22.75 6.06294 17.9371 1.25 12 1.25ZM16.5303 10.0303C16.8232 9.73744 16.8232 9.26256 16.5303 8.96967C16.2374 8.67678 15.7626 8.67678 15.4697 8.96967L11 13.4393L8.53033 10.9697C8.23744 10.6768 7.76256 10.6768 7.46967 10.9697C7.17678 11.2626 7.17678 11.7374 7.46967 12.0303L10.4697 15.0303C10.7626 15.3232 11.2374 15.3232 11.5303 15.0303L16.5303 10.0303Z" fill="currentColor"/>
+                  </svg>
+                  <p class="text-sm font-semibold text-primary-600">Lamaran berhasil dikirim!</p>
+                </div>`;
+            }
+          } else if (data.already_applied) {
+            const confirmModal = document.getElementById("modal-apply-confirm");
+            if (confirmModal) hideModal(confirmModal);
+          } else {
+            confirmBtn.textContent = "Ya, Lamar Sekarang";
+            confirmBtn.removeAttribute("disabled");
+            alert(data.message ?? "Gagal mengirim lamaran");
+          }
+        } catch (err) {
+          console.error("[apply]", err);
+          confirmBtn.textContent = "Ya, Lamar Sekarang";
+          confirmBtn.removeAttribute("disabled");
+        }
+      });
+    }
+
+    // ── Share button ────────────────────────────────────────────────────────
+    const shareBtn = container.querySelector("[data-share-btn]");
+    if (shareBtn) {
+      shareBtn.addEventListener("click", async () => {
+        // Native Web Share API (mobile)
+        if (navigator.share) {
+          try {
+            await navigator.share({ title: pageTitle, url: pageUrl });
+            return;
+          } catch (err) {
+            if (err instanceof Error && err.name === "AbortError") return; // user cancel
+          }
+        }
+        // Fallback: copy to clipboard
+        try {
+          await navigator.clipboard.writeText(pageUrl);
+          const original = shareBtn.getAttribute("data-tooltip");
+          shareBtn.setAttribute("data-tooltip", "Link disalin!");
+          setTimeout(() => shareBtn.setAttribute("data-tooltip", original ?? "Share"), 2000);
+        } catch {
+          prompt("Salin link berikut:", pageUrl);
+        }
+      });
+    }
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initJobsDetail);
+  } else {
+    initJobsDetail();
+  }
+  window.addEventListener("barba:after", initJobsDetail);
+  </script>
+
+  <script type="module" src="/src/main.js"></script>
+</BaseLayout>

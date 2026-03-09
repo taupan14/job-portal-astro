@@ -14,7 +14,7 @@ export const initSectionFooter = async () => {
                         <div class="flex flex-col gap-16 | not-lg:items-center not-lg:text-center">
                             <a href="./" class="inline-flex items-center flex-nowrap gap-3">
                                 <div class="size-11 shrink-0">
-                                    <img src="./assets/images/logo/logo-icon.png" alt="RUN8" class="size-full object-contain">
+                                    <img src="/assets/images/logo/logo-icon.png" alt="RUN8" class="size-full object-contain">
                                 </div>
                                 <div class="flex flex-col text-base leading-none uppercase font-extrabold whitespace-nowrap text-white">
                                     <div>Radar Utama</div>

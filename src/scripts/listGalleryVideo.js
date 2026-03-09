@@ -2,7 +2,7 @@ import barba from '@barba/core'
 
 const iniComponents = async () => {
     try {
-        const response = await fetch('./assets/json/list-gallery-video.json')
+        const response = await fetch('/assets/json/list-gallery-video.json')
         if (!response.ok) {
             throw new Error('Network response was not ok')
         }
