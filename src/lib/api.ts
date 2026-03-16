@@ -19,6 +19,10 @@ function extractTokenFromCookie(cookie?: string): string | null {
 // sekaligus meneruskan cookie asli (untuk endpoint yang masih pakai cookie)
 function defaultOptions(cookie?: string): RequestInit {
   const token = extractTokenFromCookie(cookie);
+  // console.log(
+  //   "[apiGet] token extracted:",
+  //   token ? token.substring(0, 20) : "NULL",
+  // );
   return {
     headers: {
       "Content-Type": "application/json",
@@ -41,22 +45,23 @@ export async function apiGet<T>(
   try {
     const url = `${API_URL}${path}`;
     //console.log("[apiGet] fetch:", url);           // ← cek URL yang dihit
-    
+
     const res = await fetch(url, {
       ...defaultOptions(cookie),
       method: "GET",
     });
 
     // console.log("[apiGet] status:", res.status, path); // ← cek status response
-    
+
     if (!res.ok) {
       const text = await res.text();
-      console.error("[apiGet] error body:", text);  // ← cek pesan error
+      // console.error("[apiGet] error body:", text);  // ← cek pesan error
+      console.error("[apiGet] error body:", text, "| path:", path);
       return null;
     }
     return res.json() as Promise<T>;
   } catch (err) {
-    console.error("[apiGet] exception:", err);      // ← cek exception
+    console.error("[apiGet] exception:", err); // ← cek exception
     return null;
   }
 }

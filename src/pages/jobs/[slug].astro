@@ -17,6 +17,7 @@ function getUserFromCookie(cookie: string) {
 }
 const currentUser = getUserFromCookie(cookieHeader);
 
+
 // ── SSR fetch paralel ─────────────────────────────────────────────────────────
 const job = await apiGet<{
   id: number;
@@ -219,8 +220,8 @@ const pageTitle = `${job.job_title} — ${job.company.name}`;
             </div>
 
             <div class="absolute inset-0 flex justify-center -z-1 pointer-events-none select-none">
-              <h1 class="shrink-0 text-transparent [-webkit-text-stroke:1px_var(--color-dark-100)] leading-[0.8] uppercase whitespace-nowrap">Loker</h1>
-            </div>
+              <h1 class="shrink-0 text-transparent [-webkit-text-stroke:1px_var(--color-dark-100)] leading-[0.8] uppercase whitespace-nowrap [--min-size:10rem] [--val-size:22vw] [--max-size:22rem]">Loker</h1>
+          </div>
           </div>
         </section>
 
@@ -330,7 +331,7 @@ const pageTitle = `${job.job_title} — ${job.company.name}`;
                             </div>
                           )}
                           <div class="flex flex-col gap-0.5">
-                            <p class="text-sm font-semibold text-dark-950">
+                            <p class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]">
                               {totalApplied > 0
                                 ? `${totalApplied} orang telah melamar`
                                 : "Jadilah yang pertama melamar"}
@@ -376,8 +377,8 @@ const pageTitle = `${job.job_title} — ${job.company.name}`;
                             <p class="text-sm font-semibold text-primary-600">Anda sudah melamar pekerjaan ini</p>
                           </div>
                         ) : (
-                          <div class="flex items-center gap-3">
-                            <button
+                          <div class="flex justify-center | not-lg:mt-8 | lg:justify-end">
+                            {/* <button
                               type="button"
                               class="btn btn-primary btn-circle-white"
                               data-hover-effect
@@ -391,6 +392,20 @@ const pageTitle = `${job.job_title} — ${job.company.name}`;
                                 <path d="M17.5 6.5L6 18" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                 <path d="M8 6H18V16" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                               </svg>
+                            </button> */}
+                            <button type="submit" class="inline-flex items-center gap-4" 
+                              data-hover-group 
+                              data-apply-btn
+                              data-vacancy-id={job.id}
+                              data-vacancy-title={job.job_title}
+                              data-company={job.company.name}>
+                                <div class="h3 [--min-size:var(--text-4xl)] text-primary-600 link link-reverse">Lamar Sekarang</div>
+                                <div class="text-dark-950 [--icon-hover:var(--color-primary-600)]" data-hover-effect>
+                                    <svg class="icon icon-stroke icon-up-right size-5" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M17.5 6.5L6 18" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M8 6H18V16" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
                             </button>
                           </div>
                         )}
@@ -590,29 +605,45 @@ const pageTitle = `${job.job_title} — ${job.company.name}`;
           <div class="grid gap-4 | lg:grid-cols-12">
             <div class="grid-item col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5">
               <div class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg" data-modal-content>
-                <div class="absolute top-0 right-0">
+                <div class="absolute top-2 right-2">
                   <button type="button" class="btn btn-sm btn-icon btn-dark" data-hover-effect data-modal-hide>
-                    <svg class="icon icon-stroke" viewBox="0 0 24 24" fill="none">
-                      <path d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6" stroke="#141B34" stroke-width="1.5" stroke-linejoin="round"/>
+                    <svg class="icon icon-stroke" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6" stroke="#141B34" stroke-width="1.5" stroke-linejoin="round"></path>
                     </svg>
                   </button>
                 </div>
                 <div class="shrink-0 px-6 py-4 | lg:py-6">
                   <div class="flex flex-col gap-4 items-center text-center">
                     <div class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600">Cari Loker</div>
-                    <h4 class="w-full font-bold leading-none text-balance">Login untuk melanjutkan</h4>
+                    <h4 class="w-full font-bold leading-none text-balance">Apakah Anda Sudah<br/>Memiliki Akun ?</h4>
                   </div>
                 </div>
                 <div class="shrink-0 px-6 py-4 | lg:py-6">
-                  <div class="grid gap-6">
-                    <a href="/auth/login" class="btn btn-primary" data-hover-effect>Login Sekarang</a>
-                    <div class="flex items-center gap-4">
-                      <div class="grow h-px bg-dark-300"></div>
-                      <div class="text-sm leading-none font-bold uppercase tracking-wide">Atau</div>
-                      <div class="grow h-px bg-dark-300"></div>
+                  <form action="index-login.html" data-login-form>
+                    <div class="grid gap-6">
+                      <div class="c-form-wrapper">
+                        <div class="c-form">
+                          <label for="input-email" class="c-label">Masukan Alamat Email</label>
+                          <input type="email" name="input-email" class="c-input" placeholder="..." />
+                        </div>
+                        <div class="text-xs mt-1 text-dark-400">silahkan masukan alamat email yang terdaftar</div>
+                      </div>
+                      <div class="c-form-wrapper">
+                        <div class="c-form">
+                          <label for="input-password" class="c-label">Masukan Password</label>
+                          <input type="password" name="input-password" class="c-input" placeholder="..." />
+                        </div>
+                        <div class="text-xs mt-1 text-dark-400">password sudah dikirimkan melalui email</div>
+                      </div>
+                      <button type="submit" class="btn btn-primary" data-hover-effect>Submit</button>
+                      <div class="flex items-center gap-4">
+                        <div class="grow h-px bg-dark-200"></div>
+                        <div class="text-sm leading-none font-bold uppercase tracking-wide">Atau</div>
+                        <div class="grow h-px bg-dark-200"></div>
+                      </div>
+                      <a href="/applicant" class="btn" data-hover-effect>Daftar Sekarang</a>
                     </div>
-                    <a href="/auth/register" class="btn" data-hover-effect>Daftar Sekarang</a>
-                  </div>
+                  </form>
                 </div>
               </div>
             </div>

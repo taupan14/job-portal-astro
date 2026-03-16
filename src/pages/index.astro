@@ -27,7 +27,6 @@ function getUserFromCookie(cookie: string) {
 }
 
 const currentUser = getUserFromCookie(cookieHeader);
-if (!currentUser?.id) return Astro.redirect("/login?redirect=/profile");
 
 const latestJobs = await apiGet<Array<{
   id: number;
@@ -1663,7 +1662,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                           Cari Loker
                         </div>
                         <h4 class="w-full font-bold leading-none text-balance">
-                          Apakah Anda Sudah Memiliki Akun ?
+                          Apakah Anda Sudah<br/>Memiliki Akun ?
                         </h4>
                       </div>
                     </div>
@@ -1678,7 +1677,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                           <div class="c-form-wrapper">
                             <div class="c-form">
                               <label for="input-email" class="c-label"
-                                >Masukan Alamat Email</label
+                                >Masukan Email</label
                               >
                               <input
                                 type="email"
