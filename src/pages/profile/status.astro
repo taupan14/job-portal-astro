@@ -63,17 +63,18 @@ const JOB_TYPE: Record<number, string> = {
 };
 
 const STATUS_LABEL: Record<number, string> = {
-  0: "Apply",
+  0: "Lamar",
   1: "Review",
-  2: "Selected",
-  3: "Rejected",
+  2: "Diterima",
+  3: "Ditolak",
 };
 
 const STATUS_CLASS: Record<number, string> = {
   0: "bg-primary-50 text-primary-600",
-  1: "bg-yellow-50 text-yellow-600",
-  2: "bg-green-50 text-green-600",
-  3: "bg-red-50 text-red-600",
+  1: "bg-yellow-200 text-yellow-700",
+  2: "bg-green-200 text-green-700",
+  3: "bg-red-200 text-red-700",
+  
 };
 
 const formatCurrency = (n: number) =>
@@ -212,7 +213,7 @@ const formatDateTime = (d: string) =>
                                           href={`/jobs/${app.vacancy.slug}`}
                                           class="font-semibold text-dark-950 hover:text-primary-600 transition-colors duration-200 link"
                                           data-vacancy-link
-                                          onclick="event.stopPropagation()"
+                                          onclick="(event) => event.stopPropagation()"
                                         >
                                           {app.vacancy.job_title}
                                         </a>
@@ -234,12 +235,12 @@ const formatDateTime = (d: string) =>
                                             {STATUS_LABEL[app.status] ?? "-"}
                                           </span>
                                           <!-- Expand chevron -->
-                                          <svg
+                                          {/* <svg
                                             class="icon icon-stroke size-4 text-dark-400 transition-transform duration-300 group-[.is-expanded]:rotate-180 shrink-0"
                                             width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                                           >
                                             <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                          </svg>
+                                          </svg> */}
                                         </div>
                                       </td>
                                     </tr>
@@ -483,5 +484,5 @@ const formatDateTime = (d: string) =>
     }
   </script>
 
-  <script type="module" src="/src/main.js"></script>
+  <script is:inline type="module" src="/src/main.js"></script>
 </BaseLayout>

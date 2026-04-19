@@ -255,3 +255,5 @@ document.addEventListener("click", (e) => {
     barba.go(path);
   }
 });
+
+window.__modalShow = showModal;

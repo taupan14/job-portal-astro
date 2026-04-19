@@ -34,13 +34,13 @@ export const initSectionHeader = async () => {
                 <div class="col-span-full | not-lg:hidden | lg:col-span-4">
                     <ul class="flex items-center justify-between">
                         <li data-barba-active>
-                            <a href="page-about.html" class="flex text-sm font-bold uppercase tracking-wide link link-reverse [--link-underline:var(--color-primary-600)] [.is-active_&]:[--link-from:100%] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover) | [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:text-white [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--link-underline:white] [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--text-hover:white]" data-hover-effect>
+                            <a href="/about-us" class="flex text-sm font-bold uppercase tracking-wide link link-reverse [--link-underline:var(--color-primary-600)] [.is-active_&]:[--link-from:100%] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover) | [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:text-white [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--link-underline:white] [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--text-hover:white]" data-hover-effect>
                                 Tentang Kami
                             </a>
                         </li>
                         <li data-menu data-barba-active data-hover-group>
                             <a href="javascript:;" class="flex text-sm font-bold uppercase tracking-wide link link-reverse [--link-underline:var(--color-primary-600)] [.is-active_&]:[--link-from:100%] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover) | [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:text-white [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--link-underline:white] [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--text-hover:white]" data-hover-effect>
-                                Service
+                                Layanan
                             </a>
                             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-dvw pointer-events-none drop-shadow-[0_0_3rem_rgba(0,0,0,0.3)] -z-1">
                                 <div class="relative pt-(--space-header) bg-white pointer-events-auto" data-submenu>
@@ -49,14 +49,14 @@ export const initSectionHeader = async () => {
                                             <div class="grid gap-8 | lg:grid-cols-8 lg:gap-0">
                                                 <div class="col-span-full | lg:col-span-2">
                                                     <div class="flex flex-col gap-4 pr-16">
-                                                        <div class="h5 text-dark-950">Service Kami</div>
+                                                        <div class="h5 text-dark-950">Layanan Kami</div>
                                                         <p class="text-sm font-medium text-dark-400">Kami menawarkan solusi inovatif untuk efisiensi bisnis dan pekerjaan. Dengan teknologi, kami memudahkan proses, menghemat waktu, dan meningkatkan produktivitas.</p>
                                                     </div>
                                                 </div>
                                                 <div class="col-span-full | lg:col-span-4">
                                                     <ul class="grid gap-8 grid-cols-2 | lg:gap-x-16">
                                                         <li data-nav-submenu>
-                                                            <a href="page-service-detail.html" class="flex items-center gap-4 group" data-barba-active-child>
+                                                            <a href="/service" class="flex items-center gap-4 group" data-barba-active-child>
                                                                 <div class="size-12 flex items-center justify-center rounded-lg bg-primary-50/50 shrink-0">
                                                                     <svg class="icon icon-fill text-primary-600 size-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                         <g opacity="0.4">
@@ -74,7 +74,7 @@ export const initSectionHeader = async () => {
                                                             </a>
                                                         </li>
                                                         <li data-nav-submenu>
-                                                            <a href="page-service-detail.html" class="flex items-center gap-4 group" data-barba-active-child>
+                                                            <a href="/service" class="flex items-center gap-4 group" data-barba-active-child>
                                                                 <div class="size-12 flex items-center justify-center rounded-lg bg-primary-50/50 shrink-0">
                                                                     <svg class="icon icon-fill text-primary-600 size-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                         <path d="M8.25 6.25013C8.25 5.94617 8.25 5.79419 8.32601 5.67259C8.40202 5.55098 8.53863 5.48439 8.81186 5.35122L15.1701 2.25213C16.8246 1.44574 17.6518 1.04254 18.5741 1.35681C19.4964 1.67109 19.8129 2.34544 20.4461 3.69416C22.1846 7.39773 22.1846 11.6023 20.4461 15.3058C19.8129 16.6546 19.4964 17.3289 18.5741 17.6432C17.6518 17.9575 16.8246 17.5543 15.1701 16.7479L8.81186 13.6488C8.53863 13.5156 8.40202 13.449 8.32601 13.3274C8.25 13.2058 8.25 13.0538 8.25 12.7499L8.25 6.25013Z" fill="#141B34"/>
@@ -89,7 +89,7 @@ export const initSectionHeader = async () => {
                                                             </a>
                                                         </li>
                                                         <li data-nav-submenu>
-                                                            <a href="page-service-detail.html" class="flex items-center gap-4 group" data-barba-active-child>
+                                                            <a href="/service" class="flex items-center gap-4 group" data-barba-active-child>
                                                                 <div class="size-12 flex items-center justify-center rounded-lg bg-primary-50/50 shrink-0">
                                                                     <svg class="icon icon-fill text-primary-600 size-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                         <path fill-rule="evenodd" clip-rule="evenodd" d="M1 8C1 7.44772 1.44772 7 2 7H8C8.55228 7 9 7.44772 9 8C9 8.55228 8.55228 9 8 9H2C1.44772 9 1 8.55228 1 8ZM1 11C1 10.4477 1.44772 10 2 10H6C6.55228 10 7 10.4477 7 11C7 11.5523 6.55228 12 6 12H2C1.44772 12 1 11.5523 1 11Z" fill="#141B34"/>
@@ -106,7 +106,7 @@ export const initSectionHeader = async () => {
                                                             </a>
                                                         </li>
                                                         <li data-nav-submenu>
-                                                            <a href="page-service-detail.html" class="flex items-center gap-4 group" data-barba-active-child>
+                                                            <a href="/service" class="flex items-center gap-4 group" data-barba-active-child>
                                                                 <div class="size-12 flex items-center justify-center rounded-lg bg-primary-50/50 shrink-0">
                                                                     <svg class="icon icon-fill text-primary-600 size-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                         <path opacity="0.4" d="M14.451 5.88138C14.9426 5.91189 15.368 5.97567 15.7706 6.12583C16.9527 6.56676 17.8852 7.49923 18.3261 8.68139C18.4763 9.08398 18.5401 9.50938 18.5706 10.001C18.6004 10.4813 18.6004 11.0722 18.6004 11.8133L18.6004 15.1516C18.6004 18.7966 15.6455 21.7516 12.0004 21.7516C8.35531 21.7516 5.40039 18.7966 5.40039 15.1516V11.8133C5.40039 11.0722 5.40038 10.4813 5.4302 10.001C5.46072 9.50938 5.5245 9.08398 5.67466 8.68139C6.11558 7.49923 7.04806 6.56676 8.23022 6.12583C8.63281 5.97567 9.05821 5.91189 9.54981 5.88138C10.0302 5.85156 10.621 5.85156 11.3621 5.85156H11.3621H12.6386C13.3797 5.85156 13.9706 5.85156 14.451 5.88138Z" fill="#141B34"/>
@@ -127,7 +127,7 @@ export const initSectionHeader = async () => {
                                                             </a>
                                                         </li>
                                                         <li data-nav-submenu>
-                                                            <a href="page-service-detail.html" class="flex items-center gap-4 group" data-barba-active-child>
+                                                            <a href="/service" class="flex items-center gap-4 group" data-barba-active-child>
                                                                 <div class="size-12 flex items-center justify-center rounded-lg bg-primary-50/50 shrink-0">
                                                                     <svg class="icon icon-fill text-primary-600 size-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                         <path opacity="0.4" d="M17.4659 1.75C18.1014 1.74998 18.6428 1.74995 19.0862 1.80238C19.5603 1.85843 19.9974 1.9811 20.3931 2.27649C20.7867 2.57024 21.0328 2.95546 21.2305 3.39554C21.4172 3.811 21.5873 4.33952 21.789 4.96638L22.4853 7.12954L22.5002 7.17604C22.6763 7.72227 22.8175 8.16018 22.7141 8.82232C22.6713 9.09674 22.6166 9.32192 22.5239 9.53046C22.4367 9.72661 22.328 9.87688 22.2446 9.99204L22.2323 10.0092C21.2481 11.3718 19.4436 12.25 17.7543 12.25C16.6746 12.25 15.6772 11.8933 14.8766 11.2923C14.0759 11.8937 13.0789 12.25 11.9989 12.25C10.9195 12.25 9.92238 11.8935 9.12194 11.2928C8.32127 11.8939 7.32456 12.25 6.24489 12.25C4.55562 12.25 2.75108 11.3718 1.76692 10.0092L1.75455 9.99206C1.67123 9.8769 1.56251 9.72662 1.4753 9.53046C1.38259 9.32192 1.32789 9.09674 1.28506 8.82231C1.18173 8.16018 1.32288 7.72227 1.49895 7.17603L1.51393 7.12954L2.19765 5.0053L2.21018 4.9664L2.21018 4.96639C2.41192 4.33952 2.58202 3.811 2.76865 3.39554C2.96634 2.95546 3.2125 2.57024 3.60604 2.27649C4.00177 1.9811 4.43892 1.85843 4.91299 1.80238C5.35639 1.74995 5.89776 1.74998 6.53326 1.75H6.53329H17.4659H17.4659Z" fill="#141B34"/>
@@ -142,7 +142,7 @@ export const initSectionHeader = async () => {
                                                             </a>
                                                         </li>
                                                         <li data-nav-submenu>
-                                                            <a href="page-service-detail.html" class="flex items-center gap-4 group" data-barba-active-child>
+                                                            <a href="/service" class="flex items-center gap-4 group" data-barba-active-child>
                                                                 <div class="size-12 flex items-center justify-center rounded-lg bg-primary-50/50 shrink-0">
                                                                     <svg class="icon icon-fill text-primary-600 size-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                         <path d="M18.4327 6.25H20.4663C21.4249 6.25 21.9043 6.25 22.2021 6.54289C22.4999 6.83579 22.4999 7.30719 22.4999 8.25V12.25C22.4999 13.1928 22.4999 13.6642 22.2021 13.9571C21.9043 14.25 21.4249 14.25 20.4663 14.25H19.8694C19.855 13.906 19.715 13.5662 19.4495 13.3036L13.3488 7.26785H12.332L11.0771 8.50942C10.3444 9.23432 9.17795 9.29823 8.36881 8.65782L8.13058 8.46927C7.71863 8.14322 7.51265 7.98019 7.50044 7.75745C7.48823 7.5347 7.67518 7.35084 8.04908 6.9831L9.0412 6.00736C9.92284 5.14027 10.3637 4.70672 10.9242 4.47836C11.4848 4.25 12.2884 4.25 13.5353 4.25C14.4521 4.25 14.9105 4.25 15.3428 4.37872C15.775 4.50745 16.1565 4.75753 16.9193 5.2577L18.4327 6.25Z" fill="#141B34"/>
@@ -156,7 +156,7 @@ export const initSectionHeader = async () => {
                                                             </a>
                                                         </li>
                                                         <li data-nav-submenu>
-                                                            <a href="page-service-detail.html" class="flex items-center gap-4 group" data-barba-active-child>
+                                                            <a href="/service" class="flex items-center gap-4 group" data-barba-active-child>
                                                                 <div class="size-12 flex items-center justify-center rounded-lg bg-primary-50/50 shrink-0">
                                                                     <svg class="icon icon-fill text-primary-600 size-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                         <path opacity="0.4" d="M10.9149 1.49784C11.2832 1.35888 11.6455 1.25 12.0001 1.25C12.3548 1.25 12.717 1.35888 13.0854 1.49784C13.4582 1.63848 13.9239 1.8452 14.5047 2.103C15.3583 2.48193 16.4849 2.91682 17.6934 3.26033L17.6934 3.26035C18.5753 3.51102 19.2882 3.71368 19.8283 3.9231C20.3711 4.13358 20.8632 4.39466 21.1945 4.83324C21.5153 5.258 21.6387 5.75424 21.6954 6.28941C21.7502 6.80597 21.7501 7.45411 21.7501 8.23883V11.1833C21.7501 14.2392 20.3707 16.6624 18.7034 18.4686C17.0414 20.2691 15.0613 21.4939 13.7562 22.1827L13.6932 22.216C13.1374 22.5098 12.6831 22.75 12.0001 22.75C11.3172 22.75 10.8629 22.5098 10.307 22.216L10.244 22.1827C8.93895 21.4939 6.95889 20.2691 5.29681 18.4686C3.62958 16.6624 2.25012 14.2392 2.25012 11.1833V8.23885V8.23883C2.25011 7.4541 2.25009 6.80596 2.30481 6.28941C2.3615 5.75424 2.48493 5.258 2.80578 4.83324C3.13706 4.39466 3.62917 4.13358 4.17196 3.9231C4.71204 3.71367 5.425 3.51101 6.30687 3.26034L6.30688 3.26034C7.51532 2.91682 8.64194 2.48194 9.49556 2.10302C10.0763 1.84521 10.542 1.63848 10.9149 1.49784Z" fill="#141B34"/>
@@ -171,7 +171,7 @@ export const initSectionHeader = async () => {
                                                             </a>
                                                         </li>
                                                         <li data-nav-submenu>
-                                                            <a href="page-service-detail.html" class="flex items-center gap-4 group" data-barba-active-child>
+                                                            <a href="/service" class="flex items-center gap-4 group" data-barba-active-child>
                                                                 <div class="size-12 flex items-center justify-center rounded-lg bg-primary-50/50 shrink-0">
                                                                     <svg class="icon icon-fill text-primary-600 size-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                         <path opacity="0.4" d="M6.97475 12.2517C7.38896 12.2517 7.75 12.5875 7.75 13.0017C7.75 15.2228 8.8526 16.7851 10.0017 17.8193C10.5769 18.3369 11.566 18.9311 12 19.177C12.4339 18.9311 13.4231 18.3369 13.9983 17.8193C15.1474 16.7851 16.25 15.2228 16.25 13.0017C16.25 12.8017 16.3299 12.61 16.4719 12.4691C16.614 12.3283 16.8322 12.2503 17.0322 12.252C17.4847 12.2559 17.8625 12.2591 18.1726 12.2834C18.4955 12.3087 18.8001 12.3599 19.0942 12.4874C19.742 12.7684 20.2568 13.2877 20.5322 13.9378C20.6573 14.233 20.7059 14.538 20.7284 14.8612C20.75 15.1714 20.75 15.5492 20.75 16.0017V16.0018V22.0017C20.75 22.416 20.4142 22.7517 20 22.7517H4C3.58579 22.7517 3.25 22.416 3.25 22.0017V15.9765V15.9765C3.24999 15.532 3.24999 15.161 3.27077 14.8564C3.29241 14.5393 3.33905 14.2397 3.45933 13.9494C3.73844 13.2755 4.27379 12.7402 4.94762 12.4611C5.23801 12.3408 5.53754 12.2941 5.85464 12.2725C6.15925 12.2517 6.53028 12.2517 6.97474 12.2517H6.97475Z" fill="#141B34"/>
@@ -211,7 +211,7 @@ export const initSectionHeader = async () => {
                                                 <div class="col-span-full | lg:col-span-4">
                                                     <ul class="grid gap-8 grid-cols-2 | lg:gap-x-16">
                                                         <li data-nav-submenu>
-                                                            <a href="page-product-detail.html" class="flex items-center gap-4 group" data-barba-active-child>
+                                                            <a href="/product" class="flex items-center gap-4 group" data-barba-active-child>
                                                                 <div class="size-12 flex items-center justify-center rounded-lg bg-primary-50/50 shrink-0">
                                                                     <svg class="icon icon-fill text-primary-600 size-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                         <path opacity="0.4" d="M13.75 3.99721C13.7515 3.58299 14.0886 3.24846 14.5028 3.25001C15.817 3.2549 16.8911 3.27921 17.7587 3.42347C18.6447 3.5708 19.3871 3.85371 19.9907 4.42553C20.6728 5.07174 20.9734 5.89294 21.1144 6.8867C21.25 7.84235 21.25 9.0586 21.25 10.5723V15.4253C21.25 16.939 21.25 18.1553 21.1144 19.111C20.9734 20.1047 20.6728 20.9259 19.9907 21.5721C19.3143 22.2129 18.4643 22.4903 17.4352 22.6214C16.4347 22.7489 15.158 22.7488 13.5532 22.7488H13.5532H10.4468H10.4468C8.84201 22.7488 7.56529 22.7489 6.56479 22.6214C5.53566 22.4903 4.68571 22.2129 4.00932 21.5721C3.32721 20.9259 3.02661 20.1047 2.88558 19.111C2.74996 18.1553 2.74998 16.9391 2.75 15.4254V15.4253V10.5723V10.5723C2.74998 9.05858 2.74996 7.84234 2.88558 6.8867C3.02661 5.89294 3.32721 5.07174 4.00932 4.42553C4.61291 3.85371 5.35533 3.5708 6.24135 3.42347C7.10891 3.27921 8.18295 3.2549 9.49721 3.25001C9.91142 3.24846 10.2485 3.58299 10.25 3.99721L9.5028 5.79816H14.4972L13.75 3.99721Z" fill="#141B34"/>
@@ -227,7 +227,7 @@ export const initSectionHeader = async () => {
                                                             </a>
                                                         </li>
                                                         <li data-nav-submenu>
-                                                            <a href="page-product-detail.html" class="flex items-center gap-4 group" data-barba-active-child>
+                                                            <a href="/product" class="flex items-center gap-4 group" data-barba-active-child>
                                                                 <div class="size-12 flex items-center justify-center rounded-lg bg-primary-50/50 shrink-0">
                                                                     <svg class="icon icon-fill text-primary-600 size-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                         <path opacity="0.4" fill-rule="evenodd" clip-rule="evenodd" d="M1.5 11.9255V12.0745C1.49998 14.2504 1.49996 15.9852 1.68282 17.3453C1.87164 18.7497 2.27175 19.9035 3.18414 20.8159C4.09653 21.7283 5.25033 22.1284 6.65471 22.3172C6.83878 22.3419 7 22.1968 7 22.0111V11C7 10.5286 7 10.2929 6.85355 10.1464C6.70711 10 6.47141 10 6 10H2.49623C2.02855 10 1.79471 10 1.64832 10.1461C1.50193 10.2922 1.50148 10.525 1.50058 10.9905C1.49999 11.2927 1.5 11.6043 1.5 11.9255ZM22.4994 10.9905C22.4985 10.525 22.4981 10.2922 22.3517 10.1461C22.2053 10 21.9715 10 21.5038 10L10 10C9.5286 10 9.29289 10 9.14645 10.1464C9 10.2929 9 10.5286 9 11V21.503C9 21.9644 9 22.1951 9.14472 22.3412C9.28944 22.4874 9.51775 22.4896 9.97436 22.4941C10.5812 22.5 11.2309 22.5 11.9255 22.5H12.0745C14.2504 22.5 15.9852 22.5 17.3453 22.3172C18.7497 22.1284 19.9035 21.7283 20.8159 20.8159C21.7283 19.9035 22.1284 18.7497 22.3172 17.3453C22.5 15.9851 22.5 14.2504 22.5 12.0744V11.9256C22.5 11.6043 22.5 11.2927 22.4994 10.9905Z" fill="#141B34"/>
@@ -241,7 +241,7 @@ export const initSectionHeader = async () => {
                                                             </a>
                                                         </li>
                                                         <li data-nav-submenu>
-                                                            <a href="page-product-detail.html" class="flex items-center gap-4 group" data-barba-active-child>
+                                                            <a href="/product" class="flex items-center gap-4 group" data-barba-active-child>
                                                                 <div class="size-12 flex items-center justify-center rounded-lg bg-primary-50/50 shrink-0">
                                                                     <svg class="icon icon-fill text-primary-600 size-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                         <path fill-rule="evenodd" clip-rule="evenodd" d="M8.00009 17.7499C8.55238 17.7499 9.00009 18.1976 9.00009 18.7499V20.7499C9.00009 21.3022 8.55238 21.7499 8.00009 21.7499C7.44781 21.7499 7.00009 21.3022 7.00009 20.7499V18.7499C7.00009 18.1976 7.44781 17.7499 8.00009 17.7499ZM16.0001 17.7499C16.5524 17.7499 17.0001 18.1976 17.0001 18.7499V20.7499C17.0001 21.3022 16.5524 21.7499 16.0001 21.7499C15.4478 21.7499 15.0001 21.3022 15.0001 20.7499V18.7499C15.0001 18.1976 15.4478 17.7499 16.0001 17.7499Z" fill="#141B34"/>
@@ -257,7 +257,7 @@ export const initSectionHeader = async () => {
                                                             </a>
                                                         </li>
                                                         <li data-nav-submenu>
-                                                            <a href="page-product-detail.html" class="flex items-center gap-4 group" data-barba-active-child>
+                                                            <a href="/product" class="flex items-center gap-4 group" data-barba-active-child>
                                                                 <div class="size-12 flex items-center justify-center rounded-lg bg-primary-50/50 shrink-0">
                                                                     <svg class="icon icon-fill text-primary-600 size-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                         <g opacity="0.4">
@@ -275,7 +275,7 @@ export const initSectionHeader = async () => {
                                                             </a>
                                                         </li>
                                                         <li data-nav-submenu>
-                                                            <a href="page-product-detail.html" class="flex items-center gap-4 group" data-barba-active-child>
+                                                            <a href="/product" class="flex items-center gap-4 group" data-barba-active-child>
                                                                 <div class="size-12 flex items-center justify-center rounded-lg bg-primary-50/50 shrink-0">
                                                                     <svg class="icon icon-fill text-primary-600 size-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                         <path opacity="0.4" d="M12.4724 14.99C11.9357 14.2489 11.0867 13.7418 10.0656 13.7418H8.8884C8.72611 13.7418 8.56107 13.7011 8.40513 13.6164L7.40609 13.0741C6.67311 11.8904 6.25 10.4946 6.25 9C6.25 4.71979 9.7198 1.25 14 1.25C18.2802 1.25 21.75 4.71979 21.75 9C21.75 10.9009 21.0656 12.6421 19.9298 13.9903C19.1282 13.3248 18.0482 13.0641 16.9868 13.4339L12.4724 14.99Z" fill="#141B34"/>
@@ -290,7 +290,7 @@ export const initSectionHeader = async () => {
                                                             </a>
                                                         </li>
                                                         <li data-nav-submenu>
-                                                            <a href="page-product-detail.html" class="flex items-center gap-4 group" data-barba-active-child>
+                                                            <a href="/product" class="flex items-center gap-4 group" data-barba-active-child>
                                                                 <div class="size-12 flex items-center justify-center rounded-lg bg-primary-50/50 shrink-0">
                                                                     <svg class="icon icon-fill text-primary-600 size-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                         <g opacity="0.4">
@@ -316,12 +316,12 @@ export const initSectionHeader = async () => {
                             </div>
                         </li>
                         <li data-barba-active>
-                            <a href="page-team.html" class="flex text-sm font-bold uppercase tracking-wide link link-reverse [--link-underline:var(--color-primary-600)] [.is-active_&]:[--link-from:100%] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover) | [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:text-white [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--link-underline:white] [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--text-hover:white]" data-hover-effect>
+                            <a href="/our-team" class="flex text-sm font-bold uppercase tracking-wide link link-reverse [--link-underline:var(--color-primary-600)] [.is-active_&]:[--link-from:100%] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover) | [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:text-white [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--link-underline:white] [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--text-hover:white]" data-hover-effect>
                                 Tim Kami
                             </a>
                         </li>
                         <li data-barba-active>
-                            <a href="page-project.html" class="flex text-sm font-bold uppercase tracking-wide link link-reverse [--link-underline:var(--color-primary-600)] [.is-active_&]:[--link-from:100%] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover) | [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:text-white [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--link-underline:white] [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--text-hover:white]" data-hover-effect>
+                            <a href="/project" class="flex text-sm font-bold uppercase tracking-wide link link-reverse [--link-underline:var(--color-primary-600)] [.is-active_&]:[--link-from:100%] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover) | [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:text-white [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--link-underline:white] [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--text-hover:white]" data-hover-effect>
                                 Project
                             </a>
                         </li>
@@ -346,61 +346,61 @@ export const initSectionHeader = async () => {
                                 <a href="./"><span class="h2 uppercase tracking-tight leading-none [.is-active_&]:text-primary-600">Beranda</span></a>
                             </li>
                             <li class="w-full" data-barba-active>
-                                <a href="page-about.html"><span class="h2 uppercase tracking-tight leading-none [.is-active_&]:text-primary-600">Tentang Kami</span></a>
+                                <a href="/about-us"><span class="h2 uppercase tracking-tight leading-none [.is-active_&]:text-primary-600">Tentang Kami</span></a>
                             </li>
                             <li class="w-full accordion-item overflow-clip" data-barba-active>
-                                <a href="javascript:;" data-target="menu-services"><span class="h2 uppercase tracking-tight leading-none [.is-active_&]:text-primary-600">Service</span></a>
+                                <a href="javascript:;" data-target="menu-services"><span class="h2 uppercase tracking-tight leading-none [.is-active_&]:text-primary-600">Layanan</span></a>
                                 <div id="menu-services" class="accordion-content overflow-clip" aria-expanded="false">
                                     <ul class="flex justify-center flex-wrap gap-2 py-6">
                                         <li data-nav-submenu>
-                                            <a href="page-service-detail.html" class="btn btn-sm" data-barba-active-child>Cleaning Service</a>
+                                            <a href="/service" class="btn btn-sm" data-barba-active-child>Cleaning Service</a>
                                         </li>
                                         <li data-nav-submenu>
-                                            <a href="page-service-detail.html" class="btn btn-sm" data-barba-active-child>Sales</a>
+                                            <a href="/service" class="btn btn-sm" data-barba-active-child>Sales</a>
                                         </li>
                                         <li data-nav-submenu>
-                                            <a href="page-service-detail.html" class="btn btn-sm" data-barba-active-child>Kurir</a>
+                                            <a href="/service" class="btn btn-sm" data-barba-active-child>Kurir</a>
                                         </li>
                                         <li data-nav-submenu>
-                                            <a href="page-service-detail.html" class="btn btn-sm" data-barba-active-child>Pest Control</a>
+                                            <a href="/service" class="btn btn-sm" data-barba-active-child>Pest Control</a>
                                         </li>
                                         <li data-nav-submenu>
-                                            <a href="page-service-detail.html" class="btn btn-sm" data-barba-active-child>Crew Store</a>
+                                            <a href="/service" class="btn btn-sm" data-barba-active-child>Crew Store</a>
                                         </li>
                                         <li data-nav-submenu>
-                                            <a href="page-service-detail.html" class="btn btn-sm" data-barba-active-child>Alih Daya</a>
+                                            <a href="/service" class="btn btn-sm" data-barba-active-child>Alih Daya</a>
                                         </li>
                                         <li data-nav-submenu>
-                                            <a href="page-service-detail.html" class="btn btn-sm" data-barba-active-child>Security</a>
+                                            <a href="/service" class="btn btn-sm" data-barba-active-child>Security</a>
                                         </li>
                                         <li data-nav-submenu>
-                                            <a href="page-service-detail.html" class="btn btn-sm" data-barba-active-child>Receptionist</a>
+                                            <a href="/service" class="btn btn-sm" data-barba-active-child>Receptionist</a>
                                         </li>
                                     </ul>
                                     <!--<ul class="py-6 flex flex-col divide-y divide-dark-300">
                                         <li class="py-3 first:pt-0 last:pb-0" data-nav-submenu>
-                                            <a href="page-service-detail.html" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Cleaning Service</a>
+                                            <a href="/service" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Cleaning Service</a>
                                         </li>
                                         <li class="py-3 first:pt-0 last:pb-0" data-nav-submenu>
-                                            <a href="page-service-detail.html" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Sales</a>
+                                            <a href="/service" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Sales</a>
                                         </li>
                                         <li class="py-3 first:pt-0 last:pb-0" data-nav-submenu>
-                                            <a href="page-service-detail.html" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Kurir</a>
+                                            <a href="/service" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Kurir</a>
                                         </li>
                                         <li class="py-3 first:pt-0 last:pb-0" data-nav-submenu>
-                                            <a href="page-service-detail.html" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Pest Control</a>
+                                            <a href="/service" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Pest Control</a>
                                         </li>
                                         <li class="py-3 first:pt-0 last:pb-0" data-nav-submenu>
-                                            <a href="page-service-detail.html" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Crew Store</a>
+                                            <a href="/service" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Crew Store</a>
                                         </li>
                                         <li class="py-3 first:pt-0 last:pb-0" data-nav-submenu>
-                                            <a href="page-service-detail.html" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Alih Daya</a>
+                                            <a href="/service" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Alih Daya</a>
                                         </li>
                                         <li class="py-3 first:pt-0 last:pb-0" data-nav-submenu>
-                                            <a href="page-service-detail.html" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Security</a>
+                                            <a href="/service" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Security</a>
                                         </li>
                                         <li class="py-3 first:pt-0 last:pb-0" data-nav-submenu>
-                                            <a href="page-service-detail.html" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Receptionist</a>
+                                            <a href="/service" class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950" data-barba-active-child>Receptionist</a>
                                         </li>
                                     </ul>-->
                                 </div>
@@ -410,34 +410,34 @@ export const initSectionHeader = async () => {
                                 <div id="menu-product" class="accordion-content overflow-clip" aria-expanded="false">
                                     <ul class="flex justify-center flex-wrap gap-2 py-6">
                                         <li data-nav-submenu>
-                                            <a href="page-product-detail.html" class="btn btn-sm" data-barba-active-child>Software HRIS</a>
+                                            <a href="/product" class="btn btn-sm" data-barba-active-child>Software HRIS</a>
                                         </li>
                                         <li data-nav-submenu>
-                                            <a href="page-product-detail.html" class="btn btn-sm" data-barba-active-child>Software ERP</a>
+                                            <a href="/product" class="btn btn-sm" data-barba-active-child>Software ERP</a>
                                         </li>
                                         <li data-nav-submenu>
-                                            <a href="page-product-detail.html" class="btn btn-sm" data-barba-active-child>Software Parkir</a>
+                                            <a href="/product" class="btn btn-sm" data-barba-active-child>Software Parkir</a>
                                         </li>
                                         <li data-nav-submenu>
-                                            <a href="page-product-detail.html" class="btn btn-sm" data-barba-active-child>Online Travel Agen</a>
+                                            <a href="/product" class="btn btn-sm" data-barba-active-child>Online Travel Agen</a>
                                         </li>
                                         <li data-nav-submenu>
-                                            <a href="page-product-detail.html" class="btn btn-sm" data-barba-active-child>Cash Collect</a>
+                                            <a href="/product" class="btn btn-sm" data-barba-active-child>Cash Collect</a>
                                         </li>
                                         <li data-nav-submenu>
-                                            <a href="page-product-detail.html" class="btn btn-sm" data-barba-active-child>Recruitment</a>
+                                            <a href="/product" class="btn btn-sm" data-barba-active-child>Recruitment</a>
                                         </li>
                                     </ul>
                                 </div>
                             </li>
                             <li class="w-full" data-barba-active>
-                                <a href="page-team.html"><span class="h2 uppercase tracking-tight leading-none [.is-active_&]:text-primary-600">Tim Kami</span></a>
+                                <a href="/our-team"><span class="h2 uppercase tracking-tight leading-none [.is-active_&]:text-primary-600">Tim Kami</span></a>
                             </li>
                             <li class="w-full" data-barba-active>
-                                <a href="page-project.html"><span class="h2 uppercase tracking-tight leading-none [.is-active_&]:text-primary-600">Project</span></a>
+                                <a href="/project"><span class="h2 uppercase tracking-tight leading-none [.is-active_&]:text-primary-600">Project</span></a>
                             </li>
                             <li class="w-full" data-barba-active>
-                                <a href="page-contact.html"><span class="h2 uppercase tracking-tight leading-none [.is-active_&]:text-primary-600">Kontak Kami</span></a>
+                                <a href="/contact-us"><span class="h2 uppercase tracking-tight leading-none [.is-active_&]:text-primary-600">Kontak Kami</span></a>
                             </li>
                         </ul>
                     </div>
@@ -514,7 +514,7 @@ const checkLoginPage = async () => {
     authHeader.innerHTML = `
       <div class="relative | not-lg:hidden">
         <div class="opacity-0 transition-all duration-800 ease-custom [.is-dark_&]:opacity-100 [.is-sticky_&,.is-hover-menu_&]:opacity-0">
-          <a href="page-contact.html" class="btn btn-white btn-circle-primary | not-lg:hidden" data-hover-effect>
+          <a href="/contact-us" class="btn btn-white btn-circle-primary | not-lg:hidden" data-hover-effect>
             Kontak Kami
             <svg class="icon icon-stroke circle-icon circle-right icon-up-right" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M17.5 6.5L6 18" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -523,7 +523,7 @@ const checkLoginPage = async () => {
           </a>
         </div>
         <div class="absolute inset-0 w-min transition-all duration-800 ease-custom [.is-dark_&]:opacity-0 [.is-dark_&]:invisible [.is-sticky_&,.is-hover-menu_&]:opacity-100 [.is-sticky_&,.is-hover-menu_&]:visible">
-          <a href="page-contact.html" class="btn btn-primary btn-circle-white | not-lg:hidden" data-hover-effect>
+          <a href="/contact-us" class="btn btn-primary btn-circle-white | not-lg:hidden" data-hover-effect>
             Kontak Kami
             <svg class="icon icon-stroke circle-icon circle-right icon-up-right" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M17.5 6.5L6 18" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -611,7 +611,7 @@ const checkLoginPage = async () => {
     authHeader.innerHTML = `
       <div class="relative | not-lg:hidden">
         <div class="opacity-0 transition-all duration-800 ease-custom [.is-dark_&]:opacity-100 [.is-sticky_&,.is-hover-menu_&]:opacity-0">
-          <a href="page-contact.html" class="btn btn-white btn-circle-primary | not-lg:hidden" data-hover-effect>
+          <a href="/contact-us" class="btn btn-white btn-circle-primary | not-lg:hidden" data-hover-effect>
             Kontak Kami
             <svg class="icon icon-stroke circle-icon circle-right icon-up-right" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M17.5 6.5L6 18" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -620,7 +620,7 @@ const checkLoginPage = async () => {
           </a>
         </div>
         <div class="absolute inset-0 w-min transition-all duration-800 ease-custom [.is-dark_&]:opacity-0 [.is-dark_&]:invisible [.is-sticky_&,.is-hover-menu_&]:opacity-100 [.is-sticky_&,.is-hover-menu_&]:visible">
-          <a href="page-contact.html" class="btn btn-primary btn-circle-white | not-lg:hidden" data-hover-effect>
+          <a href="/contact-us" class="btn btn-primary btn-circle-white | not-lg:hidden" data-hover-effect>
             Kontak Kami
             <svg class="icon icon-stroke circle-icon circle-right icon-up-right" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M17.5 6.5L6 18" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -654,7 +654,7 @@ barba.hooks.enter(() => {
   checkLoginPage();
 });
 
-window.addEventListener("avatar:updated", (e) => {
+window.addEventListener("avatar:updated", () => {
   // Cache sudah di-set di _profile.js sebelum event ini di-dispatch
   // Cukup re-render header dengan data terbaru
   checkLoginPage();

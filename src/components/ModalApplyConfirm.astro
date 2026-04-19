@@ -1,0 +1,103 @@
+<div
+  id="modal-apply-confirm"
+  class="fixed top-0 inset-x-0 z-[999] invisible"
+  data-modal
+>
+  <div
+    class="relative w-full h-dvh flex flex-col overflow-auto"
+    data-lenis-prevent
+  >
+    <div
+      class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
+    >
+      <div class="grow w-full flex flex-col max-container">
+        <div class="grid gap-4 | lg:grid-cols-12">
+          <div
+            class="grid-item col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
+          >
+            <div
+              class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
+              data-modal-content
+            >
+              <div class="absolute top-2 right-2">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-icon btn-dark"
+                  data-hover-effect
+                  data-modal-hide
+                >
+                  <svg class="icon icon-stroke" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6"
+                      stroke="#141B34"
+                      stroke-width="1.5"
+                      stroke-linejoin="round"></path>
+                  </svg>
+                </button>
+              </div>
+              <div class="shrink-0 px-6 py-6 | lg:py-8">
+                <div class="flex flex-col gap-4 items-center text-center">
+                  <div
+                    class="flex items-center justify-center size-16 rounded-full bg-primary-50"
+                  >
+                    <svg
+                      class="icon icon-stroke size-8 text-primary-600"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M9.00897 19.0001L2.5 12.0001M9.00897 19.0001L22 5.00012M9.00897 19.0001C9.00897 19.0001 9 19 9.00897 19.0001Z"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"></path>
+                    </svg>
+                  </div>
+                  <div
+                    class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
+                  >
+                    Konfirmasi Lamaran
+                  </div>
+                  <h4
+                    class="w-full font-bold leading-none text-balance"
+                    id="modal-apply-title"
+                  >
+                    Yakin ingin melamar?
+                  </h4>
+                  <p
+                    class="text-sm text-dark-400 text-balance"
+                    id="modal-apply-desc"
+                  >
+                    Anda akan mengirimkan lamaran untuk posisi ini.
+                  </p>
+                </div>
+              </div>
+              <div class="shrink-0 px-6 pb-6 | lg:pb-8">
+                <div class="grid gap-3">
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    data-hover-effect
+                    data-apply-confirm-btn
+                  >
+                    Ya, Lamar Sekarang
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline"
+                    data-hover-effect
+                    data-modal-hide
+                  >
+                    Batal
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

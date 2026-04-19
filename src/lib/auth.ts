@@ -11,10 +11,14 @@ export interface AuthUser {
   role: "applicant" | "company" | "admin";
 }
 
+type GetCurrentUserResult =
+  | { user: AuthUser; expired: false }
+  | { user: null; expired: boolean };
+
 export async function getCurrentUser(
   cookieHeader: string,
-): Promise<AuthUser | null> {
-  if (!cookieHeader) return null;
+): Promise<GetCurrentUserResult> {
+  if (!cookieHeader) return { user: null, expired: false };
   const match = cookieHeader
     .split(";")
     .map((c) => c.trim())
@@ -22,10 +26,14 @@ export async function getCurrentUser(
   const token = match
     ? decodeURIComponent(match.slice("auth_token=".length))
     : null;
-  if (!token) return null;
+  if (!token) return { user: null, expired: false };
+
   try {
-    return jwt.verify(token, JWT_SECRET) as AuthUser;
-  } catch {
-    return null;
+    const user = jwt.verify(token, JWT_SECRET) as AuthUser;
+    return { user, expired: false };
+  } catch (err: any) {
+    // ✅ Bedakan expired vs invalid token
+    const expired = err?.name === "TokenExpiredError";
+    return { user: null, expired };
   }
 }

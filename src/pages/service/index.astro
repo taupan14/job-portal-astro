@@ -1,0 +1,716 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Layanan">
+  <!-- Paste HTML dari index.html di sini -->
+  <html lang="en">
+    <div id="app">
+      <!-- @components sectionHeader -->
+
+      <main id="section-main" data-barba="wrapper">
+        <div
+          data-hero-scheme="light"
+          data-barba="container"
+          data-barba-namespace="service-detail"
+        >
+          <section
+            id="page-header"
+            class="relative isolate pt-(--space-header) min-h-dvh flex flex-col justify-center overflow-x-clip mb-16 | lg:pb-(--space-header)"
+          >
+            <div class="relative py-16 | lg:py-24">
+              <div class="max-container">
+                <div class="grid gap-8 | lg:grid-cols-12">
+                  <div class="col-span-full | lg:col-span-8 lg:col-start-3">
+                    <div class="flex flex-col gap-6 items-center text-center">
+                      <div class="inline-flex items-center gap-3">
+                        <div
+                          class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                        >
+                        </div>
+                        <div
+                          class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950"
+                        >
+                          Services
+                        </div>
+                      </div>
+                      <h1 class="leading-none text-balance">
+                        Cleaning Service
+                      </h1>
+                    </div>
+                  </div>
+                  <div
+                    class="col-span-full text-center | lg:col-span-6 lg:col-start-4"
+                  >
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-4"
+                      data-hover-group
+                      data-scroll-to="page-content"
+                    >
+                      <div
+                        class="text-sm font-bold uppercase tracking-wide"
+                        data-hover-effect
+                      >
+                        Lihat Detail
+                      </div>
+                      <div class="btn btn-icon btn-primary" data-hover-effect>
+                        <svg
+                          class="icon icon-stroke icon-down-right"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            fill="none"
+                            stroke="#141B34"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M17.5,17.5L6,6"></path>
+                          <path
+                            fill="none"
+                            stroke="#141B34"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M18,8v10H8"></path>
+                        </svg>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="absolute inset-x-0 top-(--space-header) bottom-0 flex flex-col justify-between pointer-events-none"
+            >
+              <div class="w-full max-container">
+                <div class="grid grid-cols-12">
+                  <div
+                    class="col-span-4 -translate-x-1/2 | lg:col-span-3 lg:-translate-x-2/3"
+                  >
+                    <div class="aspect-video rounded-lg overflow-clip">
+                      <img
+                        src="./assets/images/thumbnails/img01.webp"
+                        alt=""
+                        class="size-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div
+                    class="col-span-5 col-start-8 translate-y-1/2 | lg:col-span-2 lg:col-start-10 lg:translate-y-1/4"
+                  >
+                    <div class="aspect-video rounded-lg overflow-clip">
+                      <img
+                        src="./assets/images/thumbnails/img02.webp"
+                        alt=""
+                        class="size-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div
+                    class="translate-y-2/3 translate-x-2/3 | lg:col-span-3 lg:col-start-10 | not-lg:hidden"
+                  >
+                    <div class="aspect-video rounded-lg overflow-clip">
+                      <img
+                        src="./assets/images/thumbnails/img03.webp"
+                        alt=""
+                        class="size-full object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="w-full max-container">
+                <div class="grid grid-cols-12">
+                  <div
+                    class="col-span-5 -translate-x-1/3 | lg:col-span-2 lg:translate-y-1/2"
+                  >
+                    <div class="aspect-video rounded-lg overflow-clip">
+                      <img
+                        src="./assets/images/thumbnails/img04.webp"
+                        alt=""
+                        class="size-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div
+                    class="col-span-4 col-start-9 translate-x-1/2 -translate-y-1/2 | lg:col-span-3 lg:col-start-7 lg:-translate-y-0 lg:translate-x-3"
+                  >
+                    <div class="aspect-video rounded-lg overflow-clip">
+                      <img
+                        src="./assets/images/thumbnails/img05.webp"
+                        alt=""
+                        class="size-full object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="absolute inset-0 [-webkit-mask-image:radial-gradient(closest-side,black,transparent)] -z-1 -translate-y-1/4 -translate-x-1/2 pointer-events-none opacity-20 [--square:4rem] [--line-w:1px] | lg:[--square:6rem] lg:[--line-w:1px]"
+            >
+              <div
+                class="size-full bg-[repeating-linear-gradient(to_left,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square)),repeating-linear-gradient(to_bottom,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square))]"
+              >
+              </div>
+            </div>
+            <div
+              class="absolute inset-0 [-webkit-mask-image:radial-gradient(closest-side,black,transparent)] -z-1 translate-y-1/4 translate-x-1/2 pointer-events-none opacity-20 [--square:4rem] [--line-w:1px] | lg:[--square:6rem] lg:[--line-w:1px]"
+            >
+              <div
+                class="size-full bg-[repeating-linear-gradient(to_left,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square)),repeating-linear-gradient(to_bottom,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square))]"
+              >
+              </div>
+            </div>
+          </section>
+
+          <section id="page-content" class="relative">
+            <div class="py-16 | lg:py-24">
+              <div class="max-container">
+                <div class="relative">
+                  <div
+                    class="relative flex items-center | lg:items-start lg:justify-end lg:absolute lg:inset-0 lg:pointer-events-none"
+                  >
+                    <div
+                      class="not-lg:w-full not-lg:py-8 not-lg:mb-8 not-lg:border-b not-lg:border-dark-300 | lg:sticky lg:top-(--space-header) lg:pt-8 lg:-mt-8"
+                    >
+                      <div
+                        class="flex items-center | not-lg:justify-between | lg:gap-6 lg:flex-col"
+                      >
+                        <div
+                          class="text-sm leading-none font-bold uppercase pointer-events-auto | lg:[writing-mode:vertical-rl] lg:block"
+                        >
+                          Share
+                        </div>
+                        <div
+                          class="flex flex-row gap-1 pointer-events-auto | lg:flex-col"
+                        >
+                          <a
+                            href="#!"
+                            class="btn btn-sm btn-icon"
+                            aria-label="Facebook"
+                            data-hover-effect
+                            data-tooltip="Facebook"
+                          >
+                            <svg
+                              class="icon icon-fill icon-up"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M5.55869 10.2083C4.47617 10.2083 4.25024 10.4146 4.25024 11.4028V13.1944C4.25024 14.1826 4.47617 14.3889 5.55869 14.3889H8.17557V21.5556C8.17557 22.5438 8.40149 22.75 9.48401 22.75H12.1009C13.1834 22.75 13.4093 22.5438 13.4093 21.5556V14.3889H16.3477C17.1687 14.3889 17.3803 14.2432 17.6058 13.5226L18.1666 11.7309C18.5529 10.4965 18.3148 10.2083 16.9085 10.2083H13.4093V7.22222C13.4093 6.56255 13.9951 6.02778 14.7178 6.02778H18.4418C19.5243 6.02778 19.7502 5.82154 19.7502 4.83333V2.44444C19.7502 1.45624 19.5243 1.25 18.4418 1.25H14.7178C11.1046 1.25 8.17557 3.92386 8.17557 7.22222V10.2083H5.55869Z"
+                                fill="#141B34"></path>
+                            </svg>
+                          </a>
+                          <a
+                            href="#!"
+                            class="btn btn-sm btn-icon"
+                            aria-label="X/Twitter"
+                            data-hover-effect
+                            data-tooltip="X/Twitter"
+                          >
+                            <svg
+                              class="icon icon-fill icon-up"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M2.3569 2.78113C2.52359 2.45513 2.85886 2.25 3.225 2.25H8.1C8.41308 2.25 8.70711 2.40034 8.89041 2.65415L13.5354 9.08571L20.0856 2.53557C20.4663 2.15481 21.0837 2.15481 21.4644 2.53557C21.8452 2.91633 21.8452 3.53367 21.4644 3.91443L14.6919 10.687L21.5654 20.2041C21.7798 20.501 21.8098 20.8929 21.6431 21.2189C21.4764 21.5449 21.1411 21.75 20.775 21.75H15.9C15.5869 21.75 15.2929 21.5997 15.1096 21.3459L10.4646 14.9143L3.91443 21.4644C3.53367 21.8452 2.91634 21.8452 2.53557 21.4644C2.15481 21.0837 2.15481 20.4663 2.53557 20.0856L9.30811 13.313L2.43459 3.79585C2.22022 3.49903 2.19021 3.10713 2.3569 2.78113Z"
+                                fill="#141B34"></path>
+                            </svg>
+                          </a>
+                          <a
+                            href="#!"
+                            class="btn btn-sm btn-icon"
+                            aria-label="Instagram"
+                            data-hover-effect
+                            data-tooltip="Instagram"
+                          >
+                            <svg
+                              class="icon icon-fill icon-up"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M12.0572 1.75H12.0572C14.2479 1.74999 15.9686 1.74998 17.312 1.93059C18.6886 2.11568 19.7809 2.50271 20.6391 3.36091C21.4973 4.21911 21.8843 5.31137 22.0694 6.68802C22.25 8.03144 22.25 9.7521 22.25 11.9428V11.9428V12.0572V12.0572C22.25 14.2479 22.25 15.9686 22.0694 17.312C21.8843 18.6886 21.4973 19.7809 20.6391 20.6391C19.7809 21.4973 18.6886 21.8843 17.312 22.0694C15.9686 22.25 14.2479 22.25 12.0572 22.25H12.0572H11.9428H11.9428C9.7521 22.25 8.03144 22.25 6.68802 22.0694C5.31137 21.8843 4.21911 21.4973 3.36091 20.6391C2.50272 19.7809 2.11568 18.6886 1.93059 17.312C1.74998 15.9686 1.74999 14.2479 1.75 12.0572V11.9428C1.74999 9.75212 1.74998 8.03144 1.93059 6.68802C2.11568 5.31137 2.50272 4.21911 3.36091 3.36091C4.21911 2.50271 5.31137 2.11568 6.68802 1.93059C8.03143 1.74998 9.7521 1.74999 11.9428 1.75H11.9428H12.0572ZM16.5 12C16.5 14.4853 14.4853 16.5 12 16.5C9.51472 16.5 7.5 14.4853 7.5 12C7.5 9.51472 9.51472 7.5 12 7.5C14.4853 7.5 16.5 9.51472 16.5 12ZM17.5123 7.5C18.0621 7.5 18.5078 7.05229 18.5078 6.5C18.5078 5.94772 18.0621 5.5 17.5123 5.5H17.5033C16.9535 5.5 16.5078 5.94772 16.5078 6.5C16.5078 7.05228 16.9535 7.5 17.5033 7.5H17.5123Z"
+                                fill="#141B34"></path>
+                            </svg>
+                          </a>
+                          <a
+                            href="javascript:;"
+                            rel="noopener noreferrer"
+                            class="btn btn-sm btn-icon"
+                            aria-label="Link"
+                            data-hover-effect
+                            data-tooltip="Copy Link"
+                            data-copy-clipboard
+                          >
+                            <svg
+                              class="icon icon-stroke icon-up"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M9.521 14.4356L14.434 9.52258"
+                                stroke="#141B34"
+                                stroke-width="2"
+                                stroke-linecap="round"></path>
+                              <path
+                                d="M12.569 15.1084C13.3087 16.2488 13.1113 17.4178 12.2568 18.2723L9.26158 21.2675C8.28318 22.2459 6.69687 22.2459 5.71847 21.2675L2.73234 18.2814C1.75393 17.303 1.75393 15.7167 2.73234 14.7383L5.72755 11.743C6.42949 11.0411 7.76361 10.6357 8.91007 11.4659M15.1088 12.5685C16.2492 13.3082 17.4182 13.1109 18.2727 12.2564L21.2679 9.26114C22.2463 8.28273 22.2463 6.69641 21.2679 5.718L18.2818 2.73185C17.3034 1.75344 15.7171 1.75344 14.7387 2.73185L11.7434 5.72709C11.0415 6.42903 10.6362 7.76315 11.4664 8.90962"
+                                stroke="#141B34"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"></path>
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="post-entry">
+                    <h5>
+                      Perusahaan kami telah dipercaya untuk pengadaan Jasa
+                      Alihdaya Cleaning Service untuk menjaga kebersihan kantor
+                      atau area kerja Perusahaan Anda.
+                    </h5>
+                    <p>
+                      Menjaga kebersihan umum di seluruh area, termasuk lantai,
+                      dinding, langit-langit, dan area publik. membersihkan dan
+                      merawat lantai, termasuk penyedotan debu, pengeluaran
+                      noda, dan pembersihan lantai berbagai jenis.
+                    </p>
+                    <p>
+                      Menjaga kebersihan kamar mandi dan toilet, termasuk
+                      membersihkan sanitasi, wastafel, dan area-area lainnya.
+                      membersihkan dan merawat peralatan, perabot, dan fasilitas
+                      lainnya yang digunakan dalam ruangan, seperti meja, kursi,
+                      dan peralatan elektronik.
+                    </p>
+                    <p>
+                      Membersihkan dan merawat area dapur, termasuk membersihkan
+                      peralatan dapur, meja makan, dan area makan. membersihkan
+                      kaca dan jendela untuk memastikan transparansi dan
+                      kebersihan.
+                    </p>
+                    <p>
+                      Mengelola sampah dan limbah dengan membuangnya sesuai
+                      dengan prosedur dan regulasi yang berlaku. menyediakan
+                      layanan pembersihan khusus setelah acara atau pertemuan
+                      untuk memastikan ruangan kembali bersih dan teratur.
+                    </p>
+                    <p>
+                      Membersihkan permukaan keras seperti meja, lantai keramik,
+                      dan dinding untuk menghilangkan debu, noda, dan kotoran
+                      lainnya. membersihkan dan merawat ruang terbuka, seperti
+                      halaman atau taman, serta merawat pot tanaman dan hiasan
+                      luar ruangan.
+                    </p>
+                    <p>
+                      Melakukan desinfeksi dan sanitasi, terutama di area yang
+                      sering disentuh atau berpotensi menjadi tempat penyebaran
+                      penyakit.
+                    </p>
+                    <p>
+                      Membantu menciptakan lingkungan yang aman dan teratur
+                      dengan merapikan barang-barang yang berserakan dan
+                      memastikan akses ke area-area penting. melakukan
+                      pemeliharaan dan perbaikan sederhana pada fasilitas atau
+                      peralatan yang terkait dengan tugas kebersihan.
+                    </p>
+                    <p>
+                      Menyediakan layanan khusus sesuai permintaan pelanggan,
+                      seperti pembersihan karpet, poles lantai, atau pembersihan
+                      yang melibatkan teknologi khusus.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="py-16 | lg:py-24">
+              <div class="max-container">
+                <div class="splide group/slide" data-slide-related-services>
+                  <div class="grid gap-8 | lg:grid-cols-12">
+                    <div class="col-span-full | lg:col-span-3">
+                      <div class="flex flex-col gap-8 | lg:h-full">
+                        <div class="flex flex-col items-start gap-6">
+                          <div class="inline-flex items-center gap-3">
+                            <div
+                              class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                            >
+                            </div>
+                            <div
+                              class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950"
+                            >
+                              Service
+                            </div>
+                          </div>
+                          <h3 class="text-balance leading-none">
+                            Service<br />Lainnya
+                          </h3>
+                        </div>
+                        <div
+                          class="flex flex-row justify-between gap-4 | lg:grow lg:flex-col lg:items-start lg:text-start"
+                        >
+                          <!-- <a href="page-jobs.html" class="btn btn-sm" data-hover-effect>
+                                    Lainnya
+                                </a> -->
+                          <div class="flex items-center gap-1 mt-auto">
+                            <button
+                              type="button"
+                              class="btn-splide-prev btn btn-sm btn-icon"
+                              data-hover-effect
+                            >
+                              <svg
+                                class="icon icon-stroke icon-left"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  fill="none"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M4.2,12h16.3"></path>
+                                <path
+                                  fill="none"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M10.6,19.1L3.5,12 l7.1-7.1"></path>
+                              </svg>
+                            </button>
+                            <button
+                              type="button"
+                              class="btn-splide-next btn btn-sm btn-icon"
+                              data-hover-effect
+                            >
+                              <svg
+                                class="icon icon-stroke icon-right"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  fill="none"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M19.8,12H3.5"></path>
+                                <path
+                                  fill="none"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M13.4,4.9l7.1,7.1 l-7.1,7.1"></path>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-9">
+                      <div
+                        class="relative | not-lg:-mx-4 not-lg:px-4 | lg:-mr-8 | 2xl:-mr-[calc((100vw-var(--breakpoint-2xl))/2)]"
+                      >
+                        <div
+                          class="splide__track | not-lg:!overflow-visible | lg:rounded-l-lg"
+                        >
+                          <div
+                            class="splide__list [&>*]:w-[calc(1/1.125*100%)] | lg:!mr-6 lg:[&>*]:w-[calc(1/3.25*100%)]"
+                          >
+                            <!-- @components listSlideRelatedServices -->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div><!-- data-barba container -->
+      </main>
+
+      <!-- @components sectionFooter -->
+    </div><!-- #app -->
+
+    <div
+      id="modal-cari-loker"
+      class="fixed top-0 inset-x-0 z-[999] invisible"
+      data-modal
+    >
+      <div
+        class="relative w-full h-dvh flex flex-col overflow-auto"
+        data-lenis-prevent
+      >
+        <div
+          class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
+        >
+          <div class="grow w-full flex flex-col max-container">
+            <div class="grid gap-4 | lg:grid-cols-12">
+              <div
+                class="col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
+              >
+                <div
+                  class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
+                  data-modal-content
+                >
+                  <div class="absolute top-0 right-0">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-icon btn-dark"
+                      data-hover-effect
+                      data-modal-hide
+                    >
+                      <svg
+                        class="icon icon-stroke"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6"
+                          stroke="#141B34"
+                          stroke-width="1.5"
+                          stroke-linejoin="round"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="shrink-0 px-6 py-4 | lg:py-6">
+                    <div class="flex flex-col gap-4 items-center text-center">
+                      <div
+                        class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
+                      >
+                        Cari Loker
+                      </div>
+                      <h4 class="w-full font-bold leading-none text-balance">
+                        Apakah Anda Sudah Memiliki Id Number ?
+                      </h4>
+                    </div>
+                  </div>
+                  <!-- <div class="shrink-0 px-6 py-4 | lg:py-6">
+                                <article class="post-entry no-grid">
+                                    
+                                </article>
+                            </div> -->
+                  <div class="shrink-0 px-6 py-4 | lg:py-6">
+                    <form action="index-login.html">
+                      <div class="grid gap-6">
+                        <div class="c-form-wrapper">
+                          <div class="c-form">
+                            <label for="input-idnumber" class="c-label"
+                              >Masukan ID Number</label
+                            >
+                            <input
+                              type="number"
+                              name="input-idnumber"
+                              inputmode="numeric"
+                              class="c-input"
+                              placeholder="Masuan id number"
+                            />
+                          </div>
+                          <div class="text-xs mt-1 text-dark-400">
+                            please fill out this field
+                          </div>
+                        </div>
+                        <button
+                          type="submit"
+                          class="btn btn-primary"
+                          data-hover-effect>Submit</button
+                        >
+                        <div class="flex items-center gap-4">
+                          <div class="grow h-px bg-dark-200"></div>
+                          <div
+                            class="text-sm leading-none font-bold uppercase tracking-wide"
+                          >
+                            Atau
+                          </div>
+                          <div class="grow h-px bg-dark-200"></div>
+                        </div>
+                        <a
+                          href="auth-signup-search-job.html"
+                          class="btn"
+                          data-hover-effect>Daftar Sekarang</a
+                        >
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="modal-pasang-loker"
+      class="fixed top-0 inset-x-0 z-[999] invisible"
+      data-modal
+    >
+      <div
+        class="relative w-full h-dvh flex flex-col overflow-auto"
+        data-lenis-prevent
+      >
+        <div
+          class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
+        >
+          <div class="grow w-full flex flex-col max-container">
+            <div class="grid gap-4 | lg:grid-cols-12">
+              <div
+                class="col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
+              >
+                <div
+                  class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
+                  data-modal-content
+                >
+                  <div class="absolute top-0 right-0">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-icon btn-dark"
+                      data-hover-effect
+                      data-modal-hide
+                    >
+                      <svg
+                        class="icon icon-stroke"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6"
+                          stroke="#141B34"
+                          stroke-width="1.5"
+                          stroke-linejoin="round"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="shrink-0 px-6 py-4 | lg:py-6">
+                    <div class="flex flex-col gap-4 items-center text-center">
+                      <div
+                        class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
+                      >
+                        Pasang Loker
+                      </div>
+                      <h4 class="w-full font-bold leading-none text-balance">
+                        Apakah Anda Sudah Memiliki Id Number ?
+                      </h4>
+                    </div>
+                  </div>
+                  <!-- <div class="shrink-0 px-6 py-4 | lg:py-6">
+                                <article class="post-entry no-grid">
+                                    
+                                </article>
+                            </div> -->
+                  <div class="shrink-0 px-6 py-4 | lg:py-6">
+                    <form action="index-login.html">
+                      <div class="grid gap-6">
+                        <div class="c-form-wrapper">
+                          <div class="c-form">
+                            <label for="input-idnumber" class="c-label"
+                              >Masukan ID Number</label
+                            >
+                            <input
+                              type="number"
+                              name="input-idnumber"
+                              inputmode="numeric"
+                              class="c-input"
+                              placeholder="Masuan id number"
+                            />
+                          </div>
+                          <div class="text-xs mt-1 text-dark-400">
+                            please fill out this field
+                          </div>
+                        </div>
+                        <button
+                          type="submit"
+                          class="btn btn-primary"
+                          data-hover-effect>Submit</button
+                        >
+                        <div class="flex items-center gap-4">
+                          <div class="grow h-px bg-dark-200"></div>
+                          <div
+                            class="text-sm leading-none font-bold uppercase tracking-wide"
+                          >
+                            Atau
+                          </div>
+                          <div class="grow h-px bg-dark-200"></div>
+                        </div>
+                        <a
+                          href="auth-signup-add-job.html"
+                          class="btn"
+                          data-hover-effect>Daftar Sekarang</a
+                        >
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <svg
+      width="0"
+      height="0"
+      class="absolute hidden"
+      color-interpolation-filters="sRGB"
+    >
+      <defs>
+        <filter id="gooey-content">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"
+          ></feGaussianBlur>
+          <feColorMatrix
+            in="blur"
+            mode="matrix"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 11 -6"
+            result="gooey-content"></feColorMatrix>
+          <feComposite in="SourceGraphic" in2="gooey-content" operator="atop"
+          ></feComposite>
+          <feBlend in="SourceGraphic" in2="gooey-content"></feBlend>
+        </filter>
+      </defs>
+    </svg>
+
+    <div id="preloader">
+      <div id="preloader-spinner">
+        <img src="./assets/images/logo/logo-icon.png" alt="" />
+      </div>
+      <div id="preloader-transition"></div>
+    </div>
+
+    <script is:inline type="module" src="/src/main.js"></script>
+  </html>
+</BaseLayout>

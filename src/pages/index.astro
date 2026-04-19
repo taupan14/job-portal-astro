@@ -28,18 +28,21 @@ function getUserFromCookie(cookie: string) {
 
 const currentUser = getUserFromCookie(cookieHeader);
 
-const latestJobs = await apiGet<Array<{
-  id: number;
-  slug: string;
-  job_title: string;
-  job_type: number;
-  job_type_label: string;
-  sallary_formatted: string;
-  description: string;
-  location: string;
-  company: { name: string; logo: string | null };
-  category: string;
-}>>("/api/vacancies/latest?limit=6", cookieHeader) ?? [];
+const latestJobs =
+  (await apiGet<
+    Array<{
+      id: number;
+      slug: string;
+      job_title: string;
+      job_type: number;
+      job_type_label: string;
+      sallary_formatted: string;
+      description: string;
+      location: string;
+      company: { name: string; logo: string | null };
+      category: string;
+    }>
+  >("/api/vacancies/latest?limit=6", cookieHeader)) ?? [];
 
 // console.log("latestJobs:", JSON.stringify(latestJobs, null, 2));
 const JOB_TYPE_CLASS: Record<number, string> = {
@@ -51,10 +54,10 @@ const JOB_TYPE_CLASS: Record<number, string> = {
 
 // Fetch liked vacancy IDs jika user sudah login
 const likedIds: number[] = currentUser?.id
-  ? (await apiGet<number[]>(
+  ? ((await apiGet<number[]>(
       `/api/vacancies/liked?applicant_id=${currentUser.id}`,
       cookieHeader,
-    )) ?? []
+    )) ?? [])
   : [];
 
 const API_URL = import.meta.env.PUBLIC_API_URL;
@@ -65,11 +68,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
 
   <html lang="en">
     <head>
-      <meta charset="UTF-8" />
+      <!-- <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta name="description" content="Runlapan" />
       <meta name="referrer" content="no-referrer-when-downgrade" />
-      <title>RUNLAPAN | Job Portal</title>
+      <title>RUNLAPAN | Job Portal</title> -->
 
       <style>
         #preloader {
@@ -175,7 +178,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                               aria-label="CariLoker"
                               class="btn btn-circle-primary | not-lg:justify-start not-lg:w-full"
                               data-hover-effect
-                              data-modal-target="modal-cari-loker"
+                              data-cari-loker-btn
+                              data-logged-in={currentUser ? "true" : "false"}
                             >
                               Cari Loker
                               <svg
@@ -200,14 +204,13 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                                   stroke-linejoin="round"></path>
                               </svg>
                             </button>
-                            <button
-                              type="button"
-                              aria-label="CariLoker"
+                            <a
+                              href="/company"
+                              aria-label="PasangLokers"
                               class="btn btn-circle-dark | not-lg:justify-start not-lg:w-full | lg:hidden"
                               data-hover-effect
-                              data-modal-target="modal-cari-loker"
                             >
-                              Cari Loker
+                              Pasang Loker
                               <svg
                                 class="icon icon-stroke circle-icon circle-right icon-up-right"
                                 width="24"
@@ -229,13 +232,12 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                                   stroke-linecap="round"
                                   stroke-linejoin="round"></path>
                               </svg>
-                            </button>
-                            <button
-                              type="button"
+                            </a>
+                            <a
+                              href="/company"
                               aria-label="PasangLoker"
                               class="inline-flex items-center gap-4 shrink-0 | not-lg:hidden"
                               data-hover-group
-                              data-modal-target="modal-pasang-loker"
                             >
                               <div
                                 class="link text-sm font-bold uppercase tracking-wide text-white [--text-hover:white]"
@@ -269,7 +271,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                                     stroke-linejoin="round"></path>
                                 </svg>
                               </div>
-                            </button>
+                            </a>
                           </div>
                         </div>
                       </div>
@@ -282,7 +284,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                           class="aspect-3/4 | not-lg:[mask-image:linear-gradient(to_bottom,black_65%,transparent)] | lg:aspect-auto lg:absolute lg:inset-x-0 lg:-top-16 lg:-bottom-24 | 2xl:-bottom-32"
                         >
                           <img
-                            src="./assets/images/person01.webp"
+                            src="/assets/images/person01.webp"
                             alt=""
                             class="size-full object-contain"
                           />
@@ -450,13 +452,18 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                                 class="c-label text-white"
                                 >Lokasi Pekerjaan</label
                               >
-                              <select id="select-province" class="c-input c-select">
+                              <select
+                                id="select-province"
+                                class="c-input c-select"
+                              >
                                 <option value="">Semua Lokasi</option>
-                                {(provinces ?? []).map((prov) => (
-                                  <option value={prov.name}>
-                                    {prov.name}
-                                  </option>
-                                ))}
+                                {
+                                  (provinces ?? []).map((prov) => (
+                                    <option value={prov.name}>
+                                      {prov.name}
+                                    </option>
+                                  ))
+                                }
                               </select>
                             </div>
                             <div class="text-xs mt-1 px-4 text-white/70">
@@ -469,15 +476,19 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                             <div class="c-form c-form-default">
                               <label
                                 for="select-category"
-                                class="c-label text-white">Bidang Pekerjaan</label
+                                class="c-label text-white"
+                                >Bidang Pekerjaan</label
                               >
-                              <select id="select-category" class="c-input c-select">
+                              <select
+                                id="select-category"
+                                class="c-input c-select"
+                              >
                                 <option value="">Semua Bidang</option>
-                                {(categories ?? []).map((cat) => (
-                                  <option value={cat.id}>
-                                    {cat.name}
-                                  </option>
-                                ))}
+                                {
+                                  (categories ?? []).map((cat) => (
+                                    <option value={cat.id}>{cat.name}</option>
+                                  ))
+                                }
                               </select>
                             </div>
                             <div class="text-xs mt-1 px-4 text-white/70">
@@ -664,101 +675,176 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                     data-slide-jobs="6"
                   >
                     <div class="splide__track !overflow-visible">
-                      <div class="splide__list [&>*]:w-[calc(1/1.125*100%)] | lg:[&>*]:w-[calc((1/3*100%)-(1.5rem*2/3))] | 2xl:[&>*]:w-[calc((1/4*100%)-(1.5rem*3/4))]">
-
+                      <div
+                        class="splide__list [&>*]:w-[calc(1/1.125*100%)] | lg:[&>*]:w-[calc((1/3*100%)-(1.5rem*2/3))] | 2xl:[&>*]:w-[calc((1/4*100%)-(1.5rem*3/4))]"
+                      >
                         <!-- Card loker dari API (SSR) -->
-                        {latestJobs.map((job) => (
-                          <div class="splide__slide">
-                            <div
-                              class="relative isolate flex flex-col bg-dark-50 ring-inset ring-1 ring-dark-200 rounded-lg overflow-clip | lg:h-full"
-                              data-hover-group
-                            >
-                              {/* <!-- Header: badge job type --> */}
-                              <div class="relative flex flex-col items-start gap-4 px-4 | lg:px-6">
-                                <div class="w-full flex items-start justify-end">
-                                  <div class:list={["badge rounded-t-none", JOB_TYPE_CLASS[job.job_type] ?? "badge-default"]}>
-                                    <span>{job.job_type_label}</span>
+                        {
+                          latestJobs.map((job) => (
+                            <div class="splide__slide">
+                              <div
+                                class="relative isolate flex flex-col bg-dark-50 ring-inset ring-1 ring-dark-200 rounded-lg overflow-clip | lg:h-full"
+                                data-hover-group
+                              >
+                                {/* <!-- Header: badge job type --> */}
+                                <div class="relative flex flex-col items-start gap-4 px-4 | lg:px-6">
+                                  <div class="w-full flex items-start justify-end">
+                                    <div
+                                      class:list={[
+                                        "badge rounded-t-none",
+                                        JOB_TYPE_CLASS[job.job_type] ??
+                                          "badge-default",
+                                      ]}
+                                    >
+                                      <span>{job.job_type_label}</span>
+                                    </div>
                                   </div>
-                                </div>
-                                <div class="w-full flex flex-col items-start gap-1">
-                                  <div class="w-full text-sm font-medium truncate text-primary-600">{job.category}</div>
-                                  <h5 class="text-balance tracking-normal line-clamp-2">{job.job_title}</h5>
-                                </div>
-                              </div>
-
-                              {/* <!-- Deskripsi singkat --> */}
-                              <div class="px-4 py-6 | lg:px-6">
-                                <p class="text-sm font-medium line-clamp-3">{job.description}</p>
-                              </div>
-
-                              {/* <!-- Footer: salary, lokasi, company --> */}
-                              <div class="flex flex-col mt-auto">
-                                <div class="flex flex-col divide-y divide-dark-200 p-4 | lg:p-6">
-                                  <div class="flex items-baseline justify-between gap-4 pt-6 pb-3 first:pt-0 last:pb-0">
-                                    <div class="h6 text-dark-400 shrink-0">Salary</div>
-                                    <div class="text-sm font-semibold text-dark-950 basis-2/3 text-end">{job.sallary_formatted}</div>
-                                  </div>
-                                  <div class="flex items-baseline justify-between gap-4 pt-6 pb-3 first:pt-0 last:pb-0">
-                                    <div class="h6 text-dark-400 shrink-0">Lokasi</div>
-                                    <div class="text-sm font-semibold text-dark-950 basis-2/3 text-end">{job.location}</div>
+                                  <div class="w-full flex flex-col items-start gap-1">
+                                    <div class="w-full text-sm font-medium truncate text-primary-600">
+                                      {job.category}
+                                    </div>
+                                    <h5 class="text-balance tracking-normal line-clamp-2">
+                                      {job.job_title}
+                                    </h5>
                                   </div>
                                 </div>
 
-                                {/* <!-- Company bar --> */}
-                                <div class="flex items-center gap-4 p-4 bg-dark-100 rounded-lg | lg:p-6">
-                                  <div class="grow flex items-center gap-4">
-                                    <div class="avatar">
-                                      {job.company.logo ? (
-                                        <picture>
-                                          <img
-                                            src={`${API_URL}/pubs/uploads/avatar/${job.company.logo}`}
-                                            alt={job.company.name}
-                                            loading="lazy"
-                                            decoding="async"
-                                            class="size-full object-contain"
+                                {/* <!-- Deskripsi singkat --> */}
+                                <div class="px-4 py-6 | lg:px-6">
+                                  <p class="text-sm font-medium line-clamp-3">
+                                    {job.description}
+                                  </p>
+                                </div>
+
+                                {/* <!-- Footer: salary, lokasi, company --> */}
+                                <div class="flex flex-col mt-auto">
+                                  <div class="flex flex-col divide-y divide-dark-200 p-4 | lg:p-6">
+                                    <div class="flex items-baseline justify-between gap-4 pt-6 pb-3 first:pt-0 last:pb-0">
+                                      <div class="h6 text-dark-400 shrink-0">
+                                        Salary
+                                      </div>
+                                      <div class="text-sm font-semibold text-dark-950 basis-2/3 text-end">
+                                        {job.sallary_formatted}
+                                      </div>
+                                    </div>
+                                    <div class="flex items-baseline justify-between gap-4 pt-6 pb-3 first:pt-0 last:pb-0">
+                                      <div class="h6 text-dark-400 shrink-0">
+                                        Lokasi
+                                      </div>
+                                      <div class="text-sm font-semibold text-dark-950 basis-2/3 text-end">
+                                        {job.location}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* <!-- Company bar --> */}
+                                  <div class="flex items-center gap-4 p-4 bg-dark-100 rounded-lg | lg:p-6">
+                                    <div class="grow flex items-center gap-4">
+                                      <div class="avatar">
+                                        {job.company.logo ? (
+                                          <picture>
+                                            <img
+                                              src={`${API_URL}/pubs/uploads/avatar/${job.company.logo}`}
+                                              alt={job.company.name}
+                                              loading="lazy"
+                                              decoding="async"
+                                              class="size-full object-contain"
+                                            />
+                                          </picture>
+                                        ) : (
+                                          <svg
+                                            class="icon icon-fill size-5 text-dark-950"
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                          >
+                                            <path
+                                              fill-rule="evenodd"
+                                              clip-rule="evenodd"
+                                              d="M13.3292 3.46341C13.9961 3.65696 14.5602 3.82069 15.0046 4.01016C15.4784 4.21221 15.888 4.47174 16.199 4.89716C16.5082 5.3201 16.6358 5.7919 16.6946 6.31017C16.7502 6.80094 16.7502 7.40489 16.7502 8.12649V8.12652V22.0002C16.7502 22.4144 16.4144 22.7502 16.0002 22.7502H3.00019C2.58597 22.7502 2.25018 22.4144 2.25018 22.0002L2.25018 6.65904V6.65902V6.659C2.25016 5.45328 2.25014 4.46853 2.35635 3.71083C2.46632 2.92626 2.70926 2.22577 3.32744 1.7391C3.95235 1.24713 4.68464 1.19025 5.45696 1.29365C6.19444 1.39238 7.11291 1.65901 8.22733 1.98252L8.22737 1.98253L13.3292 3.4634L13.3292 3.46341ZM7.25019 8.00008C7.25019 7.58587 7.58597 7.25008 8.00019 7.25008L11.0002 7.25008C11.4144 7.25008 11.7502 7.58587 11.7502 8.00008C11.7502 8.4143 11.4144 8.75008 11.0002 8.75008L8.00019 8.75008C7.58597 8.75008 7.25019 8.4143 7.25019 8.00008ZM7.25019 12.0001C7.25019 11.5859 7.58597 11.2501 8.00019 11.2501L11.0002 11.2501C11.4144 11.2501 11.7502 11.5859 11.7502 12.0001C11.7502 12.4143 11.4144 12.7501 11.0002 12.7501L8.00019 12.7501C7.58597 12.7501 7.25019 12.4143 7.25019 12.0001Z"
+                                              fill="#141B34"
+                                            />
+                                            <path
+                                              fill-rule="evenodd"
+                                              clip-rule="evenodd"
+                                              d="M1.00018 21.7501C1.00018 21.1978 1.4479 20.7501 2.00018 20.7501L22.0002 20.7501C22.5525 20.7501 23.0002 21.1978 23.0002 21.7501C23.0002 22.3024 22.5525 22.7501 22.0002 22.7501L2.00018 22.7501C1.4479 22.7501 1.00018 22.3024 1.00018 21.7501Z"
+                                              fill="#141B34"
+                                            />
+                                          </svg>
+                                        )}
+                                      </div>
+                                      <div class="grow flex flex-col gap-1">
+                                        <div class="text-sm font-semibold text-dark-950 truncate">
+                                          {job.company.name}
+                                        </div>
+                                        <div class="h6 truncate">
+                                          {job.location}
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <button
+                                      type="button"
+                                      class:list={[
+                                        "btn btn-icon btn-like transition-colors duration-800 ease-custom [&.is-liked]:bg-primary-600 z-10",
+                                        {
+                                          "is-liked": likedIds.includes(job.id),
+                                        },
+                                      ]}
+                                      data-tooltip="Like"
+                                      data-like-btn
+                                      data-vacancy-id={job.id}
+                                      data-liked={
+                                        likedIds.includes(job.id)
+                                          ? "true"
+                                          : "false"
+                                      }
+                                    >
+                                      <div class="flex flex-col size-4.5 overflow-clip [.is-liked_&>*]:-translate-y-full">
+                                        <svg
+                                          class="icon icon-stroke transition-transform duration-800 ease-custom"
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M19.4626 3.99415C16.7809 2.34923 14.4404 3.01211 13.0344 4.06801C12.4578 4.50096 12.1696 4.71743 12 4.71743C11.8304 4.71743 11.5422 4.50096 10.9656 4.06801C9.55962 3.01211 7.21909 2.34923 4.53744 3.99415C1.01807 6.15294 0.221721 13.2749 8.33953 19.2834C9.88572 20.4278 10.6588 21 12 21C13.3412 21 14.1143 20.4278 15.6605 19.2834C23.7783 13.2749 22.9819 6.15294 19.4626 3.99415Z"
+                                            stroke="#141B34"
+                                            stroke-width="1.5"
+                                            stroke-linecap="round"
                                           />
-                                        </picture>
-                                      ) : (
-                                        <svg class="icon icon-fill size-5 text-dark-950" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                          <path fill-rule="evenodd" clip-rule="evenodd" d="M13.3292 3.46341C13.9961 3.65696 14.5602 3.82069 15.0046 4.01016C15.4784 4.21221 15.888 4.47174 16.199 4.89716C16.5082 5.3201 16.6358 5.7919 16.6946 6.31017C16.7502 6.80094 16.7502 7.40489 16.7502 8.12649V8.12652V22.0002C16.7502 22.4144 16.4144 22.7502 16.0002 22.7502H3.00019C2.58597 22.7502 2.25018 22.4144 2.25018 22.0002L2.25018 6.65904V6.65902V6.659C2.25016 5.45328 2.25014 4.46853 2.35635 3.71083C2.46632 2.92626 2.70926 2.22577 3.32744 1.7391C3.95235 1.24713 4.68464 1.19025 5.45696 1.29365C6.19444 1.39238 7.11291 1.65901 8.22733 1.98252L8.22737 1.98253L13.3292 3.4634L13.3292 3.46341ZM7.25019 8.00008C7.25019 7.58587 7.58597 7.25008 8.00019 7.25008L11.0002 7.25008C11.4144 7.25008 11.7502 7.58587 11.7502 8.00008C11.7502 8.4143 11.4144 8.75008 11.0002 8.75008L8.00019 8.75008C7.58597 8.75008 7.25019 8.4143 7.25019 8.00008ZM7.25019 12.0001C7.25019 11.5859 7.58597 11.2501 8.00019 11.2501L11.0002 11.2501C11.4144 11.2501 11.7502 11.5859 11.7502 12.0001C11.7502 12.4143 11.4144 12.7501 11.0002 12.7501L8.00019 12.7501C7.58597 12.7501 7.25019 12.4143 7.25019 12.0001Z" fill="#141B34"/>
-                                          <path fill-rule="evenodd" clip-rule="evenodd" d="M1.00018 21.7501C1.00018 21.1978 1.4479 20.7501 2.00018 20.7501L22.0002 20.7501C22.5525 20.7501 23.0002 21.1978 23.0002 21.7501C23.0002 22.3024 22.5525 22.7501 22.0002 22.7501L2.00018 22.7501C1.4479 22.7501 1.00018 22.3024 1.00018 21.7501Z" fill="#141B34"/>
                                         </svg>
-                                      )}
-                                    </div>
-                                    <div class="grow flex flex-col gap-1">
-                                      <div class="text-sm font-semibold text-dark-950 truncate">{job.company.name}</div>
-                                      <div class="h6 truncate">{job.location}</div>
-                                    </div>
+                                        <svg
+                                          class="icon icon-fill text-white transition-transform duration-800 ease-custom"
+                                          width="24"
+                                          height="24"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M4.1449 3.35515C7.12587 1.52662 9.8001 2.25537 11.4156 3.46861C11.6814 3.6682 11.8638 3.8048 11.9996 3.89704C12.1354 3.8048 12.3178 3.6682 12.5836 3.46861C14.1991 2.25537 16.8734 1.52662 19.8543 3.35515C21.9156 4.61952 23.0754 7.2606 22.6684 10.2951C22.2595 13.3443 20.2859 16.7929 16.1063 19.8865C14.6549 20.9614 13.5897 21.7503 11.9996 21.7503C10.4095 21.7503 9.34433 20.9614 7.89294 19.8865C3.71334 16.7929 1.73976 13.3443 1.33081 10.2951C0.923824 7.2606 2.08365 4.61952 4.1449 3.35515Z"
+                                            fill="#141B34"
+                                          />
+                                        </svg>
+                                      </div>
+                                    </button>
                                   </div>
-
-                                  <button
-                                    type="button"
-                                    class:list={[
-                                      "btn btn-icon btn-like transition-colors duration-800 ease-custom [&.is-liked]:bg-primary-600 z-10",
-                                      { "is-liked": likedIds.includes(job.id) }
-                                    ]}
-                                    data-tooltip="Like"
-                                    data-like-btn
-                                    data-vacancy-id={job.id}
-                                    data-liked={likedIds.includes(job.id) ? "true" : "false"}
-                                  >
-                                    <div class="flex flex-col size-4.5 overflow-clip [.is-liked_&>*]:-translate-y-full">
-                                      <svg class="icon icon-stroke transition-transform duration-800 ease-custom" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M19.4626 3.99415C16.7809 2.34923 14.4404 3.01211 13.0344 4.06801C12.4578 4.50096 12.1696 4.71743 12 4.71743C11.8304 4.71743 11.5422 4.50096 10.9656 4.06801C9.55962 3.01211 7.21909 2.34923 4.53744 3.99415C1.01807 6.15294 0.221721 13.2749 8.33953 19.2834C9.88572 20.4278 10.6588 21 12 21C13.3412 21 14.1143 20.4278 15.6605 19.2834C23.7783 13.2749 22.9819 6.15294 19.4626 3.99415Z" stroke="#141B34" stroke-width="1.5" stroke-linecap="round"/>
-                                      </svg>
-                                      <svg class="icon icon-fill text-white transition-transform duration-800 ease-custom" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M4.1449 3.35515C7.12587 1.52662 9.8001 2.25537 11.4156 3.46861C11.6814 3.6682 11.8638 3.8048 11.9996 3.89704C12.1354 3.8048 12.3178 3.6682 12.5836 3.46861C14.1991 2.25537 16.8734 1.52662 19.8543 3.35515C21.9156 4.61952 23.0754 7.2606 22.6684 10.2951C22.2595 13.3443 20.2859 16.7929 16.1063 19.8865C14.6549 20.9614 13.5897 21.7503 11.9996 21.7503C10.4095 21.7503 9.34433 20.9614 7.89294 19.8865C3.71334 16.7929 1.73976 13.3443 1.33081 10.2951C0.923824 7.2606 2.08365 4.61952 4.1449 3.35515Z" fill="#141B34"/>
-                                      </svg>
-                                    </div>
-                                  </button>
                                 </div>
-                              </div>
 
-                              {/* <!-- Full card link --> */}
-                              <a href={`/jobs/${job.slug}`} class="block absolute inset-0"></a>
+                                {/* <!-- Full card link --> */}
+                                <a
+                                  href={`/jobs/${job.slug}`}
+                                  class="block absolute inset-0"
+                                />
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))
+                        }
 
                         <!-- Card promo Runlapan (tetap ada, selalu di depan) -->
                         <div class="splide__slide">
@@ -767,18 +853,49 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                             class="relative isolate flex flex-col justify-between bg-primary-600 rounded-lg overflow-clip p-6 h-full"
                             data-hover-group
                           >
-                            <div class="btn btn-icon btn-white self-end" data-hover-effect>
-                              <svg class="icon icon-stroke icon-up-right" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M17.5 6.5L6 18" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M8 6H18V16" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <div
+                              class="btn btn-icon btn-white self-end"
+                              data-hover-effect
+                            >
+                              <svg
+                                class="icon icon-stroke icon-up-right"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M17.5 6.5L6 18"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                                <path
+                                  d="M8 6H18V16"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
                               </svg>
                             </div>
                             <div class="flex flex-col gap-2">
-                              <div class="text-sm leading-none font-bold uppercase tracking-wide text-white/70">Runlapan</div>
-                              <h5 class="text-balance text-white">Jelajahi Karirmu</h5>
+                              <div
+                                class="text-sm leading-none font-bold uppercase tracking-wide text-white/70"
+                              >
+                                Runlapan
+                              </div>
+                              <h5 class="text-balance text-white">
+                                Jelajahi Karirmu
+                              </h5>
                             </div>
-                            <div class="absolute inset-0 [-webkit-mask-image:radial-gradient(circle_at_center,black,transparent)] -z-1 -translate-y-1/4 translate-x-1/4 pointer-events-none [--square:4rem] [--line-w:1px]">
-                              <div class="size-full bg-[repeating-linear-gradient(to_left,var(--color-primary-400),var(--color-primary-400)_var(--line-w),transparent_var(--line-w),transparent_var(--square)),repeating-linear-gradient(to_bottom,var(--color-primary-400),var(--color-primary-400)_var(--line-w),transparent_var(--line-w),transparent_var(--square))]"></div>
+                            <div
+                              class="absolute inset-0 [-webkit-mask-image:radial-gradient(circle_at_center,black,transparent)] -z-1 -translate-y-1/4 translate-x-1/4 pointer-events-none [--square:4rem] [--line-w:1px]"
+                            >
+                              <div
+                                class="size-full bg-[repeating-linear-gradient(to_left,var(--color-primary-400),var(--color-primary-400)_var(--line-w),transparent_var(--line-w),transparent_var(--square)),repeating-linear-gradient(to_bottom,var(--color-primary-400),var(--color-primary-400)_var(--line-w),transparent_var(--line-w),transparent_var(--square))]"
+                              >
+                              </div>
                             </div>
                           </a>
                         </div>
@@ -1095,7 +1212,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                           class="not-lg:aspect-square | lg:absolute lg:left-0 lg:top-0 lg lg:-bottom-27 lg:-right-8 | 2xl:-right-[calc((100vw-var(--breakpoint-2xl))/2)]"
                         >
                           <img
-                            src="./assets/images/thumbnails/img01.webp"
+                            src="/assets/images/thumbnails/img01.webp"
                             alt=""
                             class="size-full object-cover rounded-lg overflow-clip | lg:rounded-r-none"
                           />
@@ -1113,15 +1230,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                     <div
                       class="col-span-full | lg:col-span-3 | not-lg:text-center"
                     >
-                      <!-- <a href="page-why-us-detail.html" class="w-full pl-6 btn justify-between" data-hover-effect>
-                        Lihat Detail
-                        <svg class="icon icon-stroke circle-icon circle-right icon-up-right" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M17.5 6.5L6 18" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M8 6H18V16" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </a> -->
                       <a
-                        href="page-why-us-detail.html"
+                        href="/why-us"
                         class="inline-flex items-center gap-4 justify-between | lg:flex"
                         data-hover-group
                       >
@@ -1250,7 +1360,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                             <div
                               class="text-sm leading-none font-bold uppercase tracking-wide text-white | lg:w-min"
                             >
-                              Service Kami
+                              Layanan Kami
                             </div>
                           </div>
                           <h2
@@ -1485,10 +1595,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                   <!-- @components listBlog -->
                 </div>
                 <div class="flex justify-center mt-16">
-                  <a
-                    href="page-blog.html"
-                    class="btn btn-outline"
-                    data-hover-effect>Berita Lainnya</a
+                  <a href="/blog" class="btn btn-outline" data-hover-effect
+                    >Berita Lainnya</a
                   >
                 </div>
               </div>
@@ -1504,7 +1612,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                     <div class="relative isolate aspect-square | lg:size-full">
                       <div class="relative size-full rounded-lg overflow-clip">
                         <img
-                          src="./assets/images/thumbnails/img04.webp"
+                          src="/assets/images/thumbnails/img04.webp"
                           alt=""
                           class="size-full object-cover"
                         />
@@ -1552,7 +1660,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                         <div class="flex items-center justify-between">
                           <div class="font-medium">Butuh Bantuan ?</div>
                           <a
-                            href="page-faq.html"
+                            href="/faqs"
                             class="flex items-center gap-4"
                             data-hover-group
                           >
@@ -1612,246 +1720,6 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
       </div>
       <!-- #app -->
 
-      <div
-        id="modal-cari-loker"
-        class="fixed top-0 inset-x-0 z-[999] invisible"
-        data-modal
-      >
-        <div
-          class="relative w-full h-dvh flex flex-col overflow-auto"
-          data-lenis-prevent
-        >
-          <div
-            class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
-          >
-            <div class="grow w-full flex flex-col max-container">
-              <div class="grid gap-4 | lg:grid-cols-12">
-                <div
-                  class="grid-item col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
-                >
-                  <div
-                    class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
-                    data-modal-content
-                  >
-                    <div class="absolute top-2 right-2">
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-icon btn-dark"
-                        data-hover-effect
-                        data-modal-hide
-                      >
-                        <svg
-                          class="icon icon-stroke"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6"
-                            stroke="#141B34"
-                            stroke-width="1.5"
-                            stroke-linejoin="round"></path>
-                        </svg>
-                      </button>
-                    </div>
-                    <div class="shrink-0 px-6 py-4 | lg:py-6">
-                      <div class="flex flex-col gap-4 items-center text-center">
-                        <div
-                          class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
-                        >
-                          Cari Loker
-                        </div>
-                        <h4 class="w-full font-bold leading-none text-balance">
-                          Apakah Anda Sudah<br/>Memiliki Akun ?
-                        </h4>
-                      </div>
-                    </div>
-                    <!-- <div class="shrink-0 px-6 py-4 | lg:py-6">
-                                <article class="post-entry no-grid">
-                                    
-                                </article>
-                            </div> -->
-                    <div class="shrink-0 px-6 py-4 | lg:py-6">
-                      <form action="index-login.html" data-login-form>
-                        <div class="grid gap-6">
-                          <div class="c-form-wrapper">
-                            <div class="c-form">
-                              <label for="input-email" class="c-label"
-                                >Masukan Email</label
-                              >
-                              <input
-                                type="email"
-                                name="input-email"
-                                class="c-input"
-                                placeholder="..."
-                              />
-                            </div>
-                            <div class="text-xs mt-1 text-dark-400">
-                              silahkan masukan alamat email yang terdaftar
-                            </div>
-                          </div>
-                          <div class="c-form-wrapper">
-                            <div class="c-form">
-                              <label for="input-password" class="c-label"
-                                >Masukan Password</label
-                              >
-                              <input
-                                type="password"
-                                name="input-password"
-                                class="c-input"
-                                placeholder="..."
-                              />
-                            </div>
-                            <div class="text-xs mt-1 text-dark-400">
-                              password sudah dikirimkan melalui email
-                            </div>
-                          </div>
-                          <button
-                            type="submit"
-                            class="btn btn-primary"
-                            data-hover-effect
-                          >
-                            Submit
-                          </button>
-                          <div class="flex items-center gap-4">
-                            <div class="grow h-px bg-dark-200"></div>
-                            <div
-                              class="text-sm leading-none font-bold uppercase tracking-wide"
-                            >
-                              Atau
-                            </div>
-                            <div class="grow h-px bg-dark-200"></div>
-                          </div>
-                          <a href="/applicant" class="btn" data-hover-effect
-                            >Daftar Sekarang</a
-                          >
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div
-        id="modal-pasang-loker"
-        class="fixed top-0 inset-x-0 z-[999] invisible"
-        data-modal
-      >
-        <div
-          class="relative w-full h-dvh flex flex-col overflow-auto"
-          data-lenis-prevent
-        >
-          <div
-            class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
-          >
-            <div class="grow w-full flex flex-col max-container">
-              <div class="grid gap-4 | lg:grid-cols-12">
-                <div
-                  class="grid-item col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
-                >
-                  <div
-                    class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
-                    data-modal-content
-                  >
-                    <div class="absolute top-2 right-2">
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-icon btn-dark"
-                        data-hover-effect
-                        data-modal-hide
-                      >
-                        <svg
-                          class="icon icon-stroke"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6"
-                            stroke="#141B34"
-                            stroke-width="1.5"
-                            stroke-linejoin="round"></path>
-                        </svg>
-                      </button>
-                    </div>
-                    <div class="shrink-0 px-6 py-4 | lg:py-6">
-                      <div class="flex flex-col gap-4 items-center text-center">
-                        <div
-                          class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
-                        >
-                          Pasang Loker
-                        </div>
-                        <h4 class="w-full font-bold leading-none text-balance">
-                          Apakah Anda Sudah Memiliki Id Number ?
-                        </h4>
-                      </div>
-                    </div>
-                    <!-- <div class="shrink-0 px-6 py-4 | lg:py-6">
-                                <article class="post-entry no-grid">
-                                    
-                                </article>
-                            </div> -->
-                    <div class="shrink-0 px-6 py-4 | lg:py-6">
-                      <form action="index-login.html">
-                        <div class="grid gap-6">
-                          <div class="c-form-wrapper">
-                            <div class="c-form">
-                              <label for="input-idnumber" class="c-label"
-                                >Masukan ID Number</label
-                              >
-                              <input
-                                type="number"
-                                name="input-idnumber"
-                                inputmode="numeric"
-                                class="c-input"
-                                placeholder="Masuan id number"
-                              />
-                            </div>
-                            <div class="text-xs mt-1 text-dark-400">
-                              please fill out this field
-                            </div>
-                          </div>
-                          <button
-                            type="submit"
-                            class="btn btn-primary"
-                            data-hover-effect
-                          >
-                            Submit
-                          </button>
-                          <div class="flex items-center gap-4">
-                            <div class="grow h-px bg-dark-200"></div>
-                            <div
-                              class="text-sm leading-none font-bold uppercase tracking-wide"
-                            >
-                              Atau
-                            </div>
-                            <div class="grow h-px bg-dark-200"></div>
-                          </div>
-                          <a href="/company" class="btn" data-hover-effect
-                            >Daftar Sekarang</a
-                          >
-                          <!-- <button
-                            type="button"
-                            class="btn"
-                            data-hover-effect
-                            data-barba-navigate="/company"
-                            >Daftar Sekarang</button
-                          > -->
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <svg
         width="0"
         height="0"
@@ -1876,58 +1744,47 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
 
       <div id="preloader">
         <div id="preloader-spinner">
-          <img src="./assets/images/logo/logo-icon.png" alt="Runlapan" />
+          <img src="/assets/images/logo/logo-icon.png" alt="Runlapan" />
         </div>
         <div id="preloader-transition"></div>
       </div>
-
-      <script type="module" src="/src/main.js"></script>
     </body>
   </html>
 
-  <script>
-
-    // Init form search di halaman jobs (reuse logic yang sama)
-    const initJobsSearch = () => {
-      const form = document.querySelector<HTMLFormElement>("[data-search-home]");
-      const submitBtn = document.querySelector("[data-search-home-submit]");
-      if (!form) return;
-
-      // Tombol search desktop trigger submit form
-      submitBtn?.addEventListener("click", () => form.requestSubmit());
-
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-
-        const params = new URLSearchParams();
-        const keyword  = (form.querySelector<HTMLInputElement>("#input-keyword"))?.value.trim() ?? "";
-        const province = (form.querySelector<HTMLSelectElement>("#select-province"))?.value ?? "";
-        const category = (form.querySelector<HTMLSelectElement>("#select-category"))?.value ?? "";
-
-        if (keyword)  params.set("q", keyword);
-        if (province) params.set("province", province);
-        if (category) params.set("category", category);
-        params.set("page", "1"); // reset ke halaman 1 saat search baru
-
-        const query = params.toString();
-        window.location.href = `/jobs${query ? `?${query}` : ""}`;
-      });
-    };
-
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initJobsSearch);
-    } else {
-      initJobsSearch();
-    }
-    window.addEventListener("barba:after", initJobsSearch);
-  </script>
+  <script is:inline type="module" src="/src/main.js"></script>
 </BaseLayout>
 
 <script>
   import Splide from "@splidejs/splide";
+  import barba from "@barba/core";
+  import { showModal } from "../../public/assets/js/_modal";
 
   const el = document.querySelector<HTMLElement>("#splide-hero");
   if (el) {
     new Splide(el).mount();
   }
+
+  // "Cari Loker" Logic //
+  const initLogicLokerBtn = () => {
+    const btns = document.querySelectorAll("[data-cari-loker-btn]");
+
+    btns.forEach((btn) => {
+      const fresh = btn.cloneNode(true) as HTMLElement;
+      btn.parentNode?.replaceChild(fresh, btn);
+
+      fresh.addEventListener("click", () => {
+        const isLoggedIn = fresh.dataset.loggedIn === "true";
+
+        if (isLoggedIn) {
+          barba.go("/jobs");
+        } else {
+          const modal = document.getElementById("modal-cari-loker");
+          if (modal) showModal(modal);
+        }
+      });
+    });
+  };
+
+  // Jalankan saat load
+  initLogicLokerBtn();
 </script>

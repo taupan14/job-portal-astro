@@ -1,0 +1,250 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Gallery Video">
+  <!-- Paste HTML dari index.html di sini -->
+  <html lang="en">
+    <div id="app">
+      <!-- @components sectionHeader -->
+
+      <main id="section-main" data-barba="wrapper">
+        <div
+          data-hero-scheme="light"
+          data-barba="container"
+          data-barba-namespace="gallery-detail"
+        >
+          <section id="page-header" class="relative pt-(--space-header)">
+            <div class="relative py-16 | lg:pt-24">
+              <div class="max-container">
+                <div class="grid gap-8 | lg:grid-cols-12">
+                  <div class="col-span-full | lg:col-span-8 lg:col-start-3">
+                    <div class="flex flex-col gap-6 items-center text-center">
+                      <div class="inline-flex items-center gap-3">
+                        <div
+                          class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                        >
+                        </div>
+                        <div
+                          class="text-sm leading-none font-bold uppercase tracking-wide"
+                        >
+                          Gallery
+                        </div>
+                      </div>
+                      <h1 class="text-balance">Workshop Karir Sukses</h1>
+                      <div
+                        class="text-sm leading-none font-bold uppercase tracking-wide"
+                      >
+                        20 Maret, 2024
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="absolute inset-0 flex justify-center -z-1 pointer-events-none select-none"
+              >
+                <h1
+                  class="shrink-0 text-transparent [-webkit-text-stroke:1px_var(--color-dark-100)] leading-[0.8] uppercase whitespace-nowrap [--min-size:10rem] [--val-size:22vw] [--max-size:22rem]"
+                >
+                  Gallery
+                </h1>
+              </div>
+            </div>
+          </section>
+
+          <section id="page-content" class="relative">
+            <div class="py-16 | lg:py-24">
+              <div class="max-full-container">
+                <div class="flex justify-center mb-16">
+                  <ul class="flex items-center gap-8">
+                    <li class="flex items-center gap-2">
+                      <a
+                        href="page-gallery-detail.html"
+                        class="flex text-sm font-bold uppercase tracking-wide link link-reverse [--link-underline:var(--color-primary-600)] [.is-active_&]:[--link-from:100%] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover)"
+                        data-hover-effect
+                      >
+                        Gallery Foto
+                      </a>
+                      <div
+                        class="text-sm font-bold uppercase tracking-wide text-primary-600"
+                      >
+                        [20]
+                      </div>
+                    </li>
+                    <li class="flex items-center gap-2 is-active">
+                      <a
+                        href="page-gallery-detail-video.html"
+                        class="flex text-sm font-bold uppercase tracking-wide link link-reverse [--link-underline:var(--color-primary-600)] [.is-active_&]:[--link-from:100%] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover)"
+                        data-hover-effect
+                      >
+                        Gallery Video
+                      </a>
+                      <div
+                        class="text-sm font-bold uppercase tracking-wide text-primary-600"
+                      >
+                        [9]
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div
+                  class="grid gap-4 | lg:grid-cols-3 lg:gap-6"
+                  data-gallery
+                  data-gallery-video
+                >
+                </div>
+                <div data-pagination></div>
+              </div>
+            </div>
+            <div class="py-16 | lg:py-24">
+              <div class="max-container">
+                <div class="splide group/slide" data-slide-album="6">
+                  <div class="grid gap-8 | lg:grid-cols-12">
+                    <div class="col-span-full | lg:col-span-3">
+                      <div class="flex flex-col gap-8 | lg:h-full">
+                        <div class="flex flex-col items-start gap-6">
+                          <div class="inline-flex items-center gap-3">
+                            <div
+                              class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                            >
+                            </div>
+                            <div
+                              class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950"
+                            >
+                              Gallery
+                            </div>
+                          </div>
+                          <h3 class="text-balance leading-none">
+                            Album<br />Lainnya
+                          </h3>
+                        </div>
+                        <div
+                          class="flex flex-row justify-between gap-4 | lg:grow lg:flex-col lg:items-start lg:text-start"
+                        >
+                          <a
+                            href="page-gallery.html"
+                            class="btn btn-sm btn-primary"
+                            data-hover-effect
+                          >
+                            Lainnya
+                          </a>
+                          <div class="flex items-center gap-1 mt-auto">
+                            <button
+                              type="button"
+                              class="btn-splide-prev btn btn-sm btn-icon"
+                              data-hover-effect
+                            >
+                              <svg
+                                class="icon icon-stroke icon-left"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  fill="none"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M4.2,12h16.3"></path>
+                                <path
+                                  fill="none"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M10.6,19.1L3.5,12 l7.1-7.1"></path>
+                              </svg>
+                            </button>
+                            <button
+                              type="button"
+                              class="btn-splide-next btn btn-sm btn-icon"
+                              data-hover-effect
+                            >
+                              <svg
+                                class="icon icon-stroke icon-right"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  fill="none"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M19.8,12H3.5"></path>
+                                <path
+                                  fill="none"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M13.4,4.9l7.1,7.1 l-7.1,7.1"></path>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-span-full | lg:col-span-9">
+                      <div
+                        class="relative | lg:-mr-8 | 2xl:-mr-[calc((100vw-var(--breakpoint-2xl))/2)]"
+                      >
+                        <div class="splide__track | not-lg:!overflow-visible">
+                          <div
+                            class="splide__list [&>*]:w-[calc(1/1.25*100%)] | lg:!mr-8 lg:[&>*]:w-[calc(1/2.75*100%)] | 2xl:[&>*]:w-[calc(1/3.5*100%)]"
+                          >
+                            <!-- @components listSlideAlbum -->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div><!-- data-barba container -->
+      </main>
+
+      <!-- @components sectionFooter -->
+    </div><!-- #app -->
+
+    <svg
+      width="0"
+      height="0"
+      class="absolute hidden"
+      color-interpolation-filters="sRGB"
+    >
+      <defs>
+        <filter id="gooey-content">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"
+          ></feGaussianBlur>
+          <feColorMatrix
+            in="blur"
+            mode="matrix"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 11 -6"
+            result="gooey-content"></feColorMatrix>
+          <feComposite in="SourceGraphic" in2="gooey-content" operator="atop"
+          ></feComposite>
+          <feBlend in="SourceGraphic" in2="gooey-content"></feBlend>
+        </filter>
+      </defs>
+    </svg>
+
+    <div id="preloader">
+      <div id="preloader-spinner">
+        <img src="/assets/images/logo/logo-icon.png" alt="" />
+      </div>
+      <div id="preloader-transition"></div>
+    </div>
+
+    <script is:inline type="module" src="/src/main.js"></script>
+  </html>
+</BaseLayout>

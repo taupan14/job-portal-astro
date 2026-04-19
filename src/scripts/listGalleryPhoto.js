@@ -1,34 +1,36 @@
-import barba from '@barba/core'
+import barba from "@barba/core";
 
 const iniComponents = async () => {
-    try {
-        const response = await fetch('/assets/json/list-gallery-photo.json')
-        if (!response.ok) {
-            throw new Error('Network response was not ok')
-        }
-        const data = await response.json()
-        const containers = document.querySelectorAll('[data-gallery-photo]')
-        
-        containers.forEach(container => {
-            const limit = container.getAttribute('data-gallery-photo') || ''
-            const itemsToDisplay = limit ? Math.min(data.length, parseInt(limit, '')) : data.length
+  try {
+    const response = await fetch("/assets/json/list-gallery-photo.json");
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await response.json();
+    const containers = document.querySelectorAll("[data-gallery-photo]");
 
-            data.slice(0, itemsToDisplay).forEach((item, index) => {
-                const initImgThumbnail = (imageThumbnail) => {
-                    if (!imageThumbnail?.gallery_img) {
-                        return `
+    containers.forEach((container) => {
+      const limit = container.getAttribute("data-gallery-photo") || "";
+      const itemsToDisplay = limit
+        ? Math.min(data.length, parseInt(limit, ""))
+        : data.length;
+
+      data.slice(0, itemsToDisplay).forEach((item) => {
+        const initImgThumbnail = (imageThumbnail) => {
+          if (!imageThumbnail?.gallery_img) {
+            return `
                             <div></div>
-                        `
-                    }
-                    return `
+                        `;
+          }
+          return `
                         <picture>
                             <source type="image/webp" srcset="${item.gallery_img} 400w, ${item.gallery_img} 800w, ${item.gallery_img} 1200w, ${item.gallery_img} 1600w" sizes="100vw">
                             <img src="${item.gallery_img}" srcset="${item.gallery_img} 400w, ${item.gallery_img} 800w, ${item.gallery_img} 1200w, ${item.gallery_img} 1600w" sizes="100vw" decoding="async" alt="${item.gallery_title}" class="size-full object-cover">
                         </picture>
-                    `
-                }
+                    `;
+        };
 
-                const items = `
+        const items = `
                     <div class="col-span-full | lg:col-span-1">
                         <div class="relative aspect-square rounded-lg overflow-clip bg-dark-200 cursor-pointer group" data-gallery-item data-src="${item.gallery_img}">
                             ${initImgThumbnail(item)}
@@ -40,15 +42,15 @@ const iniComponents = async () => {
                             </div>
                         </div>
                     </div>
-                `
-                container.insertAdjacentHTML('beforeend', items)
-            })
-        })
-    } catch (error) {
-        console.error('There was a problem with the fetch operation:', error)
-    }
-}
+                `;
+        container.insertAdjacentHTML("beforeend", items);
+      });
+    });
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+  }
+};
 
 barba.hooks.beforeEnter(async () => {
-    await iniComponents()
-})
+  await iniComponents();
+});

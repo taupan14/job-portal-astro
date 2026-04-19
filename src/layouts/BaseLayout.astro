@@ -1,6 +1,9 @@
 ---
 // src/layouts/BaseLayout.astro
 import "../styles/global.css";
+import ModalAuthExpired from "../components/ModalAuthExpired.astro";
+import ModalApplyConfirm from "../components/ModalApplyConfirm.astro";
+import ModalCariLoker from "../components/ModalCariLoker.astro";
 
 interface Props {
   title: string;
@@ -9,8 +12,10 @@ interface Props {
 
 const { title, description = "Runlapan - Platform Karir Terpercaya" } =
   Astro.props;
-const user = Astro.locals.user;
+// const user = Astro.locals.user;
 const apiUrl = import.meta.env.PUBLIC_API_URL;
+const PROTECTED_ROUTES = ["/profile", "/add-job", "/search-job"];
+const tokenExpired = Astro.locals.tokenExpired ?? false;
 ---
 
 <!doctype html>
@@ -19,14 +24,89 @@ const apiUrl = import.meta.env.PUBLIC_API_URL;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
-    <title>RUNLAPAN | Job Portal</title>
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <title>RUNLAPAN | Job Portal - {title}</title>
     <link rel="icon" href="/favicon.ico" />
   </head>
   <body>
     <slot />
+
+    <!-- Auth Expired Dialog -->
+    <ModalAuthExpired />
+
+    <!-- Apply Confirm Dialog -->
+    <ModalApplyConfirm />
+
+    <!-- Login Auth Dialog -->
+    <ModalCariLoker />
   </body>
 </html>
 
-<script define:vars={{ apiUrl: import.meta.env.PUBLIC_API_URL }}>
+<script
+  is:inline
+  define:vars={{ apiUrl, protectedRoutes: PROTECTED_ROUTES, tokenExpired }}
+>
   window.__ENV_PUBLIC_API_URL__ = apiUrl ?? "";
+
+  // ─── Auth Expired Dialog ───────────────────────────────────────────────
+
+  function clearAuthCookies() {
+    document.cookie.split(";").forEach((c) => {
+      const name = c.trim().split("=")[0];
+      if (!name) return;
+      document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0; SameSite=Lax`;
+    });
+
+    // Hapus semua auth data
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("auth_user");
+    localStorage.removeItem("avatar_cache");
+  }
+
+  function showAuthExpiredModal() {
+    clearAuthCookies();
+
+    const modal = document.getElementById("modal-auth-expired");
+    if (!modal) return;
+
+    // ✅ Reset inline style GSAP sebelum show
+    const content = modal.querySelector("[data-modal-content]");
+    if (content) content.style.cssText = "";
+
+    const tryShow = () => {
+      if (typeof window.__modalShow === "function") {
+        window.__modalShow(modal);
+      } else {
+        setTimeout(tryShow, 100);
+      }
+    };
+
+    tryShow();
+  }
+
+  window.addEventListener("load", () => {
+    if (tokenExpired) {
+      showAuthExpiredModal();
+    }
+  });
+
+  // Intercept klik ke protected route saat tidak ada cookie
+  document.addEventListener("click", (e) => {
+    const target = e.target.closest("a");
+    if (!target) return;
+
+    const href = target.getAttribute("href") ?? "";
+    const isProtected = protectedRoutes.some(
+      (route) => href === route || href.startsWith(route + "/"),
+    );
+    if (!isProtected) return;
+
+    const hasAuth = document.cookie
+      .split(";")
+      .some((c) => c.trim().startsWith("auth_token="));
+    if (hasAuth) return;
+
+    e.preventDefault();
+    window.location.href = href;
+  });
 </script>

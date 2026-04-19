@@ -1,0 +1,528 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Kontak Kami">
+  <!-- Paste HTML dari index.html di sini -->
+  <html lang="en">
+    <div id="app">
+      <!-- @components sectionHeader -->
+
+      <main id="section-main" data-barba="wrapper">
+        <div
+          data-hero-scheme="light"
+          data-barba="container"
+          data-barba-namespace="contact"
+        >
+          <section id="page-header" class="relative pt-(--space-header)">
+            <div class="relative py-16 | lg:pt-24">
+              <div class="max-container">
+                <div class="grid gap-8 | lg:grid-cols-12">
+                  <div class="col-span-full | lg:col-span-8 lg:col-start-3">
+                    <div class="flex flex-col gap-6 items-center text-center">
+                      <div class="inline-flex items-center gap-3">
+                        <div
+                          class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                        >
+                        </div>
+                        <div
+                          class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950"
+                        >
+                          Kontak Kami
+                        </div>
+                      </div>
+                      <h1 class="leading-none text-balance">
+                        Tetaplah Terhubung Bersama Kami
+                      </h1>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="absolute inset-0 flex justify-center -z-1 pointer-events-none select-none"
+              >
+                <h1
+                  class="shrink-0 text-transparent [-webkit-text-stroke:1px_var(--color-dark-100)] leading-[0.8] uppercase whitespace-nowrap [--min-size:10rem] [--val-size:22vw] [--max-size:22rem]"
+                >
+                  Kontak Kami
+                </h1>
+              </div>
+            </div>
+          </section>
+
+          <section id="page-content" class="relative">
+            <div class="py-16 | lg:py-24">
+              <div class="max-container">
+                <div class="grid gap-16 | lg:grid-cols-12">
+                  <div class="col-span-full | lg:col-span-3">
+                    <div
+                      class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
+                    >
+                      <p class="text-balance">
+                        Isi form berikut agar kami bisa memberikan solusi yang
+                        paling tepat untuk perusahaan Anda. Atau hubungi :
+                      </p>
+                      <div class="flex flex-col gap-1">
+                        <h5>
+                          <a href="#!" class="leading-none link link-reverse"
+                            >+62 81234 5678 90</a
+                          >
+                        </h5>
+                        <h5>
+                          <a
+                            href="#!"
+                            class="leading-none text-primary-600 link link-reverse"
+                            >support@runlapan.com</a
+                          >
+                        </h5>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-span-full | lg:col-span-9">
+                    <div class="grid gap-6 | lg:gap-y-8 lg:grid-cols-2">
+                      <div class="col-span-full">
+                        <div class="c-form-wrapper">
+                          <div class="c-form c-form-default">
+                            <label for="input-name" class="c-label"
+                              >Nama Lengkap</label
+                            >
+                            <input
+                              type="text"
+                              name="name"
+                              id="input-name"
+                              class="c-input"
+                              placeholder="Masukan nama lengkap *"
+                            />
+                          </div>
+                          <div class="text-xs mt-1 text-dark-400 px-4">
+                            please fill out this field
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-span-full | lg:col-span-1">
+                        <div class="c-form-wrapper">
+                          <div class="c-form c-form-default">
+                            <label for="input-email" class="c-label"
+                              >Email</label
+                            >
+                            <input
+                              type="email"
+                              name="email"
+                              id="input-email"
+                              class="c-input"
+                              placeholder="Masukan email *"
+                            />
+                          </div>
+                          <div class="text-xs mt-1 text-dark-400 px-4">
+                            please fill out this field
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-span-full | lg:col-span-1">
+                        <div class="c-form-wrapper">
+                          <div class="c-form c-form-default">
+                            <label for="input-nohp" class="c-label"
+                              >Nomor HP</label
+                            >
+                            <input
+                              type="number"
+                              inputmode="numeric"
+                              name="nohp"
+                              id="input-nohp"
+                              class="c-input"
+                              placeholder="Masukan nomor HP *"
+                            />
+                          </div>
+                          <div class="text-xs mt-1 text-dark-400 px-4">
+                            please fill out this field
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-span-full | lg:col-span-1">
+                        <div class="c-form-wrapper">
+                          <div class="c-form c-form-default">
+                            <label for="input-company" class="c-label"
+                              >Nama Perusahaan</label
+                            >
+                            <input
+                              type="text"
+                              name="company"
+                              id="input-company"
+                              class="c-input"
+                              placeholder="Masukan nama perusahaan *"
+                            />
+                          </div>
+                          <div class="text-xs mt-1 text-dark-400 px-4">
+                            please fill out this field
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-span-full | lg:col-span-1">
+                        <div class="c-form-wrapper">
+                          <div class="c-form c-form-default">
+                            <label for="input-sector" class="c-label"
+                              >Bidang Usaha</label
+                            >
+                            <input
+                              type="text"
+                              name="sector"
+                              id="input-sector"
+                              class="c-input"
+                              placeholder="Masukan bidang usaha *"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-span-full">
+                        <div class="c-form-wrapper">
+                          <div class="c-form c-form-default">
+                            <label for="input-address" class="c-label"
+                              >Alamat Perusahaan</label
+                            >
+                            <textarea
+                              name="address"
+                              id="input-address"
+                              class="c-input c-textarea"
+                              placeholder="Masukan alamat perusahaan *"
+                            ></textarea>
+                          </div>
+                          <div class="text-xs mt-1 text-dark-400 px-4">
+                            please fill out this field
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-span-full">
+                        <div class="c-form-wrapper">
+                          <div class="c-form c-form-default">
+                            <label for="input-info" class="c-label"
+                              >Keterangan</label
+                            >
+                            <textarea
+                              name="info"
+                              id="input-info"
+                              class="c-input c-textarea"
+                              placeholder="Masukan keterangan *"></textarea>
+                          </div>
+                          <div class="text-xs mt-1 text-dark-400 px-4">
+                            please fill out this field
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="grid gap-8 mt-16 | lg:grid-cols-2 lg:items-end">
+                      <div
+                        class="col-span-full | not-lg:text-center | lg:col-span-1"
+                      >
+                        <p class="text-sm text-balance text-dark-400">
+                          Dengan menekan tombol <b>Kirim Pesan</b>, Anda telah
+                          menyetujuai <a
+                            href="#!"
+                            class="link font-semibold text-primary-600"
+                            >Syarat & Ketentuan</a
+                          > yang berlaku.
+                        </p>
+                      </div>
+                      <div
+                        class="col-span-full | not-lg:text-center | lg:col-span-1"
+                      >
+                        <button
+                          type="submit"
+                          class="inline-flex items-center gap-4"
+                          data-hover-group
+                        >
+                          <div
+                            class="link font-semibold text-dark-950"
+                            data-hover-effect
+                          >
+                            Kirim Pesan
+                          </div>
+                          <div
+                            class="btn btn-icon btn-primary"
+                            data-hover-effect
+                          >
+                            <svg
+                              class="icon icon-stroke icon-up-right"
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M17.5 6.5L6 18"
+                                stroke="#141B34"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"></path>
+                              <path
+                                d="M8 6H18V16"
+                                stroke="#141B34"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"></path>
+                            </svg>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div><!-- data-barba container -->
+      </main>
+
+      <!-- @components sectionFooter -->
+    </div><!-- #app -->
+
+    <div
+      id="modal-cari-loker"
+      class="fixed top-0 inset-x-0 z-[999] invisible"
+      data-modal
+    >
+      <div
+        class="relative w-full h-dvh flex flex-col overflow-auto"
+        data-lenis-prevent
+      >
+        <div
+          class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
+        >
+          <div class="grow w-full flex flex-col max-container">
+            <div class="grid gap-4 | lg:grid-cols-12">
+              <div
+                class="grid-item col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
+              >
+                <div
+                  class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
+                  data-modal-content
+                >
+                  <div class="absolute top-0 right-0">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-icon btn-dark"
+                      data-hover-effect
+                      data-modal-hide
+                    >
+                      <svg
+                        class="icon icon-stroke"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6"
+                          stroke="#141B34"
+                          stroke-width="1.5"
+                          stroke-linejoin="round"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="shrink-0 px-6 py-4 | lg:py-6">
+                    <div class="flex flex-col gap-4 items-center text-center">
+                      <div
+                        class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
+                      >
+                        Cari Loker
+                      </div>
+                      <h4 class="w-full font-bold leading-none text-balance">
+                        Apakah Anda Sudah Memiliki Id Number ?
+                      </h4>
+                    </div>
+                  </div>
+                  <!-- <div class="shrink-0 px-6 py-4 | lg:py-6">
+                                <article class="post-entry no-grid">
+                                    
+                                </article>
+                            </div> -->
+                  <div class="shrink-0 px-6 py-4 | lg:py-6">
+                    <form action="index-login.html">
+                      <div class="grid gap-6">
+                        <div class="c-form-wrapper">
+                          <div class="c-form c-form-default">
+                            <label for="input-idnumber" class="c-label"
+                              >Masukan ID Number</label
+                            >
+                            <input
+                              type="number"
+                              name="input-idnumber"
+                              inputmode="numeric"
+                              class="c-input"
+                              placeholder="Masuan id number"
+                            />
+                          </div>
+                          <div class="text-xs mt-1 text-dark-400 px-4">
+                            please fill out this field
+                          </div>
+                        </div>
+                        <button
+                          type="submit"
+                          class="btn btn-primary"
+                          data-hover-effect>Submit</button
+                        >
+                        <div class="flex items-center gap-4">
+                          <div class="grow h-px bg-dark-300"></div>
+                          <div
+                            class="text-sm leading-none font-bold uppercase tracking-wide"
+                          >
+                            Atau
+                          </div>
+                          <div class="grow h-px bg-dark-300"></div>
+                        </div>
+                        <a
+                          href="auth-signup-search-job.html"
+                          class="btn"
+                          data-hover-effect>Daftar Sekarang</a
+                        >
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="modal-pasang-loker"
+      class="fixed top-0 inset-x-0 z-[999] invisible"
+      data-modal
+    >
+      <div
+        class="relative w-full h-dvh flex flex-col overflow-auto"
+        data-lenis-prevent
+      >
+        <div
+          class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
+        >
+          <div class="grow w-full flex flex-col max-container">
+            <div class="grid gap-4 | lg:grid-cols-12">
+              <div
+                class="grid-item col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
+              >
+                <div
+                  class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
+                  data-modal-content
+                >
+                  <div class="absolute top-0 right-0">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-icon btn-dark"
+                      data-hover-effect
+                      data-modal-hide
+                    >
+                      <svg
+                        class="icon icon-stroke"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6"
+                          stroke="#141B34"
+                          stroke-width="1.5"
+                          stroke-linejoin="round"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="shrink-0 px-6 py-4 | lg:py-6">
+                    <div class="flex flex-col gap-4 items-center text-center">
+                      <div
+                        class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
+                      >
+                        Pasang Loker
+                      </div>
+                      <h4 class="w-full font-bold leading-none text-balance">
+                        Apakah Anda Sudah Memiliki Id Number ?
+                      </h4>
+                    </div>
+                  </div>
+                  <!-- <div class="shrink-0 px-6 py-4 | lg:py-6">
+                                <article class="post-entry no-grid">
+                                    
+                                </article>
+                            </div> -->
+                  <div class="shrink-0 px-6 py-4 | lg:py-6">
+                    <form action="index-login.html">
+                      <div class="grid gap-6">
+                        <div class="c-form-wrapper">
+                          <div class="c-form c-form-default">
+                            <label for="input-idnumber" class="c-label"
+                              >Masukan ID Number</label
+                            >
+                            <input
+                              type="number"
+                              name="input-idnumber"
+                              inputmode="numeric"
+                              class="c-input"
+                              placeholder="Masuan id number"
+                            />
+                          </div>
+                          <div class="text-xs mt-1 text-dark-400 px-4">
+                            please fill out this field
+                          </div>
+                        </div>
+                        <button
+                          type="submit"
+                          class="btn btn-primary"
+                          data-hover-effect>Submit</button
+                        >
+                        <div class="flex items-center gap-4">
+                          <div class="grow h-px bg-dark-300"></div>
+                          <div
+                            class="text-sm leading-none font-bold uppercase tracking-wide"
+                          >
+                            Atau
+                          </div>
+                          <div class="grow h-px bg-dark-300"></div>
+                        </div>
+                        <a
+                          href="auth-signup-add-job.html"
+                          class="btn"
+                          data-hover-effect>Daftar Sekarang</a
+                        >
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <svg
+      width="0"
+      height="0"
+      class="absolute hidden"
+      color-interpolation-filters="sRGB"
+    >
+      <defs>
+        <filter id="gooey-content">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"
+          ></feGaussianBlur>
+          <feColorMatrix
+            in="blur"
+            mode="matrix"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 11 -6"
+            result="gooey-content"></feColorMatrix>
+          <feComposite in="SourceGraphic" in2="gooey-content" operator="atop"
+          ></feComposite>
+          <feBlend in="SourceGraphic" in2="gooey-content"></feBlend>
+        </filter>
+      </defs>
+    </svg>
+
+    <div id="preloader">
+      <div id="preloader-spinner">
+        <img src="./assets/images/logo/logo-icon.png" alt="" />
+      </div>
+      <div id="preloader-transition"></div>
+    </div>
+
+    <script is:inline type="module" src="/src/main.js"></script>
+  </html>
+</BaseLayout>

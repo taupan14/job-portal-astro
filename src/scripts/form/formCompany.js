@@ -1,8 +1,6 @@
 // src/scripts/form/formCompany.js
-import gsap from "gsap";
 import { showToast } from "@js/_toast";
 import { initializeModals, showModal } from "@js/_modal";
-import barba from "@barba/core";
 
 const BASE_URL = import.meta.env.PUBLIC_API_URL;
 

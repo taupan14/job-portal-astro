@@ -1,0 +1,111 @@
+<div
+  id="modal-cari-loker"
+  class="fixed top-0 inset-x-0 z-[999] invisible"
+  data-modal
+>
+  <div
+    class="relative w-full h-dvh flex flex-col overflow-auto"
+    data-lenis-prevent
+  >
+    <div
+      class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
+    >
+      <div class="grow w-full flex flex-col max-container">
+        <div class="grid gap-4 | lg:grid-cols-12">
+          <div
+            class="grid-item col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
+          >
+            <div
+              class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
+              data-modal-content
+            >
+              <div class="absolute top-2 right-2">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-icon btn-dark"
+                  data-hover-effect
+                  data-modal-hide
+                >
+                  <svg class="icon icon-stroke" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6"
+                      stroke="#141B34"
+                      stroke-width="1.5"
+                      stroke-linejoin="round"></path>
+                  </svg>
+                </button>
+              </div>
+              <div class="shrink-0 px-6 py-4 | lg:py-6">
+                <div class="flex flex-col gap-4 items-center text-center">
+                  <div
+                    class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
+                  >
+                    Cari Loker
+                  </div>
+                  <h4 class="w-full font-bold leading-none text-balance">
+                    Apakah Anda Sudah<br />Memiliki Akun ?
+                  </h4>
+                </div>
+              </div>
+              <div class="shrink-0 px-6 py-4 | lg:py-6">
+                <form action="index-login.html" data-login-form>
+                  <div class="grid gap-6">
+                    <div class="c-form-wrapper">
+                      <div class="c-form">
+                        <label for="input-email" class="c-label"
+                          >Masukan Alamat Email</label
+                        >
+                        <input
+                          type="email"
+                          name="input-email"
+                          class="c-input"
+                          placeholder="..."
+                        />
+                      </div>
+                      <div class="text-xs mt-1 text-dark-400">
+                        silahkan masukan alamat email yang terdaftar
+                      </div>
+                    </div>
+                    <div class="c-form-wrapper">
+                      <div class="c-form">
+                        <label for="input-password" class="c-label"
+                          >Masukan Password</label
+                        >
+                        <input
+                          type="password"
+                          name="input-password"
+                          class="c-input"
+                          placeholder="..."
+                        />
+                      </div>
+                      <div class="text-xs mt-1 text-dark-400">
+                        password sudah dikirimkan melalui email
+                      </div>
+                    </div>
+                    <button
+                      type="submit"
+                      class="btn btn-primary"
+                      data-hover-effect>Login</button
+                    >
+                    <div class="flex items-center gap-4">
+                      <div class="grow h-px bg-dark-200"></div>
+                      <div
+                        class="text-sm leading-none font-bold uppercase tracking-wide"
+                      >
+                        Atau
+                      </div>
+                      <div class="grow h-px bg-dark-200"></div>
+                    </div>
+                    <a href="/applicant" class="btn" data-hover-effect
+                      >Daftar Sekarang</a
+                    >
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

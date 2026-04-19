@@ -35,11 +35,11 @@ export const initSectionFooter = async () => {
                                 <div class="flex flex-col gap-8 | not-lg:items-center not-lg:text-center">
                                     <div class="w-full text-sm font-bold uppercase tracking-wide text-white py-4 border-b border-white">Quick Link</div>
                                     <ul class="flex flex-col gap-1">
-                                        <li><a href="page-about.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Tentang Kami</a></li>
-                                        <li><a href="page-blog.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Berita</a></li>
-                                        <li><a href="page-gallery.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Gallery</a></li>
-                                        <li><a href="page-faq.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">FAQ</a></li>
-                                        <li><a href="page-policy.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Privacy Policy</a></li>
+                                        <li><a href="/about-us" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Tentang Kami</a></li>
+                                        <li><a href="/blog" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Berita</a></li>
+                                        <li><a href="/gallery" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Gallery</a></li>
+                                        <li><a href="/faqs" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">FAQ</a></li>
+                                        <li><a href="/privacy-policy" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Privacy Policy</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -47,14 +47,14 @@ export const initSectionFooter = async () => {
                                 <div class="flex flex-col gap-8 | not-lg:items-center not-lg:text-center">
                                     <div class="w-full text-sm font-bold uppercase tracking-wide text-white py-4 border-b border-white">Service Kami</div>
                                     <ul class="flex flex-col gap-1">
-                                        <li><a href="page-service-detail.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Cleaning Service</a></li>
-                                        <li><a href="page-service-detail.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Sales</a></li>
-                                        <li><a href="page-service-detail.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Kurir</a></li>
-                                        <li><a href="page-service-detail.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Pest Control</a></li>
-                                        <li><a href="page-service-detail.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Crew Store</a></li>
-                                        <li><a href="page-service-detail.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Alih Daya</a></li>
-                                        <li><a href="page-service-detail.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Security</a></li>
-                                        <li><a href="page-service-detail.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Receptionist</a></li>
+                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Cleaning Service</a></li>
+                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Sales</a></li>
+                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Kurir</a></li>
+                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Pest Control</a></li>
+                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Crew Store</a></li>
+                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Alih Daya</a></li>
+                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Security</a></li>
+                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Receptionist</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -62,12 +62,12 @@ export const initSectionFooter = async () => {
                                 <div class="flex flex-col gap-8 | not-lg:items-center not-lg:text-center">
                                     <div class="w-full text-sm font-bold uppercase tracking-wide text-white py-4 border-b border-white">Produk Kami</div>
                                     <ul class="flex flex-col gap-1">
-                                        <li><a href="page-product-detail.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Software HRIS</a></li>
-                                        <li><a href="page-product-detail.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Software ERP</a></li>
-                                        <li><a href="page-product-detail.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Software Parkir</a></li>
-                                        <li><a href="page-product-detail.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Online Travel Agen</a></li>
-                                        <li><a href="page-product-detail.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Software Cash Collect</a></li>
-                                        <li><a href="page-product-detail.html" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Software Recruitment</a></li>
+                                        <li><a href="/product" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Software HRIS</a></li>
+                                        <li><a href="/product" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Software ERP</a></li>
+                                        <li><a href="/product" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Software Parkir</a></li>
+                                        <li><a href="/product" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Online Travel Agen</a></li>
+                                        <li><a href="/product" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Software Cash Collect</a></li>
+                                        <li><a href="/product" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Software Recruitment</a></li>
                                     </ul>
                                 </div>
                             </div>

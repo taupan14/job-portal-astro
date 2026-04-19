@@ -1,0 +1,150 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Privacy Policy">
+  <!-- Paste HTML dari index.html di sini -->
+  <html lang="en">
+    <div id="app">
+      <!-- @components sectionHeader -->
+
+      <main id="section-main" data-barba="wrapper">
+        <div
+          data-hero-scheme="light"
+          data-barba="container"
+          data-barba-namespace="privacy"
+        >
+          <section id="page-header" class="relative pt-(--space-header)">
+            <div class="relative py-16 | lg:pt-24">
+              <div class="max-container">
+                <div class="grid gap-8 | lg:grid-cols-12">
+                  <div class="col-span-full | lg:col-span-8 lg:col-start-3">
+                    <div class="flex flex-col gap-6 items-center text-center">
+                      <div class="inline-flex items-center gap-3">
+                        <div
+                          class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                        >
+                        </div>
+                        <div
+                          class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950"
+                        >
+                          Privacy Policy
+                        </div>
+                      </div>
+                      <h1 class="leading-none text-balance">
+                        Kebijakan Privasi
+                      </h1>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="absolute inset-0 flex justify-center -z-1 pointer-events-none select-none"
+              >
+                <h1
+                  class="shrink-0 text-transparent [-webkit-text-stroke:1px_var(--color-dark-100)] leading-[0.8] uppercase whitespace-nowrap [--min-size:10rem] [--val-size:22vw] [--max-size:22rem]"
+                >
+                  Kebijakan Privasi
+                </h1>
+              </div>
+            </div>
+          </section>
+
+          <section id="page-content" class="relative">
+            <div class="py-16 | lg:py-24">
+              <div class="max-container">
+                <div class="grid gap-8 | lg:grid-cols-12">
+                  <div class="col-span-full | lg:col-span-8 lg:col-start-3">
+                    <div class="text-xl text-dark-950 font-bold mb-7">
+                      Kebijakan Privasi ini menjelaskan bagaimana runlapan
+                      mengumpulkan, menggunakan, dan melindungi informasi
+                      pribadi Anda ketika Anda menggunakan situs web kami
+                      https://runlapan.com
+                    </div>
+                    <div class="flex flex-col gap-16 | lg:gap-24">
+                      <div
+                        class="accordion grid divide-y divide-dark-400"
+                        data-parent
+                        data-privacy
+                      >
+                        <!-- @components listFaq -->
+                      </div>
+                      <div
+                        class="flex flex-col items-center justify-center gap-4 | lg:gap-8 lg:flex-row"
+                      >
+                        <div class="font-medium">Butuh Bantuan ?</div>
+                        <a
+                          href="page-contact.html"
+                          class="btn btn-primary"
+                          data-hover-effect
+                        >
+                          Kontak Kami
+                          <svg
+                            class="icon icon-stroke circle-icon circle-right icon-up-right"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M17.5 6.5L6 18"
+                              stroke="#141B34"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"></path>
+                            <path
+                              d="M8 6H18V16"
+                              stroke="#141B34"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"></path>
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <!-- data-barba container -->
+      </main>
+
+      <!-- @components sectionFooter -->
+    </div>
+    <!-- #app -->
+
+    <svg
+      width="0"
+      height="0"
+      class="absolute hidden"
+      color-interpolation-filters="sRGB"
+    >
+      <defs>
+        <filter id="gooey-content">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"
+          ></feGaussianBlur>
+          <feColorMatrix
+            in="blur"
+            mode="matrix"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 11 -6"
+            result="gooey-content"></feColorMatrix>
+          <feComposite in="SourceGraphic" in2="gooey-content" operator="atop"
+          ></feComposite>
+          <feBlend in="SourceGraphic" in2="gooey-content"></feBlend>
+        </filter>
+      </defs>
+    </svg>
+
+    <div id="preloader">
+      <div id="preloader-spinner">
+        <img src="/assets/images/logo/logo-icon.png" alt="" />
+      </div>
+      <div id="preloader-transition"></div>
+    </div>
+
+    <script is:inline type="module" src="/src/main.js"></script>
+  </html>
+</BaseLayout>

@@ -4,10 +4,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import CustomEase from "gsap/CustomEase";
 import Splitting from "splitting";
 import { initProfilePage } from "@scripts/form/_profile.js";
+import { initJobsPage } from "@scripts/form/_jobs.js";
 import { initDatepicker } from "@js/_datepicker.js";
 // import SplitType from "split-type";
 
-import { navigate } from "astro:transitions/client";
+// import { navigate } from "astro:transitions/client";
 import { hideModal } from "@js/_modal";
 
 gsap.registerPlugin(ScrollTrigger, CustomEase);
@@ -135,7 +136,7 @@ const pageTransitionOnce = async () => {
         delay: 0.15,
         ...animPreloaderOut,
         onComplete: () => {
-          preloader.querySelector("#preloader-spinner").remove();
+          preloader.querySelector("#preloader-spinner")?.remove();
           preloader.remove();
         },
       },
@@ -165,7 +166,6 @@ const initHeader = async () => {
   };
 
   setHeaderScheme(headerScheme === "dark" ? "dark" : "light");
-
   if (!window.headerInitialized) {
     setHeaderScheme(headerScheme === "dark" ? "dark" : "light");
     window.headerInitialized = true;
@@ -404,7 +404,7 @@ const initSplitLine = async () => {
   document.querySelectorAll("[data-split-line]").forEach((splitLine) => {
     const splitText = Splitting({ target: splitLine, by: "lines" });
     splitText.forEach((splitResult) => {
-      let lineIndex = 0;
+      // let lineIndex = 0;
       const wrappedLines = splitResult.lines
         .map(
           (wordsArr, i) =>
@@ -576,7 +576,9 @@ const initBtnLike = async () => {
 
       // Belum login → buka modal login
       if (!isLoggedIn) {
-        const trigger = document.querySelector('[data-modal-target="modal-cari-loker"]');
+        const trigger = document.querySelector(
+          '[data-modal-target="modal-cari-loker"]',
+        );
         trigger?.click();
         return;
       }
@@ -701,7 +703,7 @@ const initRevealAnimation = async () => {
     const revealType = reveal.getAttribute("data-reveal");
     const revealDelay = reveal.getAttribute("data-delay");
     const revealOffsetY = reveal.getAttribute("data-offset-y");
-    const revealOffsetX = reveal.getAttribute("data-offset-x");
+    // const revealOffsetX = reveal.getAttribute("data-offset-x");
 
     console.log(revealOffsetY);
 
@@ -784,7 +786,7 @@ const initMenu = async () => {
   const init = [];
   document.querySelectorAll("[data-menu]").forEach((menu) => {
     const subMenu = menu.querySelector("[data-submenu]");
-    const navSubMenu = menu.querySelectorAll("[data-nav-submenu]");
+    // const navSubMenu = menu.querySelectorAll("[data-nav-submenu]");
 
     if (subMenu) {
       gsap.set(subMenu, { clipPath: "inset(0% 0% 100% 0%)" });
@@ -932,7 +934,7 @@ const initMobileMenu = async () => {
 };
 
 barba.init({
-  debug: true,
+  debug: import.meta.env.DEV,
   sync: true,
   transitions: [
     {
@@ -948,7 +950,7 @@ barba.init({
 
         // Sembunyikan container dulu agar tidak terlihat acak-acakan
         data.next.container.style.visibility = "hidden";
-        await initMobileMenu();
+        // await initMobileMenu();
       },
 
       async enter(data) {
@@ -961,6 +963,7 @@ barba.init({
           initSplitLine(),
           initAccordion(),
           initBtnLike(),
+          initSpaceHeader(),
           initInputPhoto(),
           initScrollSection(),
           initMobileMenu(),
@@ -969,13 +972,13 @@ barba.init({
         ]);
 
         await initHeader();
-
         // Tampilkan container setelah semua init selesai
         data.next.container.style.visibility = "visible";
         await pageTransitionOut(data.next.container);
 
         await initDatepicker();
         await initProfilePage();
+        await initJobsPage(data.next.container);
       },
 
       async once(data) {
@@ -1001,10 +1004,12 @@ barba.init({
         await initDatepicker();
         // Baru jalankan profile page init
         await initProfilePage();
+        await initJobsPage(data.next.container);
       },
     },
   ],
 });
+window.barba = barba; // ✅ expose ke global
 
 document.addEventListener("click", (e) => {
   const link = e.target.closest("a[href]");
@@ -1023,8 +1028,6 @@ document.addEventListener("click", (e) => {
 
   // Tunggu animasi modal selesai, baru trigger navigasi Astro
   setTimeout(() => {
-    navigate(href);
+    barba.go(href);
   }, 550); // sesuaikan dengan durasi animasi close modal kamu
 });
-
-

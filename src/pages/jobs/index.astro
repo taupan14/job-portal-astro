@@ -90,7 +90,7 @@ const buildUrl = (overrides: Record<string, string | number>) => {
 
     <main id="section-main" data-barba="wrapper">
       <div
-        data-hero-scheme="light"
+        data-header-scheme="light"
         data-barba="container"
         data-barba-namespace="jobs"
       >
@@ -426,42 +426,5 @@ const buildUrl = (overrides: Record<string, string | number>) => {
     <div id="preloader-transition"></div>
   </div>
 
-  <script>
-
-    // Init form search di halaman jobs (reuse logic yang sama)
-    const initJobsSearch = () => {
-      const form = document.querySelector<HTMLFormElement>("[data-search-jobs]");
-      const submitBtn = document.querySelector("[data-search-jobs-submit]");
-      if (!form) return;
-
-      // Tombol search desktop trigger submit form
-      submitBtn?.addEventListener("click", () => form.requestSubmit());
-
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-
-        const params = new URLSearchParams();
-        const keyword  = (form.querySelector<HTMLInputElement>("#input-keyword"))?.value.trim() ?? "";
-        const province = (form.querySelector<HTMLSelectElement>("#select-province"))?.value ?? "";
-        const category = (form.querySelector<HTMLSelectElement>("#select-category"))?.value ?? "";
-
-        if (keyword)  params.set("q", keyword);
-        if (province) params.set("province", province);
-        if (category) params.set("category", category);
-        params.set("page", "1"); // reset ke halaman 1 saat search baru
-
-        const query = params.toString();
-        window.location.href = `/jobs${query ? `?${query}` : ""}`;
-      });
-    };
-
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initJobsSearch);
-    } else {
-      initJobsSearch();
-    }
-    window.addEventListener("barba:after", initJobsSearch);
-  </script>
-
-  <script type="module" src="/src/main.js"></script>
+  <script is:inline type="module" src="/src/main.js"></script>
 </BaseLayout>

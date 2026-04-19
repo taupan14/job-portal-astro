@@ -13,5 +13,8 @@ interface ImportMeta {
 declare namespace App {
   interface Locals {
     user: import("./lib/auth").UserSession | null;
+    tokenExpired: boolean;
   }
 }
+
+declare module "@barba/core";

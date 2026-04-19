@@ -1,6 +1,6 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import { apiGet } from "../lib/api";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { apiGet } from "../../lib/api";
 
 // Fetch data dari Express saat server render (SSR)
 // Cookie diteruskan agar Express tahu siapa yang request
@@ -21,7 +21,7 @@ const provinces =
 
     <main id="section-main" data-barba="wrapper">
       <div
-        data-hero-scheme="light"
+        data-header-scheme="light"
         data-barba="container"
         data-barba-namespace="auth-signup-add-job"
       >
@@ -542,11 +542,11 @@ const provinces =
     <div id="preloader-transition"></div>
   </div>
 
-  <script type="module" src="/src/main.js"></script>
+  <script is:inline type="module" src="/src/main.js"></script>
 </BaseLayout>
 
 <script>
-  import { initFormCompany } from "../scripts/form/formCompany";
+  import { initFormCompany } from "../../scripts/form/formCompany";
   import Splide from "@splidejs/splide";
   import TomSelect from "tom-select";
 
