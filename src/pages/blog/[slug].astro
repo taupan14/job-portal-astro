@@ -1,8 +1,52 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { apiGet } from "../../lib/api";
+
+const { slug } = Astro.params;
+const cookieHeader = Astro.request.headers.get("cookie") ?? "";
+const API_URL = import.meta.env.PUBLIC_API_URL;
+const API_PUBS_URL = API_URL + "/pubs/uploads/blog";
+
+type Blog = {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  thumbnail: string | null;
+  status: string;
+  published_at: string;
+  category: {
+    id: number;
+    name: string;
+  };
+};
+type ApiResp = {
+  blog: Blog;
+  related: Blog[];
+};
+
+const resp = await apiGet<ApiResp>(`/api/blogs/slug/${slug}`, cookieHeader);
+const blog = resp?.blog;
+const related = resp?.related ?? [];
+
+// console.log("product", product);
+// console.log("related", related);
+
+// 404 jika tidak ditemukan
+if (!blog) return Astro.redirect("/404");
+
+const dateDormatted = new Date(blog.published_at).toLocaleDateString("id-ID", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+const parts = dateDormatted.split(" ");
+const formatted = `${parts[0]} ${parts[1]}, ${parts[2]}`;
+const pageTitle = blog.title;
 ---
 
-<BaseLayout title="Berita Detail">
+<BaseLayout title={pageTitle}>
   <!-- Paste HTML dari index.html di sini -->
   <html lang="en">
     <div id="app">
@@ -28,16 +72,16 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                         <div
                           class="text-sm leading-none font-bold uppercase tracking-wide"
                         >
-                          Teknologi
+                          {blog.category.name}
                         </div>
                       </div>
                       <h1 class="text-balance">
-                        10 Tren Teknologi Terbaru yang Wajib Diketahui di 2024
+                        {blog.title}
                       </h1>
                       <div
                         class="text-sm leading-none font-bold uppercase tracking-wide"
                       >
-                        15 Maret, 2024
+                        {formatted}
                       </div>
                     </div>
                   </div>
@@ -60,15 +104,25 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 <picture>
                   <source
                     type="image/webp"
-                    srcset="/assets/images/thumbnails/img01.webp 400w, /assets/images/thumbnails/img01.webp 800w, /assets/images/thumbnails/img01.webp 1200w, /assets/images/thumbnails/img01.webp 1600w"
+                    srcset={`
+      ${API_PUBS_URL}/${blog.thumbnail}?w=400 400w,
+      ${API_PUBS_URL}/${blog.thumbnail}?w=800 800w,
+      ${API_PUBS_URL}/${blog.thumbnail}?w=1200 1200w,
+      ${API_PUBS_URL}/${blog.thumbnail}?w=1600 1600w
+    `}
                     sizes="100vw"
                   />
                   <img
-                    src="/assets/images/thumbnails/img01.webp"
-                    srcset="/assets/images/thumbnails/img01.webp 400w, /assets/images/thumbnails/img01.webp 800w, /assets/images/thumbnails/img01.webp 1200w, /assets/images/thumbnails/img01.webp 1600w"
+                    src={`${API_PUBS_URL}/${blog.thumbnail}`}
+                    srcset={`
+      ${API_PUBS_URL}/${blog.thumbnail}?w=400 400w,
+      ${API_PUBS_URL}/${blog.thumbnail}?w=800 800w,
+      ${API_PUBS_URL}/${blog.thumbnail}?w=1200 1200w,
+      ${API_PUBS_URL}/${blog.thumbnail}?w=1600 1600w
+    `}
                     sizes="100vw"
                     decoding="async"
-                    alt="10 Tren Teknologi Terbaru yang Wajib Diketahui di 2024"
+                    alt={blog.title}
                     class="size-full object-cover"
                   />
                 </picture>
@@ -196,127 +250,18 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     </div>
                   </div>
                   <div class="post-entry">
-                    <h5>
-                      Perkembangan teknologi terus bergerak dengan cepat,
-                      membawa inovasi yang mengubah cara kita hidup, bekerja,
-                      dan berinteraksi.
-                    </h5>
-                    <p>
-                      Tahun 2024 menjadi tahun yang penuh dengan terobosan baru
-                      di berbagai bidang teknologi. Berikut adalah 10 tren
-                      teknologi terbaru yang wajib Anda ketahui untuk tetap
-                      relevan dan kompetitif di era digital ini.
-                    </p>
-                    <img
-                      src="/assets/images/thumbnails/img07.webp"
-                      alt="image"
-                    />
-                    <h5>Kecerdasan Buatan Generatif (Generative AI)</h5>
-                    <p>
-                      Generative AI, seperti ChatGPT dan tools sejenis, semakin
-                      canggih dan mampu menghasilkan konten teks, gambar, video,
-                      bahkan kode program dengan kualitas yang hampir sempurna.
-                      Di tahun 2024, teknologi ini akan semakin terintegrasi ke
-                      dalam berbagai industri, mulai dari pemasaran, pendidikan,
-                      hingga pengembangan produk.
-                    </p>
-                    <h5>Komputasi Kuantum</h5>
-                    <p>
-                      Komputasi kuantum mulai menunjukkan potensinya untuk
-                      memecahkan masalah kompleks yang tidak dapat diatasi oleh
-                      komputer tradisional. Pada tahun 2024, kita akan melihat
-                      lebih banyak aplikasi praktis dari teknologi ini, terutama
-                      di bidang keamanan siber, farmasi, dan optimisasi sistem.
-                    </p>
-                    <h5>
-                      Metaverse dan Realitas Virtual (VR) yang Lebih Immersif
-                    </h5>
-                    <p>
-                      Metaverse terus berkembang dengan dukungan teknologi VR
-                      dan AR (Augmented Reality) yang semakin canggih. Di tahun
-                      2024, pengalaman virtual akan menjadi lebih nyata dan
-                      interaktif, membuka peluang baru di bidang hiburan,
-                      pendidikan, dan kolaborasi kerja.
-                    </p>
-                    <h5>Internet of Things (IoT) yang Lebih Cerdas</h5>
-                    <p>
-                      Perangkat IoT semakin terhubung dan mampu berkomunikasi
-                      satu sama lain dengan lebih efisien. Tren ini akan
-                      mendorong otomatisasi di rumah, kota cerdas (smart
-                      cities), dan industri, meningkatkan kualitas hidup dan
-                      produktivitas.
-                    </p>
-                    <h5>Energi Hijau dan Teknologi Ramah Lingkungan</h5>
-                    <p>
-                      Teknologi ramah lingkungan menjadi fokus utama di tahun
-                      2024. Inovasi dalam energi terbarukan, baterai
-                      berkelanjutan, dan sistem manajemen energi akan membantu
-                      mengurangi jejak karbon dan mendukung transisi menuju masa
-                      depan yang lebih hijau.
-                    </p>
-                    <h5>Blockchain dan Web3</h5>
-                    <p>
-                      Blockchain terus berkembang melampaui cryptocurrency. Di
-                      tahun 2024, teknologi ini akan semakin digunakan untuk
-                      menciptakan ekosistem Web3 yang terdesentralisasi,
-                      termasuk aplikasi keuangan terdesentralisasi (DeFi), NFT,
-                      dan manajemen identitas digital.
-                    </p>
-                    <h5>5G dan Jaringan Generasi Berikutnya</h5>
-                    <p>
-                      Jaringan 5G akan semakin meluas, memberikan kecepatan
-                      internet yang lebih tinggi dan konektivitas yang lebih
-                      stabil. Ini akan mendorong inovasi dalam mobil otonom,
-                      telemedicine, dan smart devices.
-                    </p>
-                    <h5>Robotika dan Otomatisasi Canggih</h5>
-                    <p>
-                      Robotika semakin canggih dengan kemampuan AI yang
-                      terintegrasi. Di tahun 2024, robot akan semakin banyak
-                      digunakan di sektor manufaktur, logistik, dan bahkan
-                      layanan pelanggan, meningkatkan efisiensi dan mengurangi
-                      biaya operasional.
-                    </p>
-                    <h5>Keamanan Siber yang Lebih Canggih</h5>
-                    <p>
-                      Dengan meningkatnya ancaman siber, teknologi keamanan
-                      siber juga terus berkembang. Di tahun 2024, solusi
-                      keamanan berbasis AI dan machine learning akan menjadi
-                      andalan untuk melindungi data dan sistem dari serangan
-                      cyber yang semakin kompleks.
-                    </p>
-                    <h5>Biotechnology dan Rekayasa Genetik</h5>
-                    <ul>
-                      <li>
-                        Lorem ipsum dolor, sit amet consectetur adipisicing
-                        elit. Quaerat, doloremque ad. Pariatur amet hic tempore
-                        iste quia? Eos, magni laudantium!
-                      </li>
-                    </ul>
-                    <p>
-                      Biotechnology dan rekayasa genetik terus berkembang,
-                      membawa terobosan dalam pengobatan, pertanian, dan
-                      produksi bahan biologis. Di tahun 2024, kita akan melihat
-                      lebih banyak aplikasi praktis dari teknologi ini, seperti
-                      terapi gen dan makanan hasil rekayasa genetika.
-                    </p>
-                    <h5>Kesimpulan</h5>
-                    <p>
-                      Tahun 2024 menjadi tahun yang penuh dengan peluang dan
-                      tantangan di dunia teknologi. Dengan memahami tren-tren
-                      terbaru ini, Anda dapat mempersiapkan diri untuk
-                      menghadapi perubahan dan memanfaatkan inovasi teknologi
-                      untuk kemajuan bisnis maupun kehidupan sehari-hari. Jangan
-                      lewatkan kesempatan untuk tetap update dan mengadopsi
-                      teknologi yang relevan dengan kebutuhan Anda!
-                    </p>
+                    <div class="rich-content" set:html={blog?.content} />
                   </div>
                 </div>
               </div>
             </div>
             <div class="py-16 | lg:py-24">
               <div class="max-container">
-                <div class="splide group/slide" data-slide-blog="6">
+                <div
+                  class="splide group/slide"
+                  data-slide-blog="6"
+                  data-related={JSON.stringify(related)}
+                >
                   <div class="grid gap-8 | lg:grid-cols-12">
                     <div class="col-span-full | lg:col-span-3">
                       <div class="flex flex-col gap-8 | lg:h-full">
@@ -417,7 +362,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                           <div
                             class="splide__list [&>*]:w-[calc(1/1.125*100%)] | lg:!mr-8 lg:[&>*]:w-[calc(1/2.75*100%)] | 2xl:[&>*]:w-[calc(1/3.5*100%)]"
                           >
-                            <!-- @components listSlideRelatedServices -->
+                            <!-- @components listSlideRelatedBlog -->
                           </div>
                         </div>
                       </div>

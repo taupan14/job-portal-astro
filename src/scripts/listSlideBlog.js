@@ -1,38 +1,44 @@
-import barba from '@barba/core'
+import barba from "@barba/core";
 
 const iniComponents = async () => {
-    try {
-        const response = await fetch('/assets/json/list-blog.json')
-        if (!response.ok) {
-            throw new Error('Network response was not ok')
-        }
+  try {
+    const API_URL = import.meta.env.PUBLIC_API_URL + "/pubs/uploads/blog/";
 
-        const data = await response.json()
-        const slideContainers = document.querySelectorAll('[data-slide-blog]')
-        const containers = document.querySelectorAll('[data-slide-blog] .splide__list')
-        
-        containers.forEach((container, index) => {
-            const limit = slideContainers[index].getAttribute('data-slide-blog') || '' 
-            const itemsToDisplay = limit ? Math.min(data.length, parseInt(limit, 10)) : data.length
+    const el = document.querySelector("[data-slide-blog]");
+    let data = [];
+    if (el) {
+      data = JSON.parse(el.dataset.related || "[]");
+    }
+    const slideContainers = document.querySelectorAll("[data-slide-blog]");
+    const containers = document.querySelectorAll(
+      "[data-slide-blog] .splide__list",
+    );
 
-            data.slice(0, itemsToDisplay).forEach(item => {
-                const initImgThumbnail = (imageThumbnail) => {
-                    if (!imageThumbnail?.blog_img) {
-                        return `
-                            <div></div>
-                        `
-                    }
-                    return `
+    containers.forEach((container, index) => {
+      const limit =
+        slideContainers[index].getAttribute("data-slide-blog") || "";
+      const itemsToDisplay = limit
+        ? Math.min(data.length, parseInt(limit, 10))
+        : data.length;
+
+      data.slice(0, itemsToDisplay).forEach((item) => {
+        const initImgThumbnail = (imageThumbnail) => {
+          if (!imageThumbnail?.thumbnail) {
+            return `<div></div>`;
+          }
+
+          item.thumbnail = API_URL + item.thumbnail;
+          return `
                         <picture>
-                            <source type="image/webp" srcset="${item.blog_img} 400w, ${item.blog_img} 800w, ${item.blog_img} 1200w, ${item.blog_img} 1600w" sizes="100vw">
-                            <img src="${item.blog_img}" srcset="${item.blog_img} 400w, ${item.blog_img} 800w, ${item.blog_img} 1200w, ${item.blog_img} 1600w" sizes="100vw" decoding="async" alt="${item.title}" class="size-full object-cover">
+                            <source type="image/webp" srcset="${item.thumbnail} 400w, ${item.thumbnail} 800w, ${item.thumbnail} 1200w, ${item.thumbnail} 1600w" sizes="100vw">
+                            <img src="${item.thumbnail}" srcset="${item.thumbnail} 400w, ${item.thumbnail} 800w, ${item.thumbnail} 1200w, ${item.thumbnail} 1600w" sizes="100vw" decoding="async" alt="${item.title}" class="size-full object-cover">
                         </picture>
-                    `
-                }
+                    `;
+        };
 
-                const items = `
+        const items = `
                     <div class="splide__slide">
-                        <a href="page-blog-detail.html" class="flex flex-col" data-hover-group>
+                        <a href="/blog/${item.slug}" class="flex flex-col" data-hover-group>
                             <div class="relative isolate aspect-4/3 rounded-lg overflow-clip shrink-0">
                                 ${initImgThumbnail(item)}
                                 <div class="absolute inset-0 flex justify-end p-4 | lg:p-6">
@@ -47,22 +53,35 @@ const iniComponents = async () => {
                             <div class="p-4 !pb-0 flex flex-col gap-4 | lg:p-6">
                                 <div class="inline-flex items-center gap-3" data-subtitle="">
                                     <div class="size-1.5 rounded-full bg-primary-600 shrink-0"></div>
-                                    <div class="text-sm leading-none font-medium truncate">${item.blog_category}</div>
+                                    <div class="text-sm leading-none font-medium truncate">${item.category.name}</div>
                                 </div>
-                                <h5 class="text-xl text-balance tracking-normal line-clamp-2">${item.blog_title}</h5>
-                                <div class="text-sm leading-none font-medium truncate">${item.blog_date}</div>
+                                <h5 class="text-xl text-balance tracking-normal line-clamp-2">${item.title}</h5>
+                                <div class="text-sm leading-none font-medium truncate">${formatDate(item.published_at)}</div>
                             </div>
                         </a>
                     </div>
-                `
-                container.insertAdjacentHTML('beforeend', items)
-            })
-        })
-    } catch (error) {
-        console.error('There was a problem with the fetch operation:', error)
-    }
-}
+                `;
+        container.insertAdjacentHTML("beforeend", items);
+      });
+    });
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+  }
+};
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return "";
+  const formatted = new Date(dateStr).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  // "28 April 2026" → "28 April, 2026"
+  const parts = formatted.split(" ");
+  return `${parts[0]} ${parts[1]}, ${parts[2]}`;
+};
 
 barba.hooks.beforeEnter(async () => {
-    await iniComponents()
-})
+  await iniComponents();
+});

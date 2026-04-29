@@ -1,8 +1,43 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { apiGet } from "../../lib/api";
+
+const { slug } = Astro.params;
+const cookieHeader = Astro.request.headers.get("cookie") ?? "";
+const API_URL = import.meta.env.PUBLIC_API_URL;
+const API_PUBS_URL = API_URL + "/pubs";
+
+type Product = {
+  id: number;
+  title: string;
+  page_title: string | null;
+  slug: string;
+  description: string | null;
+  icon: string | null;
+  image: string | null;
+};
+type ApiResp = {
+  success: boolean;
+  data: { product: Product; related: Product[] };
+};
+
+const resp = await apiGet<ApiResp>(
+  `/api/homepage/products/by-slug/${slug}`,
+  cookieHeader,
+);
+const product = resp?.data?.product;
+const related = resp?.data?.related ?? [];
+
+// console.log("product", product);
+// console.log("related", related);
+
+// 404 jika tidak ditemukan
+if (!product) return Astro.redirect("/404");
+
+const pageTitle = product.page_title ?? product.title;
 ---
 
-<BaseLayout title="Layanan">
+<BaseLayout title={pageTitle}>
   <!-- Paste HTML dari index.html di sini -->
   <html lang="en">
     <div id="app">
@@ -12,7 +47,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <div
           data-hero-scheme="light"
           data-barba="container"
-          data-barba-namespace="service-detail"
+          data-barba-namespace="product-detail"
         >
           <section
             id="page-header"
@@ -28,14 +63,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                           class="size-1.5 rounded-full bg-primary-600 shrink-0"
                         >
                         </div>
-                        <div
+                        <diş
                           class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950"
                         >
-                          Services
-                        </div>
+                          {product.title ?? "Produk"}
+                        </diş>
                       </div>
                       <h1 class="leading-none text-balance">
-                        Cleaning Service
+                        {product.page_title ?? "Tidak ditemukan"}
                       </h1>
                     </div>
                   </div>
@@ -94,7 +129,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   >
                     <div class="aspect-video rounded-lg overflow-clip">
                       <img
-                        src="./assets/images/thumbnails/img01.webp"
+                        src=`${API_PUBS_URL}/${product.image}`
                         alt=""
                         class="size-full object-cover"
                       />
@@ -105,7 +140,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   >
                     <div class="aspect-video rounded-lg overflow-clip">
                       <img
-                        src="./assets/images/thumbnails/img02.webp"
+                        src=`${API_PUBS_URL}/${product.image}`
                         alt=""
                         class="size-full object-cover"
                       />
@@ -116,7 +151,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   >
                     <div class="aspect-video rounded-lg overflow-clip">
                       <img
-                        src="./assets/images/thumbnails/img03.webp"
+                        src=`${API_PUBS_URL}/${product.image}`
                         alt=""
                         class="size-full object-cover"
                       />
@@ -131,7 +166,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   >
                     <div class="aspect-video rounded-lg overflow-clip">
                       <img
-                        src="./assets/images/thumbnails/img04.webp"
+                        src=`${API_PUBS_URL}/${product.image}`
                         alt=""
                         class="size-full object-cover"
                       />
@@ -142,7 +177,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   >
                     <div class="aspect-video rounded-lg overflow-clip">
                       <img
-                        src="./assets/images/thumbnails/img05.webp"
+                        src=`${API_PUBS_URL}/${product.image}`
                         alt=""
                         class="size-full object-cover"
                       />
@@ -170,7 +205,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           </section>
 
           <section id="page-content" class="relative">
-            <div class="py-16 | lg:py-24">
+            <div class="py-16 | lg:py-10">
               <div class="max-container">
                 <div class="relative">
                   <div
@@ -289,67 +324,18 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     </div>
                   </div>
                   <div class="post-entry">
-                    <h5>
-                      Perusahaan kami telah dipercaya untuk pengadaan Jasa
-                      Alihdaya Cleaning Service untuk menjaga kebersihan kantor
-                      atau area kerja Perusahaan Anda.
-                    </h5>
-                    <p>
-                      Menjaga kebersihan umum di seluruh area, termasuk lantai,
-                      dinding, langit-langit, dan area publik. membersihkan dan
-                      merawat lantai, termasuk penyedotan debu, pengeluaran
-                      noda, dan pembersihan lantai berbagai jenis.
-                    </p>
-                    <p>
-                      Menjaga kebersihan kamar mandi dan toilet, termasuk
-                      membersihkan sanitasi, wastafel, dan area-area lainnya.
-                      membersihkan dan merawat peralatan, perabot, dan fasilitas
-                      lainnya yang digunakan dalam ruangan, seperti meja, kursi,
-                      dan peralatan elektronik.
-                    </p>
-                    <p>
-                      Membersihkan dan merawat area dapur, termasuk membersihkan
-                      peralatan dapur, meja makan, dan area makan. membersihkan
-                      kaca dan jendela untuk memastikan transparansi dan
-                      kebersihan.
-                    </p>
-                    <p>
-                      Mengelola sampah dan limbah dengan membuangnya sesuai
-                      dengan prosedur dan regulasi yang berlaku. menyediakan
-                      layanan pembersihan khusus setelah acara atau pertemuan
-                      untuk memastikan ruangan kembali bersih dan teratur.
-                    </p>
-                    <p>
-                      Membersihkan permukaan keras seperti meja, lantai keramik,
-                      dan dinding untuk menghilangkan debu, noda, dan kotoran
-                      lainnya. membersihkan dan merawat ruang terbuka, seperti
-                      halaman atau taman, serta merawat pot tanaman dan hiasan
-                      luar ruangan.
-                    </p>
-                    <p>
-                      Melakukan desinfeksi dan sanitasi, terutama di area yang
-                      sering disentuh atau berpotensi menjadi tempat penyebaran
-                      penyakit.
-                    </p>
-                    <p>
-                      Membantu menciptakan lingkungan yang aman dan teratur
-                      dengan merapikan barang-barang yang berserakan dan
-                      memastikan akses ke area-area penting. melakukan
-                      pemeliharaan dan perbaikan sederhana pada fasilitas atau
-                      peralatan yang terkait dengan tugas kebersihan.
-                    </p>
-                    <p>
-                      Menyediakan layanan khusus sesuai permintaan pelanggan,
-                      seperti pembersihan karpet, poles lantai, atau pembersihan
-                      yang melibatkan teknologi khusus.
-                    </p>
+                    <div class="rich-content" set:html={product?.description} />
                   </div>
                 </div>
               </div>
             </div>
             <div class="py-16 | lg:py-24">
               <div class="max-container">
-                <div class="splide group/slide" data-slide-related-services>
+                <div
+                  class="splide group/slide"
+                  data-slide-related-products
+                  data-related={JSON.stringify(related)}
+                >
                   <div class="grid gap-8 | lg:grid-cols-12">
                     <div class="col-span-full | lg:col-span-3">
                       <div class="flex flex-col gap-8 | lg:h-full">
@@ -362,11 +348,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                             <div
                               class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950"
                             >
-                              Service
+                              Produk
                             </div>
                           </div>
                           <h3 class="text-balance leading-none">
-                            Service<br />Lainnya
+                            Produk<br />Lainnya
                           </h3>
                         </div>
                         <div
@@ -448,7 +434,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                           <div
                             class="splide__list [&>*]:w-[calc(1/1.125*100%)] | lg:!mr-6 lg:[&>*]:w-[calc(1/3.25*100%)]"
                           >
-                            <!-- @components listSlideRelatedServices -->
+                            <!-- @components listSlideRelatedProduct -->
                           </div>
                         </div>
                       </div>
@@ -463,224 +449,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
       <!-- @components sectionFooter -->
     </div><!-- #app -->
-
-    <div
-      id="modal-cari-loker"
-      class="fixed top-0 inset-x-0 z-[999] invisible"
-      data-modal
-    >
-      <div
-        class="relative w-full h-dvh flex flex-col overflow-auto"
-        data-lenis-prevent
-      >
-        <div
-          class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
-        >
-          <div class="grow w-full flex flex-col max-container">
-            <div class="grid gap-4 | lg:grid-cols-12">
-              <div
-                class="col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
-              >
-                <div
-                  class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
-                  data-modal-content
-                >
-                  <div class="absolute top-0 right-0">
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-icon btn-dark"
-                      data-hover-effect
-                      data-modal-hide
-                    >
-                      <svg
-                        class="icon icon-stroke"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6"
-                          stroke="#141B34"
-                          stroke-width="1.5"
-                          stroke-linejoin="round"></path>
-                      </svg>
-                    </button>
-                  </div>
-                  <div class="shrink-0 px-6 py-4 | lg:py-6">
-                    <div class="flex flex-col gap-4 items-center text-center">
-                      <div
-                        class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
-                      >
-                        Cari Loker
-                      </div>
-                      <h4 class="w-full font-bold leading-none text-balance">
-                        Apakah Anda Sudah Memiliki Id Number ?
-                      </h4>
-                    </div>
-                  </div>
-                  <!-- <div class="shrink-0 px-6 py-4 | lg:py-6">
-                                <article class="post-entry no-grid">
-                                    
-                                </article>
-                            </div> -->
-                  <div class="shrink-0 px-6 py-4 | lg:py-6">
-                    <form action="index-login.html">
-                      <div class="grid gap-6">
-                        <div class="c-form-wrapper">
-                          <div class="c-form">
-                            <label for="input-idnumber" class="c-label"
-                              >Masukan ID Number</label
-                            >
-                            <input
-                              type="number"
-                              name="input-idnumber"
-                              inputmode="numeric"
-                              class="c-input"
-                              placeholder="Masuan id number"
-                            />
-                          </div>
-                          <div class="text-xs mt-1 text-dark-400">
-                            please fill out this field
-                          </div>
-                        </div>
-                        <button
-                          type="submit"
-                          class="btn btn-primary"
-                          data-hover-effect>Submit</button
-                        >
-                        <div class="flex items-center gap-4">
-                          <div class="grow h-px bg-dark-200"></div>
-                          <div
-                            class="text-sm leading-none font-bold uppercase tracking-wide"
-                          >
-                            Atau
-                          </div>
-                          <div class="grow h-px bg-dark-200"></div>
-                        </div>
-                        <a
-                          href="auth-signup-search-job.html"
-                          class="btn"
-                          data-hover-effect>Daftar Sekarang</a
-                        >
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div
-      id="modal-pasang-loker"
-      class="fixed top-0 inset-x-0 z-[999] invisible"
-      data-modal
-    >
-      <div
-        class="relative w-full h-dvh flex flex-col overflow-auto"
-        data-lenis-prevent
-      >
-        <div
-          class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
-        >
-          <div class="grow w-full flex flex-col max-container">
-            <div class="grid gap-4 | lg:grid-cols-12">
-              <div
-                class="col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
-              >
-                <div
-                  class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
-                  data-modal-content
-                >
-                  <div class="absolute top-0 right-0">
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-icon btn-dark"
-                      data-hover-effect
-                      data-modal-hide
-                    >
-                      <svg
-                        class="icon icon-stroke"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6"
-                          stroke="#141B34"
-                          stroke-width="1.5"
-                          stroke-linejoin="round"></path>
-                      </svg>
-                    </button>
-                  </div>
-                  <div class="shrink-0 px-6 py-4 | lg:py-6">
-                    <div class="flex flex-col gap-4 items-center text-center">
-                      <div
-                        class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
-                      >
-                        Pasang Loker
-                      </div>
-                      <h4 class="w-full font-bold leading-none text-balance">
-                        Apakah Anda Sudah Memiliki Id Number ?
-                      </h4>
-                    </div>
-                  </div>
-                  <!-- <div class="shrink-0 px-6 py-4 | lg:py-6">
-                                <article class="post-entry no-grid">
-                                    
-                                </article>
-                            </div> -->
-                  <div class="shrink-0 px-6 py-4 | lg:py-6">
-                    <form action="index-login.html">
-                      <div class="grid gap-6">
-                        <div class="c-form-wrapper">
-                          <div class="c-form">
-                            <label for="input-idnumber" class="c-label"
-                              >Masukan ID Number</label
-                            >
-                            <input
-                              type="number"
-                              name="input-idnumber"
-                              inputmode="numeric"
-                              class="c-input"
-                              placeholder="Masuan id number"
-                            />
-                          </div>
-                          <div class="text-xs mt-1 text-dark-400">
-                            please fill out this field
-                          </div>
-                        </div>
-                        <button
-                          type="submit"
-                          class="btn btn-primary"
-                          data-hover-effect>Submit</button
-                        >
-                        <div class="flex items-center gap-4">
-                          <div class="grow h-px bg-dark-200"></div>
-                          <div
-                            class="text-sm leading-none font-bold uppercase tracking-wide"
-                          >
-                            Atau
-                          </div>
-                          <div class="grow h-px bg-dark-200"></div>
-                        </div>
-                        <a
-                          href="auth-signup-add-job.html"
-                          class="btn"
-                          data-hover-effect>Daftar Sekarang</a
-                        >
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <svg
       width="0"
@@ -706,7 +474,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
     <div id="preloader">
       <div id="preloader-spinner">
-        <img src="./assets/images/logo/logo-icon.png" alt="" />
+        <img src="/assets/images/logo/logo-icon.png" alt="" />
       </div>
       <div id="preloader-transition"></div>
     </div>

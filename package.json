@@ -16,6 +16,7 @@
     "@dmuy/datepicker": "^2.0.5",
     "@splidejs/splide": "^4.1.4",
     "@splidejs/splide-extension-auto-scroll": "^0.5.3",
+    "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.1",
     "@vercel/routing-utils": "^5.3.3",
     "astro": "^5.17.1",

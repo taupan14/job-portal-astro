@@ -2,11 +2,13 @@ import barba from "@barba/core";
 
 const iniComponents = async () => {
   try {
-    const response = await fetch("/assets/json/list-clients.json");
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
+    const API_URL = import.meta.env.PUBLIC_API_URL + "/pubs/";
+
+    const el = document.querySelector("[data-clients]");
+    let data = [];
+    if (el) {
+      data = JSON.parse(el.dataset.contents || "[]");
     }
-    const data = await response.json();
     const containers = document.querySelectorAll("[data-clients]");
 
     containers.forEach((container) => {
@@ -16,12 +18,23 @@ const iniComponents = async () => {
         : data.length;
 
       data.slice(0, itemsToDisplay).forEach((item) => {
+        item.logo = API_URL + item.logo;
         const items = `
-                    <div class="relative shrink-0">
-                        <div class="relative isolate aspect-4/3 px-[15%] grayscale | lg:px-[20%] | 2xl:px-[25%]">
-                            <img src="${item.client_logo}" alt="${item.client_name}" class="size-full object-contain">
-                        </div>
-                    </div>
+                    <a href="${item.url}"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="relative shrink-0 block group">
+                      <div class="relative isolate aspect-4/3 px-[15%] | lg:px-[20%] | 2xl:px-[25%]">
+                        <img
+                          src="${item.logo}"
+                          alt="${item.name}"
+                          class="size-full object-contain
+                                grayscale
+                                transition-all duration-500 ease-in-out
+                                group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
+                        />
+                      </div>
+                    </a>
                 `;
         container.insertAdjacentHTML("beforeend", items);
       });

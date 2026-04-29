@@ -72,7 +72,9 @@ const populateSelect = async (url, select, placeholder, selectedValue) => {
 
 export const initProfilePage = async () => {
   const container = document.querySelector('[data-barba-namespace="profile"]');
-  const containerDoc = document.querySelector('[data-barba-namespace="profile-document"]');
+  const containerDoc = document.querySelector(
+    '[data-barba-namespace="profile-document"]',
+  );
 
   // ── Jalankan inisialisasi dokumen jika di halaman dokumen ─────────────────
   if (containerDoc) {
@@ -311,10 +313,9 @@ export const initProfilePage = async () => {
           }),
         });
         if (!res.ok) throw new Error("Gagal menyimpan");
-        setTimeout(() => {
-          const modalSuccess = document.getElementById("modal-save-success");
-          if (modalSuccess) showModal(modalSuccess);
-        }, 1000);
+
+        const modalSuccess = document.getElementById("modal-save-success");
+        if (modalSuccess) showModal(modalSuccess);
       } catch (err) {
         console.error(err);
         alert("Terjadi kesalahan saat menyimpan.");
@@ -332,7 +333,7 @@ export const initProfilePage = async () => {
 
       try {
         if (formalId) {
-          await fetch(`${API_URL}/api/education/formal/${formalId}`, {
+          await fetch(`${API_URL}/api/educations/formal/${formalId}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -358,8 +359,8 @@ export const initProfilePage = async () => {
             finish_date: getVal("nonformal-to-date"),
           };
           const endpoint = nonformalId
-            ? `${API_URL}/api/education/nonformal/${nonformalId}`
-            : `${API_URL}/api/education/nonformal`;
+            ? `${API_URL}/api/educations/nonformal/${nonformalId}`
+            : `${API_URL}/api/educations/nonformal`;
           await fetch(endpoint, {
             method: nonformalId ? "PUT" : "POST",
             headers: {
@@ -373,10 +374,62 @@ export const initProfilePage = async () => {
             ),
           });
         }
-        showModal("modal-save-success");
+
+        const modalSuccess = document.getElementById("modal-save-success");
+        if (modalSuccess) showModal(modalSuccess);
       } catch (err) {
         console.error(err);
         alert("Terjadi kesalahan saat menyimpan.");
+      }
+    });
+
+  // ── Simpan Pengalaman ─────────────────────────────────────────────────────
+  container
+    .querySelector("[data-save-pengalaman]")
+    ?.addEventListener("click", async () => {
+      const items = container.querySelectorAll("[data-experience-item]");
+
+      try {
+        for (const item of items) {
+          const expId = /** @type {HTMLElement} */ (item).dataset.expId;
+
+          const getField = (field) => {
+            const el = item.querySelector(`[data-exp-field="${field}"]`);
+            return el ? el.value : "";
+          };
+
+          const salaryRaw = getField("salary")?.replace(/[^\d]/g, "") || "0";
+
+          const body = {
+            company_name: getField("company_name"),
+            position: getField("position"),
+            start_date: getField("start_date"),
+            finish_date: getField("finish_date"),
+            description: getField("description"),
+            salary: Number(salaryRaw),
+          };
+
+          const endpoint = expId
+            ? `${API_URL}/api/applicants/work-experiences/${expId}`
+            : `${API_URL}/api/applicants/work-experiences`;
+
+          await fetch(endpoint, {
+            method: expId ? "PUT" : "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(
+              expId ? body : { ...body, applicant_refid: currentUser.refid },
+            ),
+          });
+        }
+
+        const modalSuccess = document.getElementById("modal-save-success");
+        if (modalSuccess) showModal(modalSuccess);
+      } catch (err) {
+        console.error(err);
+        alert("Terjadi kesalahan saat menyimpan pengalaman.");
       }
     });
 };
@@ -578,7 +631,9 @@ const initDocumentPage = (container) => {
 
   // ── Tambah item dokumen baru ──────────────────────────────────────────────
   container.querySelector("[data-doc-add]")?.addEventListener("click", () => {
-    const currentCount = docContainer.querySelectorAll("[data-document-item]").length;
+    const currentCount = docContainer.querySelectorAll(
+      "[data-document-item]",
+    ).length;
     if (currentCount >= MAX_DOCS) return;
 
     const wrapper = document.createElement("div");
@@ -601,7 +656,9 @@ const initDocumentPage = (container) => {
     const item = removeBtn.closest("[data-document-item]");
     if (!item) return;
 
-    const currentCount = docContainer.querySelectorAll("[data-document-item]").length;
+    const currentCount = docContainer.querySelectorAll(
+      "[data-document-item]",
+    ).length;
     if (currentCount <= MIN_DOCS) return;
 
     const docId = item.dataset.docId;
@@ -642,7 +699,9 @@ const initDocumentPage = (container) => {
     // Ambil nama file dari URL untuk judul
     const filename = url.split("/").pop() ?? "Dokumen";
     const item = previewBtn.closest("[data-document-item]");
-    const docName = item?.querySelector("[data-doc-field='document_name']")?.value?.trim();
+    const docName = item
+      ?.querySelector("[data-doc-field='document_name']")
+      ?.value?.trim();
     if (title) title.textContent = docName || filename;
 
     if (iframe) iframe.src = url;
@@ -653,111 +712,120 @@ const initDocumentPage = (container) => {
   });
 
   // Reset iframe saat modal preview ditutup agar tidak ada request aktif
-  document.getElementById("modal-doc-preview")?.addEventListener("modal:hide", () => {
-    const iframe = document.getElementById("modal-doc-preview-iframe");
-    if (iframe) iframe.src = "";
-  });
+  document
+    .getElementById("modal-doc-preview")
+    ?.addEventListener("modal:hide", () => {
+      const iframe = document.getElementById("modal-doc-preview-iframe");
+      if (iframe) iframe.src = "";
+    });
 
   // ── Simpan semua dokumen ──────────────────────────────────────────────────
-  container.querySelector("[data-save-dokumen]")?.addEventListener("click", async () => {
-    const items = docContainer.querySelectorAll("[data-document-item]");
-    let hasError = false;
+  container
+    .querySelector("[data-save-dokumen]")
+    ?.addEventListener("click", async () => {
+      const items = docContainer.querySelectorAll("[data-document-item]");
+      let hasError = false;
 
-    for (const item of items) {
-      const docId = item.dataset.docId ?? "";
-      const nameInput = item.querySelector("[data-doc-field='document_name']");
-      const fileInput = item.querySelector("[data-doc-file-input]");
+      for (const item of items) {
+        const docId = item.dataset.docId ?? "";
+        const nameInput = item.querySelector(
+          "[data-doc-field='document_name']",
+        );
+        const fileInput = item.querySelector("[data-doc-file-input]");
 
-      const documentName = nameInput?.value?.trim() ?? "";
-      const file = fileInput?.files?.[0] ?? null;
+        const documentName = nameInput?.value?.trim() ?? "";
+        const file = fileInput?.files?.[0] ?? null;
 
-      // Validasi: nama dokumen wajib diisi
-      if (!documentName) {
-        nameInput?.focus();
-        alert("Nama dokumen wajib diisi.");
-        hasError = true;
-        break;
-      }
-
-      // Jika dokumen baru (belum punya id), file wajib dipilih
-      if (!docId && !file) {
-        alert(`Pilih file PDF untuk dokumen "${documentName}".`);
-        hasError = true;
-        break;
-      }
-
-      try {
-        let uploadedFilename = "";
-
-        // Upload file jika ada file baru dipilih
-        if (file) {
-          const fd = new FormData();
-          fd.append("file", file);
-          const uploadRes = await fetch(`${API_URL}/api/upload?folder=documents`, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
-            body: fd,
-          });
-
-          if (!uploadRes.ok) throw new Error("Gagal upload file");
-          const uploadJson = await uploadRes.json();
-          uploadedFilename = uploadJson.filename;
+        // Validasi: nama dokumen wajib diisi
+        if (!documentName) {
+          nameInput?.focus();
+          alert("Nama dokumen wajib diisi.");
+          hasError = true;
+          break;
         }
 
-        const body = {
-          document_name: documentName,
-          ...(uploadedFilename && { file: uploadedFilename }),
-        };
+        // Jika dokumen baru (belum punya id), file wajib dipilih
+        if (!docId && !file) {
+          alert(`Pilih file PDF untuk dokumen "${documentName}".`);
+          hasError = true;
+          break;
+        }
 
-        if (docId) {
-          // UPDATE dokumen yang sudah ada
-          const res = await fetch(`${API_URL}/api/documents/${docId}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(body),
-          });
-          if (!res.ok) throw new Error("Gagal memperbarui dokumen");
+        try {
+          let uploadedFilename = "";
 
-          // Update URL tombol view jika file baru diupload
-          if (uploadedFilename) injectViewButton(item, uploadedFilename);
-        } else {
-          // CREATE dokumen baru
-          const res = await fetch(`${API_URL}/api/documents`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              ...body,
-              applicant_id: currentUser.id,
-            }),
-          });
-          if (!res.ok) throw new Error("Gagal menyimpan dokumen");
+          // Upload file jika ada file baru dipilih
+          if (file) {
+            const fd = new FormData();
+            fd.append("file", file);
+            const uploadRes = await fetch(
+              `${API_URL}/api/upload?folder=documents`,
+              {
+                method: "POST",
+                headers: { Authorization: `Bearer ${token}` },
+                body: fd,
+              },
+            );
 
-          // Simpan ID yang baru dibuat ke data attribute agar operasi berikutnya bisa update/delete
-          const created = await res.json();
-          if (created?.id) {
-            item.dataset.docId = String(created.id);
+            if (!uploadRes.ok) throw new Error("Gagal upload file");
+            const uploadJson = await uploadRes.json();
+            uploadedFilename = uploadJson.filename;
           }
 
-          // Inject tombol view setelah dokumen baru tersimpan
-          if (uploadedFilename) injectViewButton(item, uploadedFilename);
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Terjadi kesalahan saat menyimpan dokumen.");
-        hasError = true;
-        break;
-      }
-    }
+          const body = {
+            document_name: documentName,
+            ...(uploadedFilename && { file: uploadedFilename }),
+          };
 
-    if (!hasError) {
-      const modalSuccess = document.getElementById("modal-save-success");
-      if (modalSuccess) showModal(modalSuccess);
-    }
-  });
+          if (docId) {
+            // UPDATE dokumen yang sudah ada
+            const res = await fetch(`${API_URL}/api/documents/${docId}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(body),
+            });
+            if (!res.ok) throw new Error("Gagal memperbarui dokumen");
+
+            // Update URL tombol view jika file baru diupload
+            if (uploadedFilename) injectViewButton(item, uploadedFilename);
+          } else {
+            // CREATE dokumen baru
+            const res = await fetch(`${API_URL}/api/documents`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                ...body,
+                applicant_id: currentUser.id,
+              }),
+            });
+            if (!res.ok) throw new Error("Gagal menyimpan dokumen");
+
+            // Simpan ID yang baru dibuat ke data attribute agar operasi berikutnya bisa update/delete
+            const created = await res.json();
+            if (created?.id) {
+              item.dataset.docId = String(created.id);
+            }
+
+            // Inject tombol view setelah dokumen baru tersimpan
+            if (uploadedFilename) injectViewButton(item, uploadedFilename);
+          }
+        } catch (err) {
+          console.error(err);
+          alert("Terjadi kesalahan saat menyimpan dokumen.");
+          hasError = true;
+          break;
+        }
+      }
+
+      if (!hasError) {
+        const modalSuccess = document.getElementById("modal-save-success");
+        if (modalSuccess) showModal(modalSuccess);
+      }
+    });
 };

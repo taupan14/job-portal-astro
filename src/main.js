@@ -1,7 +1,6 @@
 // COMPONENTS
 import "@scripts/sectionHeader";
 import "@scripts/sectionFooter";
-import "@scripts/listSlideEmployes";
 import "@scripts/listSlideTestimonialsAvatar";
 import "@scripts/listSlideTestimonials";
 import "@scripts/listServices";
@@ -10,6 +9,7 @@ import "@scripts/listSlideProducts";
 import "@scripts/listSlideRelatedProducts";
 import "@scripts/listClients";
 import "@scripts/listBlog";
+import "@scripts/listBlogHome";
 import "@scripts/listSlideBlog";
 import "@scripts/listFaq";
 import "@scripts/listPrivacy";

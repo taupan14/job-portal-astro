@@ -2,12 +2,20 @@ import barba from "@barba/core";
 
 const iniComponents = async () => {
   try {
-    const response = await fetch("/assets/json/list-services.json");
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
+    // const response = await fetch("/assets/json/list-services.json");
+    // if (!response.ok) {
+    //   throw new Error("Network response was not ok");
+    // }
+
+    // const data = await response.json();
+    const API_URL = import.meta.env.PUBLIC_API_URL + "/pubs/";
+
+    const el = document.querySelector("[data-slide-related-services]");
+    let data = [];
+    if (el) {
+      data = JSON.parse(el.dataset.related || "[]");
     }
 
-    const data = await response.json();
     const slideContainers = document.querySelectorAll(
       "[data-slide-related-services]",
     );
@@ -25,22 +33,24 @@ const iniComponents = async () => {
 
       data.slice(0, itemsToDisplay).forEach((item) => {
         const initImgThumbnail = (imageThumbnail) => {
-          if (!imageThumbnail?.img) {
+          if (!imageThumbnail?.image) {
             return `
                             <div></div>
                         `;
           }
+
+          item.image = API_URL + item.image;
           return `
                         <picture>
-                            <source type="image/webp" srcset="${item.img} 400w, ${item.img} 800w, ${item.img} 1200w, ${item.img} 1600w" sizes="100vw">
-                            <img src="${item.img}" srcset="${item.img} 400w, ${item.img} 800w, ${item.img} 1200w, ${item.img} 1600w" sizes="100vw" decoding="async" alt="${item.title}" class="size-full object-cover">
+                            <source type="image/webp" srcset="${item.image} 400w, ${item.image} 800w, ${item.image} 1200w, ${item.image} 1600w" sizes="100vw">
+                            <img src="${item.image}" srcset="${item.image} 400w, ${item.image} 800w, ${item.image} 1200w, ${item.image} 1600w" sizes="100vw" decoding="async" alt="${item.title}" class="size-full object-cover">
                         </picture>
                     `;
         };
 
         const items = `
                     <div class="splide__slide">
-                        <a href="page-service-detail.html" class="relative flex flex-col rounded-lg overflow-clip">
+                        <a href="/service/${item.slug}" class="relative flex flex-col rounded-lg overflow-clip">
                             <div class="relative aspect-4/3 rounded-lg overflow-clip shrink-0">
                                 ${initImgThumbnail(item)}
                             </div>

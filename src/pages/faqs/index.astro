@@ -1,5 +1,22 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { apiGet } from "../../lib/api";
+
+const cookieHeader = Astro.request.headers.get("cookie") ?? "";
+
+type Faq = {
+  id: number;
+  question: string;
+  answer: string;
+};
+type ApiResp = {
+  success: boolean;
+  message: string;
+  data: Faq[];
+};
+
+const resp = await apiGet<ApiResp>(`/api/homepage/faqs`, cookieHeader);
+console.log(resp?.data);
 ---
 
 <BaseLayout title="FAQs">
@@ -60,6 +77,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                         class="accordion grid divide-y divide-dark-400"
                         data-parent
                         data-faq
+                        data-contents={JSON.stringify(resp?.data)}
                       >
                         <!-- @components listFaq -->
                       </div>
@@ -132,7 +150,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
     <div id="preloader">
       <div id="preloader-spinner">
-        <img src="./assets/images/logo/logo-icon.png" alt="" />
+        <img src="/assets/images/logo/logo-icon.png" alt="" />
       </div>
       <div id="preloader-transition"></div>
     </div>

@@ -2,12 +2,12 @@ import barba from "@barba/core";
 
 const iniComponents = async () => {
   try {
-    const response = await fetch("/assets/json/list-products.json");
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
+    const API_URL = import.meta.env.PUBLIC_API_URL + "/pubs/";
+    const el = document.querySelector("[data-slide-products]");
+    let data = [];
+    if (el) {
+      data = JSON.parse(el.dataset.contents || "[]");
     }
-
-    const data = await response.json();
     const slideContainers = document.querySelectorAll("[data-slide-products]");
     const containers = document.querySelectorAll(
       "[data-slide-products] .splide__list",
@@ -22,22 +22,24 @@ const iniComponents = async () => {
 
       data.slice(0, itemsToDisplay).forEach((item) => {
         const initImgThumbnail = (imageThumbnail) => {
-          if (!imageThumbnail?.img) {
+          if (!imageThumbnail?.image) {
             return `
                             <div></div>
                         `;
           }
+
+          item.image = API_URL + item.image;
           return `
                         <picture>
-                            <source type="image/webp" srcset="${item.img} 400w, ${item.img} 800w, ${item.img} 1200w, ${item.img} 1600w" sizes="100vw">
-                            <img src="${item.img}" srcset="${item.img} 400w, ${item.img} 800w, ${item.img} 1200w, ${item.img} 1600w" sizes="100vw" decoding="async" alt="${item.title}" class="size-full object-cover">
+                            <source type="image/webp" srcset="${item.image} 400w, ${item.image} 800w, ${item.image} 1200w, ${item.image} 1600w" sizes="100vw">
+                            <img src="${item.image}" srcset="${item.image} 400w, ${item.image} 800w, ${item.image} 1200w, ${item.image} 1600w" sizes="100vw" decoding="async" alt="${item.title}" class="size-full object-cover">
                         </picture>
                     `;
         };
 
         const items = `
                     <div class="splide__slide">
-                        <a href="/product" class="relative flex flex-col aspect-square rounded-lg overflow-clip scale-85 transition-all duration-800 ease-custom [.is-active-slide_&]:scale-100 | lg:aspect-video" data-hover-group>
+                        <a href="/product/${item.slug}" class="relative flex flex-col aspect-square rounded-lg overflow-clip scale-85 transition-all duration-800 ease-custom [.is-active-slide_&]:scale-100 | lg:aspect-video" data-hover-group>
                             <div class="relative size-full">
                                 ${initImgThumbnail(item)}
                             </div>
@@ -56,7 +58,7 @@ const iniComponents = async () => {
                                         </div>
                                     </div>
                                     <div class="col-span-full | lg:col-span-2 lg:text-end">
-                                        <p class="text-balance font-medium text-white">${item.subtitle}</p>
+                                        <p class="text-balance font-medium text-white">${item.page_title}</p>
                                     </div>
                                 </div>
                             </div>

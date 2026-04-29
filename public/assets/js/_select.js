@@ -49,10 +49,10 @@ const initSelect = async () => {
   //   { id: 19, position: "IT Support", disabled: false },
   //   { id: 20, position: "Quality Assurance (QA)", disabled: false },
   // ];
-  // let genders = [
-  //   { id: 0, gender: "Laki-laki", value: "Laki-laki", disabled: false },
-  //   { id: 1, gender: "Perempuan", value: "Perempuan", disabled: false },
-  // ];
+  let genders = [
+    { id: 0, gender: "Laki-laki", value: "Laki-laki", disabled: false },
+    { id: 1, gender: "Perempuan", value: "Perempuan", disabled: false },
+  ];
   // let provinces = [
   //   { id: 0, province: "Semua Provinsi", disabled: false },
   //   { id: 1, province: "Aceh", disabled: false },

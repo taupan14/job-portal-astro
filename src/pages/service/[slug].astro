@@ -1,9 +1,45 @@
 ---
+// src/pages/service/[slug].astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { apiGet } from "../../lib/api";
+
+const { slug } = Astro.params;
+const cookieHeader = Astro.request.headers.get("cookie") ?? "";
+const API_URL = import.meta.env.PUBLIC_API_URL;
+const API_PUBS_URL = import.meta.env.PUBLIC_API_URL + "/pubs";
+
+type Service = {
+  id: number;
+  title: string;
+  page_title: string | null;
+  slug: string;
+  description: string | null;
+  icon: string | null;
+  image: string | null;
+};
+type ApiResp = {
+  success: boolean;
+  data: { service: Service; related: Service[] };
+};
+
+const resp = await apiGet<ApiResp>(
+  `/api/homepage/services/by-slug/${slug}`,
+  cookieHeader,
+);
+const service = resp?.data?.service;
+const related = resp?.data?.related ?? [];
+
+// console.log("service", service);
+// console.log("related", related);
+
+// 404 jika tidak ditemukan
+if (!service) return Astro.redirect("/404");
+
+const pageTitle = service.page_title ?? service.title;
+// const imageUrl = service.image ? `${API_URL}/pubs/${service.image}` : null;
 ---
 
-<BaseLayout title="Produk">
-  <!-- Paste HTML dari index.html di sini -->
+<BaseLayout title={pageTitle}>
   <html lang="en">
     <div id="app">
       <!-- @components sectionHeader -->
@@ -12,7 +48,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <div
           data-hero-scheme="light"
           data-barba="container"
-          data-barba-namespace="product-detail"
+          data-barba-namespace="service-detail"
         >
           <section
             id="page-header"
@@ -31,13 +67,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                         <div
                           class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950"
                         >
-                          Produk
+                          Services
                         </div>
                       </div>
-                      <h1 class="leading-none text-balance">
-                        Software HRIS Sistem Efisien & Responsif untuk Mengelola
-                        SDM.
-                      </h1>
+                      <h1 class="leading-none text-balance">{service.title}</h1>
                     </div>
                   </div>
                   <div
@@ -95,7 +128,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   >
                     <div class="aspect-video rounded-lg overflow-clip">
                       <img
-                        src="./assets/images/thumbnails/img01.webp"
+                        src=`${API_PUBS_URL}/${service.image}`
                         alt=""
                         class="size-full object-cover"
                       />
@@ -106,7 +139,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   >
                     <div class="aspect-video rounded-lg overflow-clip">
                       <img
-                        src="./assets/images/thumbnails/img02.webp"
+                        src=`${API_PUBS_URL}/${service.image}`
                         alt=""
                         class="size-full object-cover"
                       />
@@ -117,7 +150,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   >
                     <div class="aspect-video rounded-lg overflow-clip">
                       <img
-                        src="./assets/images/thumbnails/img03.webp"
+                        src=`${API_PUBS_URL}/${service.image}`
                         alt=""
                         class="size-full object-cover"
                       />
@@ -132,7 +165,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   >
                     <div class="aspect-video rounded-lg overflow-clip">
                       <img
-                        src="./assets/images/thumbnails/img04.webp"
+                        src=`${API_PUBS_URL}/${service.image}`
                         alt=""
                         class="size-full object-cover"
                       />
@@ -143,7 +176,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   >
                     <div class="aspect-video rounded-lg overflow-clip">
                       <img
-                        src="./assets/images/thumbnails/img05.webp"
+                        src=`${API_PUBS_URL}/${service.image}`
                         alt=""
                         class="size-full object-cover"
                       />
@@ -290,90 +323,21 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     </div>
                   </div>
                   <div class="post-entry">
-                    <p>
-                      Dalam era digital yang semakin berkembang, pengelolaan
-                      Sumber Daya Manusia (SDM) menjadi salah satu aspek krusial
-                      dalam menjalankan bisnis yang sukses. Software HRIS (Human
-                      Resource Information System) hadir sebagai solusi
-                      terintegrasi yang dirancang untuk meningkatkan efisiensi
-                      dan responsivitas dalam mengelola berbagai aspek SDM.
-                    </p>
-                    <p>
-                      Dengan fitur-fitur canggih dan antarmuka yang
-                      user-friendly, software HRIS memungkinkan perusahaan untuk
-                      mengotomatisasi proses-proses administratif,
-                      mengoptimalkan produktivitas, dan memastikan kepatuhan
-                      terhadap regulasi yang berlaku.
-                    </p>
-                    <h5>Fitur Unggulan Software HRIS:</h5>
-                    <ul>
-                      <li>
-                        <b>Manajemen Data Karyawan Terpusat,</b> Software HRIS menyediakan
-                        database terpusat untuk menyimpan dan mengelola informasi
-                        karyawan, mulai dari data pribadi, riwayat pekerjaan, hingga
-                        dokumen penting. Hal ini memudahkan akses dan pembaruan data
-                        secara real-time.
-                      </li>
-                      <li>
-                        <b>Penggajian dan Manajemen Benefit,</b> Sistem ini mampu
-                        menghitung penggajian secara otomatis, termasuk pajak, tunjangan,
-                        dan potongan lainnya. Selain itu, HRIS juga dapat mengelola
-                        benefit karyawan seperti asuransi kesehatan, cuti, dan program
-                        pensiun.
-                      </li>
-                      <li>
-                        <b>Absensi dan Manajemen Waktu,</b> Dengan integrasi sistem
-                        absensi, HRIS memungkinkan pelacakan kehadiran, lembur, dan
-                        jam kerja karyawan secara akurat. Hal ini membantu mengurangi
-                        kesalahan manual dan meningkatkan transparansi.
-                      </li>
-                      <li>
-                        <b>Rekrutmen dan Onboarding,</b> Software HRIS menyederhanakan
-                        proses rekrutmen dengan fitur pelacakan kandidat, jadwal wawancara,
-                        dan evaluasi. Selain itu, sistem ini juga memfasilitasi proses
-                        onboarding karyawan baru dengan lebih terstruktur.
-                      </li>
-                      <li>
-                        <b>Pelatihan dan Pengembangan Karyawan,</b> HRIS menyediakan
-                        platform untuk merencanakan, melacak, dan mengevaluasi program
-                        pelatihan dan pengembangan karyawan. Hal ini membantu perusahaan
-                        dalam meningkatkan keterampilan dan kompetensi SDM.
-                      </li>
-                    </ul>
-                    <h5>Keuntungan Menggunakan Software HRIS:</h5>
-                    <ul>
-                      <li>
-                        <b>Efisiensi Operasional,</b> Mengurangi beban kerja administratif
-                        dan meminimalkan kesalahan manusia.
-                      </li>
-                      <li>
-                        <b>Responsivitas Tinggi,</b> Memungkinkan respon cepat terhadap
-                        kebutuhan dan perubahan dalam pengelolaan SDM.
-                      </li>
-                      <li>
-                        <b>Kepatuhan Regulasi,</b> Memastikan perusahaan selalu mematuhi
-                        peraturan ketenagakerjaan yang berlaku.
-                      </li>
-                      <li>
-                        <b>Peningkatan Produktivitas,</b> Mengoptimalkan waktu dan
-                        sumber daya untuk fokus pada strategi pengembangan SDM.
-                      </li>
-                    </ul>
-                    <p>
-                      Dengan segala keunggulan yang ditawarkan, Software HRIS
-                      menjadi investasi penting bagi perusahaan yang ingin
-                      mengelola SDM secara lebih efisien, responsif, dan
-                      berkelanjutan. Implementasi sistem ini tidak hanya
-                      meningkatkan kinerja tim HR, tetapi juga berkontribusi
-                      pada pertumbuhan dan kesuksesan bisnis secara keseluruhan.
-                    </p>
+                    <h5>
+                      {service?.page_title}
+                    </h5>
+                    <div class="rich-content" set:html={service?.description} />
                   </div>
                 </div>
               </div>
             </div>
             <div class="py-16 | lg:py-24">
               <div class="max-container">
-                <div class="splide group/slide" data-slide-related-products>
+                <div
+                  class="splide group/slide"
+                  data-slide-related-services
+                  data-related={JSON.stringify(related)}
+                >
                   <div class="grid gap-8 | lg:grid-cols-12">
                     <div class="col-span-full | lg:col-span-3">
                       <div class="flex flex-col gap-8 | lg:h-full">
@@ -386,11 +350,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                             <div
                               class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950"
                             >
-                              Produk
+                              Service
                             </div>
                           </div>
                           <h3 class="text-balance leading-none">
-                            Produk<br />Lainnya
+                            Service<br />Lainnya
                           </h3>
                         </div>
                         <div
@@ -472,7 +436,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                           <div
                             class="splide__list [&>*]:w-[calc(1/1.125*100%)] | lg:!mr-6 lg:[&>*]:w-[calc(1/3.25*100%)]"
                           >
-                            <!-- @components listSlideRelatedProduct -->
+                            <!-- @components listSlideRelatedServices -->
                           </div>
                         </div>
                       </div>
@@ -487,224 +451,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
       <!-- @components sectionFooter -->
     </div><!-- #app -->
-
-    <div
-      id="modal-cari-loker"
-      class="fixed top-0 inset-x-0 z-[999] invisible"
-      data-modal
-    >
-      <div
-        class="relative w-full h-dvh flex flex-col overflow-auto"
-        data-lenis-prevent
-      >
-        <div
-          class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
-        >
-          <div class="grow w-full flex flex-col max-container">
-            <div class="grid gap-4 | lg:grid-cols-12">
-              <div
-                class="grid-item col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
-              >
-                <div
-                  class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
-                  data-modal-content
-                >
-                  <div class="absolute top-0 right-0">
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-icon btn-dark"
-                      data-hover-effect
-                      data-modal-hide
-                    >
-                      <svg
-                        class="icon icon-stroke"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6"
-                          stroke="#141B34"
-                          stroke-width="1.5"
-                          stroke-linejoin="round"></path>
-                      </svg>
-                    </button>
-                  </div>
-                  <div class="shrink-0 px-6 py-4 | lg:py-6">
-                    <div class="flex flex-col gap-4 items-center text-center">
-                      <div
-                        class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
-                      >
-                        Cari Loker
-                      </div>
-                      <h4 class="w-full font-bold leading-none text-balance">
-                        Apakah Anda Sudah Memiliki Id Number ?
-                      </h4>
-                    </div>
-                  </div>
-                  <!-- <div class="shrink-0 px-6 py-4 | lg:py-6">
-                                <article class="post-entry no-grid">
-                                    
-                                </article>
-                            </div> -->
-                  <div class="shrink-0 px-6 py-4 | lg:py-6">
-                    <form action="index-login.html">
-                      <div class="grid gap-6">
-                        <div class="c-form-wrapper">
-                          <div class="c-form">
-                            <label for="input-idnumber" class="c-label"
-                              >Masukan ID Number</label
-                            >
-                            <input
-                              type="number"
-                              name="input-idnumber"
-                              inputmode="numeric"
-                              class="c-input"
-                              placeholder="Masuan id number"
-                            />
-                          </div>
-                          <div class="text-xs mt-1 text-dark-400">
-                            please fill out this field
-                          </div>
-                        </div>
-                        <button
-                          type="submit"
-                          class="btn btn-primary"
-                          data-hover-effect>Submit</button
-                        >
-                        <div class="flex items-center gap-4">
-                          <div class="grow h-px bg-dark-200"></div>
-                          <div
-                            class="text-sm leading-none font-bold uppercase tracking-wide"
-                          >
-                            Atau
-                          </div>
-                          <div class="grow h-px bg-dark-200"></div>
-                        </div>
-                        <a
-                          href="auth-signup-search-job.html"
-                          class="btn"
-                          data-hover-effect>Daftar Sekarang</a
-                        >
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div
-      id="modal-pasang-loker"
-      class="fixed top-0 inset-x-0 z-[999] invisible"
-      data-modal
-    >
-      <div
-        class="relative w-full h-dvh flex flex-col overflow-auto"
-        data-lenis-prevent
-      >
-        <div
-          class="flex flex-col pt-[var(--space-header)] mt-auto shrink-0 | lg:py-12 lg:my-auto"
-        >
-          <div class="grow w-full flex flex-col max-container">
-            <div class="grid gap-4 | lg:grid-cols-12">
-              <div
-                class="grid-item col-span-full | lg:col-span-6 lg:col-start-4 | 2xl:col-span-4 2xl:col-start-5"
-              >
-                <div
-                  class="flex flex-col relative bg-white pt-4 rounded-t-lg pointer-events-auto | lg:rounded-lg"
-                  data-modal-content
-                >
-                  <div class="absolute top-0 right-0">
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-icon btn-dark"
-                      data-hover-effect
-                      data-modal-hide
-                    >
-                      <svg
-                        class="icon icon-stroke"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M18 6L12 12M12 12L6 18M12 12L18 18M12 12L6 6"
-                          stroke="#141B34"
-                          stroke-width="1.5"
-                          stroke-linejoin="round"></path>
-                      </svg>
-                    </button>
-                  </div>
-                  <div class="shrink-0 px-6 py-4 | lg:py-6">
-                    <div class="flex flex-col gap-4 items-center text-center">
-                      <div
-                        class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
-                      >
-                        Pasang Loker
-                      </div>
-                      <h4 class="w-full font-bold leading-none text-balance">
-                        Apakah Anda Sudah Memiliki Id Number ?
-                      </h4>
-                    </div>
-                  </div>
-                  <!-- <div class="shrink-0 px-6 py-4 | lg:py-6">
-                                <article class="post-entry no-grid">
-                                    
-                                </article>
-                            </div> -->
-                  <div class="shrink-0 px-6 py-4 | lg:py-6">
-                    <form action="index-login.html">
-                      <div class="grid gap-6">
-                        <div class="c-form-wrapper">
-                          <div class="c-form">
-                            <label for="input-idnumber" class="c-label"
-                              >Masukan ID Number</label
-                            >
-                            <input
-                              type="number"
-                              name="input-idnumber"
-                              inputmode="numeric"
-                              class="c-input"
-                              placeholder="Masuan id number"
-                            />
-                          </div>
-                          <div class="text-xs mt-1 text-dark-400">
-                            please fill out this field
-                          </div>
-                        </div>
-                        <button
-                          type="submit"
-                          class="btn btn-primary"
-                          data-hover-effect>Submit</button
-                        >
-                        <div class="flex items-center gap-4">
-                          <div class="grow h-px bg-dark-200"></div>
-                          <div
-                            class="text-sm leading-none font-bold uppercase tracking-wide"
-                          >
-                            Atau
-                          </div>
-                          <div class="grow h-px bg-dark-200"></div>
-                        </div>
-                        <a
-                          href="auth-signup-add-job.html"
-                          class="btn"
-                          data-hover-effect>Daftar Sekarang</a
-                        >
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <svg
       width="0"
@@ -730,7 +476,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
     <div id="preloader">
       <div id="preloader-spinner">
-        <img src="./assets/images/logo/logo-icon.png" alt="" />
+        <img src="/assets/images/logo/logo-icon.png" alt="" />
       </div>
       <div id="preloader-transition"></div>
     </div>

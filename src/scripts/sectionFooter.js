@@ -1,10 +1,76 @@
 import barba from "@barba/core";
 
+let footerData = null;
+const BASE_URL = import.meta.env.PUBLIC_API_URL;
+
+export const apiGet = async (url) => {
+  try {
+    const res = await fetch(`${BASE_URL}${url}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // penting kalau pakai auth/cookie
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    return await res.json();
+  } catch (err) {
+    console.error("apiGet error:", err);
+    return null;
+  }
+};
+
 export const initSectionFooter = async () => {
+  // cache biar tidak fetch ulang saat transition
+  if (!footerData) {
+    try {
+      const resp = await apiGet("/api/footers");
+
+      if (!resp) return;
+
+      //   console.log("apiGet response:", resp.data);
+      footerData = resp.data;
+    } catch (err) {
+      console.error("Failed fetch footer:", err);
+      return;
+    }
+  }
   const sectionFooter = document.createElement("footer");
   sectionFooter.id = "section-footer";
   sectionFooter.className =
     "relative isolate bg-gradient-to-b from-dark-950 via-primary-900 to-primary-600 overflow-clip mt-16";
+
+  // helper render list
+  const renderServices = () => {
+    return footerData.services
+      .map(
+        (s) => `
+        <li>
+          <a href="/service/${s.slug}" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 hover:text-white">
+            ${s.title}
+          </a>
+        </li>
+      `,
+      )
+      .join("");
+  };
+
+  const renderProducts = () => {
+    return footerData.products
+      .map(
+        (p) => `
+        <li>
+          <a href="/product/${p.slug}" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 hover:text-white">
+            ${p.title}
+          </a>
+        </li>
+      `,
+      )
+      .join("");
+  };
 
   sectionFooter.innerHTML = `
         <section class="py-16 | lg:py-24 2xl:pt-32">
@@ -21,11 +87,14 @@ export const initSectionFooter = async () => {
                                     <div>Nusantara</div>
                                 </div>
                             </a>
-                            <div class="flex flex-col items-start gap-6 | not-lg:items-center not-lg:text-center">
-                                <address class="not-italic text-sm font-bold uppercase tracking-wide text-white text-baance">
-                                    <p>Jl. Gas alam No.65 A, Kelurahan Curug, Kecamatan Cimanggis Depok 16451</p>
+                            <div class="flex flex-col gap-6 not-lg:items-center not-lg:text-center">
+                                <address class="not-italic text-sm font-bold uppercase text-white">
+                                <p>${footerData.company.address}</p>
                                 </address>
-                                <a href="#!" class="link text-sm font-bold uppercase tracking-wide text-white [--link-underline:white]">Get Direction</a>
+                                <a href="${footerData.company.maps_url}" target="_blank"
+                                class="link inline-block w-fit text-sm font-bold uppercase text-white">
+                                Get Direction
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -33,7 +102,7 @@ export const initSectionFooter = async () => {
                         <div class="grid gap-16 | lg:grid-cols-3">
                             <div class="col-span-full | lg:col-span-1">
                                 <div class="flex flex-col gap-8 | not-lg:items-center not-lg:text-center">
-                                    <div class="w-full text-sm font-bold uppercase tracking-wide text-white py-4 border-b border-white">Quick Link</div>
+                                    <div class="w-full text-sm font-bold uppercase tracking-wide text-white py-4 border-b-[0.5px] border-white">Quick Link</div>
                                     <ul class="flex flex-col gap-1">
                                         <li><a href="/about-us" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Tentang Kami</a></li>
                                         <li><a href="/blog" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Berita</a></li>
@@ -45,29 +114,17 @@ export const initSectionFooter = async () => {
                             </div>
                             <div class="col-span-full | lg:col-span-1">
                                 <div class="flex flex-col gap-8 | not-lg:items-center not-lg:text-center">
-                                    <div class="w-full text-sm font-bold uppercase tracking-wide text-white py-4 border-b border-white">Service Kami</div>
-                                    <ul class="flex flex-col gap-1">
-                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Cleaning Service</a></li>
-                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Sales</a></li>
-                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Kurir</a></li>
-                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Pest Control</a></li>
-                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Crew Store</a></li>
-                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Alih Daya</a></li>
-                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Security</a></li>
-                                        <li><a href="/service" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Receptionist</a></li>
+                                    <div class="w-full text-sm font-bold uppercase tracking-wide text-white py-4 border-b-[0.5px] border-white">Layanan Kami</div>
+                                    <ul>
+                                        ${renderServices()}
                                     </ul>
                                 </div>
                             </div>
                             <div class="col-span-full | lg:col-span-1">
                                 <div class="flex flex-col gap-8 | not-lg:items-center not-lg:text-center">
-                                    <div class="w-full text-sm font-bold uppercase tracking-wide text-white py-4 border-b border-white">Produk Kami</div>
-                                    <ul class="flex flex-col gap-1">
-                                        <li><a href="/product" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Software HRIS</a></li>
-                                        <li><a href="/product" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Software ERP</a></li>
-                                        <li><a href="/product" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Software Parkir</a></li>
-                                        <li><a href="/product" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Online Travel Agen</a></li>
-                                        <li><a href="/product" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Software Cash Collect</a></li>
-                                        <li><a href="/product" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Software Recruitment</a></li>
+                                    <div class="w-full text-sm font-bold uppercase tracking-wide text-white py-4 border-b-[0.5px] border-white">Produk Kami</div>
+                                    <ul>
+                                        ${renderProducts()}
                                     </ul>
                                 </div>
                             </div>

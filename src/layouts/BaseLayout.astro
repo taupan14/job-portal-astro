@@ -4,6 +4,7 @@ import "../styles/global.css";
 import ModalAuthExpired from "../components/ModalAuthExpired.astro";
 import ModalApplyConfirm from "../components/ModalApplyConfirm.astro";
 import ModalCariLoker from "../components/ModalCariLoker.astro";
+import ModalSaveProfile from "../components/ModalSaveProfile.astro";
 
 interface Props {
   title: string;
@@ -39,6 +40,9 @@ const tokenExpired = Astro.locals.tokenExpired ?? false;
 
     <!-- Login Auth Dialog -->
     <ModalCariLoker />
+
+    <!-- Save Profile Dialog -->
+    <ModalSaveProfile />
   </body>
 </html>
 

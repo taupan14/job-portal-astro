@@ -1,50 +1,104 @@
 ---
+// src/pages/index.astro
+// ================================================================
+// Homepage — Astro SSR
+// Segment dirender secara dinamis berdasarkan data CMS:
+//   - Urutan dari home_sections.sort_order
+//   - Visibilitas dari home_sections.is_active
+//   - Teks header dari home_section_headers
+//   - Konten dari tabel masing-masing segment
+// ================================================================
+
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { apiGet } from "../lib/api";
 
 const cookieHeader = Astro.request.headers.get("cookie") ?? "";
 
-// ── SSR fetch paralel ─────────────────────────────────────────────────────────
-const [provinces, categories] = await Promise.all([
-  apiGet<{ id: string; name: string }[]>("/api/wai/provinces", cookieHeader),
-  apiGet<{ id: number; name: string }[]>("/api/categories", cookieHeader),
-]);
+// ── Types ─────────────────────────────────────────────────────
+type Section      = { section_key: string; label: string; sort_order: number; is_active: boolean };
+type SectionHeader= { subtitle: string; title: string; description: string };
+type EmployeeDept = { id: number; job_title: string; job_total: string; sort_order: number };
+type WhyUsItem = { id: number; title: string; description: string; image: string | null };
+type Testimonial  = { id: number; name: string; position: string; content: string; rating: number; photo: string };
+type Service      = { id: number; title: string; description: string; icon: string; image: string };
+type Product      = { id: number; name: string; description: string; image: string; url: string };
+type Client       = { id: number; name: string; logo: string; url: string };
+type News         = { id: number; blog : {id: number; title: string; slug: string; thumbnail: string; created_at: string; category: {id: number; name: string} } };
+type Faq          = { id: number; question: string; answer: string };
+type LokerStep    = { id: number; title: string; description: string; sort_order: number };
+type Job          = {
+  id: number; slug: string; job_title: string; job_type: number;
+  job_type_label: string; sallary_formatted: string; description: string;
+  location: string; company: { name: string; logo: string | null }; category: string;
+};
 
-// ── Decode user dari cookie untuk ambil ID ────────────────────────────────
+type ApiResponse<T> = {
+  success: boolean;
+  message: string;
+  data:    T;
+};
+
+type HomepageFull = {
+  sections:     Section[];
+  headers:      Record<string, SectionHeader>;
+  employee_departments: EmployeeDept[];
+  why_us:       WhyUsItem[];
+  testimonials: Testimonial[];
+  services:     Service[];
+  products:     Product[];
+  clients:      Client[];
+  news:         News[];
+  faqs:         Faq[];
+  loker_steps:  LokerStep[];
+};
+
+// ── Decode JWT dari cookie ────────────────────────────────────
 function getUserFromCookie(cookie: string) {
-  const match = cookie
-    .split(";")
-    .map((c) => c.trim())
-    .find((c) => c.startsWith("auth_token="));
+  const match = cookie.split(";").map((c) => c.trim()).find((c) => c.startsWith("auth_token="));
   if (!match) return null;
   try {
-    const token = decodeURIComponent(match.slice("auth_token=".length));
+    const token   = decodeURIComponent(match.slice("auth_token=".length));
     const payload = token.split(".")[1];
     return JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 const currentUser = getUserFromCookie(cookieHeader);
 
-const latestJobs =
-  (await apiGet<
-    Array<{
-      id: number;
-      slug: string;
-      job_title: string;
-      job_type: number;
-      job_type_label: string;
-      sallary_formatted: string;
-      description: string;
-      location: string;
-      company: { name: string; logo: string | null };
-      category: string;
-    }>
-  >("/api/vacancies/latest?limit=6", cookieHeader)) ?? [];
+// ── Fetch paralel ─────────────────────────────────────────────
+const [homepageRes, provinces, categories, latestJobs, likedIds] = await Promise.all([
+  apiGet<ApiResponse<HomepageFull>>("/api/homepage/full", cookieHeader),
+  apiGet<{ id: string; name: string }[]>("/api/wai/provinces", cookieHeader),
+  apiGet<{ id: number; name: string }[]>("/api/categories", cookieHeader),
+  apiGet<Job[]>("/api/vacancies/latest?limit=6", cookieHeader),
+  currentUser?.id
+    ? apiGet<number[]>(`/api/vacancies/liked?applicant_id=${currentUser.id}`, cookieHeader)
+    : Promise.resolve([] as number[]),
+]);
 
-// console.log("latestJobs:", JSON.stringify(latestJobs, null, 2));
+// ── Unwrap .data dari envelope { success, message, data } ────
+const homepageData = homepageRes?.data ?? null;
+
+// ── Destructure & fallback ────────────────────────────────────
+const sections      = homepageData?.sections     ?? [];
+const headers       = homepageData?.headers      ?? {} as Record<string, SectionHeader>;
+const employeeDepts = homepageData?.employee_departments ?? [];
+const whyUsItems    = homepageData?.why_us       ?? [];
+const testimonials  = homepageData?.testimonials ?? [];
+const services      = homepageData?.services     ?? [];
+const products      = homepageData?.products     ?? [];
+const clients       = homepageData?.clients      ?? [];
+const blogs         = homepageData?.news         ?? [];
+const faqs          = homepageData?.faqs         ?? [];
+const lokerSteps    = homepageData?.loker_steps  ?? [];
+const jobs          = latestJobs                 ?? [];
+
+// console.log("DATA FAQ", faqs);
+// Segment aktif, urut berdasarkan sort_order dari CMS
+const activeSections = sections
+  .filter((s) => s.is_active)
+  .sort((a, b) => a.sort_order - b.sort_order);
+
 const JOB_TYPE_CLASS: Record<number, string> = {
   0: "badge-primary",
   1: "badge-dark",
@@ -52,79 +106,30 @@ const JOB_TYPE_CLASS: Record<number, string> = {
   3: "badge-default",
 };
 
-// Fetch liked vacancy IDs jika user sudah login
-const likedIds: number[] = currentUser?.id
-  ? ((await apiGet<number[]>(
-      `/api/vacancies/liked?applicant_id=${currentUser.id}`,
-      cookieHeader,
-    )) ?? [])
-  : [];
-
 const API_URL = import.meta.env.PUBLIC_API_URL;
 ---
-
 <BaseLayout title="Beranda">
-  <!-- Paste HTML dari index.html di sini -->
-
   <html lang="en">
     <head>
-      <!-- <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta name="description" content="Runlapan" />
-      <meta name="referrer" content="no-referrer-when-downgrade" />
-      <title>RUNLAPAN | Job Portal</title> -->
-
       <style>
         #preloader {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100dvw;
-          height: 100dvh;
-          z-index: 9999;
-          background-color: oklch(41.01% 0.245 278.93);
-          display: grid;
-          place-content: center;
+          position: fixed; top: 0; left: 0; width: 100dvw; height: 100dvh;
+          z-index: 9999; background-color: oklch(41.01% 0.245 278.93);
+          display: grid; place-content: center;
 
           #preloader-spinner {
-            position: relative;
-            isolation: isolate;
-            width: 5rem;
-            height: 5rem;
-            z-index: 20;
-            padding: 1rem;
-
-            img {
-              width: 100%;
-              height: 100%;
-              object-fit: contain;
-              object-position: center;
-            }
-
+            position: relative; isolation: isolate;
+            width: 5rem; height: 5rem; z-index: 20; padding: 1rem;
+            img { width: 100%; height: 100%; object-fit: contain; object-position: center; }
             &::before {
-              content: "";
-              position: absolute;
-              inset: 0;
-              border: 3px solid;
+              content: ""; position: absolute; inset: 0; border: 3px solid;
               border-color: oklch(41.01% 0.245 278.93) transparent transparent;
-              border-radius: 50%;
-              animation: preloaderSpin 0.5s linear infinite;
+              border-radius: 50%; animation: preloaderSpin 0.5s linear infinite;
             }
           }
         }
-
-        #preloader-transition {
-          position: absolute;
-          inset: 0;
-          background-color: white;
-          z-index: 10;
-        }
-
-        @keyframes preloaderSpin {
-          to {
-            rotate: 360deg;
-          }
-        }
+        #preloader-transition { position: absolute; inset: 0; background-color: white; z-index: 10; }
+        @keyframes preloaderSpin { to { rotate: 360deg; } }
       </style>
     </head>
     <body>
@@ -132,11 +137,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
         <!-- @components sectionHeader -->
 
         <main id="section-main" data-barba="wrapper">
-          <div
-            data-header-scheme="dark"
-            data-barba="container"
-            data-barba-namespace="home"
-          >
+          <div data-header-scheme="dark" data-barba="container" data-barba-namespace="home">
+
+            <!-- ═══════════════════════════════════════════════════
+                 HERO — statis, tidak diatur CMS
+                 ═══════════════════════════════════════════════════ -->
             <section
               id="section-hero"
               class="relative isolate bg-gradient-to-b from-primary-600 to-primary-900 pt-(--space-header)"
@@ -552,7 +557,16 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
               </div>
             </section>
 
-            <section id="section-loker" class="lg:mb-8">
+            <!-- ═══════════════════════════════════════════════════
+                 SEGMENT DINAMIS — dirender berdasarkan CMS
+                 Urutan & visibilitas dikontrol dari home_sections
+                 ═══════════════════════════════════════════════════ -->
+            {activeSections.map((sec) => {
+              const h        = headers[sec.section_key]        ?? {} as SectionHeader;
+              const hProducts = headers['products']            ?? {} as SectionHeader;
+ 
+              if (sec.section_key === "loker") return (
+                <section id="section-loker" class="lg:mb-8">
               <div class="bg-primary-900 py-16 | lg:pt-32">
                 <div class="max-container">
                   <div class="grid mb-16 | lg:grid-cols-12 lg:mb-24">
@@ -567,104 +581,43 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                           </div>
                           <div
                             class="text-sm leading-none font-bold uppercase tracking-wide text-white"
-                          >
-                            Loker Update
-                          </div>
+                          >{h.subtitle ?? "Loker Update"}</div>
                         </div>
-                        <h2 class="leading-none text-balance text-white">
-                          Temukan Peluang Karir yang Sesuai Keahlian Anda
-                        </h2>
+                        <h2 class="leading-none text-balance text-white">{h.title ?? "Temukan Peluang Karir yang Sesuai Keahlian Anda"}</h2>
                       </div>
                     </div>
                   </div>
                   <div class="grid gap-16 | lg:gap-6 lg:grid-cols-12">
-                    <div class="col-span-full | lg:col-span-3">
-                      <div
-                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
-                      >
-                        <div class="text-sm font-bold text-warning-400">
-                          01.
-                        </div>
+                    {(lokerSteps.length > 0 ? lokerSteps : [
+                      { id: 1, title: "Pilih Bidang Pekerjaan",    description: "Pilih pekerjaan sesuai dengan minat, kemampuan, gaji, dan prospek kerja",                  sort_order: 1 },
+                      { id: 2, title: "Klik Detail Informasi",     description: "Informasi berkaitan dengan pekerjaan atau posisi yang tersedia",                           sort_order: 2 },
+                      { id: 3, title: "Bantu Teman Dengan Share",  description: "Membantu berbagi informasi pekerjaan dengan teman",                                        sort_order: 3 },
+                      { id: 4, title: "Klik Lamar Ayo Kamu Bisa", description: "Ajukan diri untuk mendapatkan pekerjaan di suatu perusahaan",                              sort_order: 4 },
+                    ]).map((step, i) => (
+                      <div class="col-span-full | lg:col-span-3">
                         <div
-                          class="flex flex-col gap-4 pt-6 border-t border-white/30"
+                          class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
                         >
-                          <h5
-                            class="text-xl text-balance tracking-normal text-white"
+                          <div class="text-sm font-bold text-warning-400">
+                            {String(i + 1).padStart(2, "0")}.
+                          </div>
+                          <div
+                            class="flex flex-col gap-4 pt-6 border-t border-white/30"
                           >
-                            Pilih Bidang Pekerjaan
-                          </h5>
-                          <p class="text-balance text-white/70">
-                            Pilih pekerjaan sesuai dengan minat, kemampuan,
-                            gaji, dan prospek kerja
-                          </p>
+                            <h5
+                              class="text-xl text-balance tracking-normal text-white"
+                            >
+                              {step.title}
+                            </h5>
+                            {step.description && (
+                              <p class="text-balance text-white/70">
+                                {step.description}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="col-span-full | lg:col-span-3">
-                      <div
-                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
-                      >
-                        <div class="text-sm font-bold text-warning-400">
-                          02.
-                        </div>
-                        <div
-                          class="flex flex-col gap-4 pt-6 border-t border-white/30"
-                        >
-                          <h5
-                            class="text-xl text-balance tracking-normal text-white"
-                          >
-                            Klik Detail Informasi
-                          </h5>
-                          <p class="text-balance text-white/70">
-                            Informasi berkaitan dengan pekerjaan atau posisi
-                            yang tersedia
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-span-full | lg:col-span-3">
-                      <div
-                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
-                      >
-                        <div class="text-sm font-bold text-warning-400">
-                          03.
-                        </div>
-                        <div
-                          class="flex flex-col gap-4 pt-6 border-t border-white/30"
-                        >
-                          <h5
-                            class="text-xl text-balance tracking-normal text-white"
-                          >
-                            Bantu Teman Dengan Share
-                          </h5>
-                          <p class="text-balance text-white/70">
-                            Membantu berbagi informasi pekerjaan dengan teman
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-span-full | lg:col-span-3">
-                      <div
-                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
-                      >
-                        <div class="text-sm font-bold text-warning-400">
-                          04.
-                        </div>
-                        <div
-                          class="flex flex-col gap-4 pt-6 border-t border-white/30"
-                        >
-                          <h5
-                            class="text-xl text-balance tracking-normal text-white"
-                          >
-                            Klik Lamar Ayo Kamu Bisa
-                          </h5>
-                          <p class="text-balance text-white/70">
-                            Ajukan diri untuk mendapatkan pekerjaan di suatu
-                            perusahaan
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -680,7 +633,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                       >
                         <!-- Card loker dari API (SSR) -->
                         {
-                          latestJobs.map((job) => (
+                          jobs.map((job) => (
                             <div class="splide__slide">
                               <div
                                 class="relative isolate flex flex-col bg-dark-50 ring-inset ring-1 ring-dark-200 rounded-lg overflow-clip | lg:h-full"
@@ -708,14 +661,14 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                                     </h5>
                                   </div>
                                 </div>
-
+ 
                                 {/* <!-- Deskripsi singkat --> */}
                                 <div class="px-4 py-6 | lg:px-6">
                                   <p class="text-sm font-medium line-clamp-3">
                                     {job.description}
                                   </p>
                                 </div>
-
+ 
                                 {/* <!-- Footer: salary, lokasi, company --> */}
                                 <div class="flex flex-col mt-auto">
                                   <div class="flex flex-col divide-y divide-dark-200 p-4 | lg:p-6">
@@ -736,7 +689,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                                       </div>
                                     </div>
                                   </div>
-
+ 
                                   {/* <!-- Company bar --> */}
                                   <div class="flex items-center gap-4 p-4 bg-dark-100 rounded-lg | lg:p-6">
                                     <div class="grow flex items-center gap-4">
@@ -784,20 +737,20 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                                         </div>
                                       </div>
                                     </div>
-
+ 
                                     <button
                                       type="button"
                                       class:list={[
                                         "btn btn-icon btn-like transition-colors duration-800 ease-custom [&.is-liked]:bg-primary-600 z-10",
                                         {
-                                          "is-liked": likedIds.includes(job.id),
+                                          "is-liked": likedIds?.includes(job.id),
                                         },
                                       ]}
                                       data-tooltip="Like"
                                       data-like-btn
                                       data-vacancy-id={job.id}
                                       data-liked={
-                                        likedIds.includes(job.id)
+                                        likedIds?.includes(job.id)
                                           ? "true"
                                           : "false"
                                       }
@@ -835,7 +788,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                                     </button>
                                   </div>
                                 </div>
-
+ 
                                 {/* <!-- Full card link --> */}
                                 <a
                                   href={`/jobs/${job.slug}`}
@@ -845,7 +798,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                             </div>
                           ))
                         }
-
+ 
                         <!-- Card promo Runlapan (tetap ada, selalu di depan) -->
                         <div class="splide__slide">
                           <a
@@ -909,8 +862,10 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                 </div>
               </div>
             </section>
+              );
 
-            <section
+              if (sec.section_key === "employees") return (
+                <section
               id="section-employes"
               class="relative py-16 | lg:py-24 lg:my-8"
             >
@@ -931,48 +886,74 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                         </div>
                         <div
                           class="text-sm leading-none font-bold uppercase tracking-wide | lg:w-min"
-                        >
-                          Karyawan Kami
-                        </div>
+                        >{h.subtitle}</div>
                       </div>
-                      <h2 class="leading-none text-balance" data-title>
-                        Jumlah & Struktur Karyawan Radar Utama Nusantara
-                      </h2>
+                      <h2 class="leading-none text-balance" data-title>{h.title}</h2>
                     </div>
                   </div>
                   <div
                     class="grid-item col-span-full | lg:col-span-4 lg:col-start-7 | not-lg:text-center"
                   >
                     <p class="text-balance">
-                      Hingga saat ini, perusahaan kami didukung oleh 1000+
-                      karyawan yang tersebar di berbagai departemen, bekerja
-                      sama untuk mencapai tujuan bersama.
-                    </p>
+                      {h.description ?? "Tidak ditemukan deskripsi 'Karyawan Kami'!"}
+                      </p>
                   </div>
                 </div>
                 <div class="grid gap-4 | lg:gap-6">
+                  {/* Slider 1 — arah normal (kiri ke kanan) */}
                   <div
                     class="grid gap-16 splide group/slide"
-                    data-slide-employes
+                    // data-slide-employes
                   >
                     <div class="splide__track !overflow-visible">
                       <div
                         class="splide__list [&>*]:w-[calc(1/1.25*100%)] | lg:[&>*]:w-[calc(1/4*100%)]"
                       >
-                        <!-- @components listSlideEmployes -->
+                        {employeeDepts.length > 0
+                          ? employeeDepts.map((dept) => (
+                              <div class="splide__slide">
+                                <div class="flex flex-col rounded-lg bg-dark-50 p-4 gap-6 aspect-4/3 | lg:p-6 lg:aspect-4/3">
+                                  <div class="flex flex-col gap-1">
+                                    <div class="h6 text-dark-400">Jumlah Karyawan</div>
+                                    <h5 class="text-xl text-balance tracking-normal">{dept.job_title}</h5>
+                                  </div>
+                                  <div class="mt-auto flex justify-end">
+                                    <div class="h3 leading-none font-bold text-primary-600">{dept.job_total}</div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          : <div><!-- @components listSlideEmployes --></div>
+                        }
                       </div>
                     </div>
                   </div>
+                  {/* Slider 2 — arah balik (kanan ke kiri via autoScroll speed negatif) */}
                   <div
                     class="grid gap-16 splide group/slide"
-                    data-slide-employes
+                    // data-slide-employes
                     data-splide='{"autoScroll":{"speed":-1}}'
                   >
                     <div class="splide__track !overflow-visible">
                       <div
                         class="splide__list [&>*]:w-[calc(1/1.25*100%)] | lg:[&>*]:w-[calc(1/4*100%)]"
                       >
-                        <!-- @components listSlideEmployes -->
+                        {employeeDepts.length > 0
+                          ? employeeDepts.map((dept) => (
+                              <div class="splide__slide">
+                                <div class="flex flex-col rounded-lg bg-dark-50 p-4 gap-6 aspect-4/3 | lg:p-6 lg:aspect-4/3">
+                                  <div class="flex flex-col gap-1">
+                                    <div class="h6 text-dark-400">Jumlah Karyawan</div>
+                                    <h5 class="text-xl text-balance tracking-normal">{dept.job_title}</h5>
+                                  </div>
+                                  <div class="mt-auto flex justify-end">
+                                    <div class="h3 leading-none font-bold text-primary-600">{dept.job_total}</div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          : <div><!-- @components listSlideEmployes --></div>
+                        }
                       </div>
                     </div>
                   </div>
@@ -987,8 +968,10 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                 </div>
               </div>
             </section>
+              );
 
-            <section
+              if (sec.section_key === "why_us") return (
+                <section
               id="section-why-us"
               class="relative isolate py-16 | lg:py-24 lg:my-8"
             >
@@ -1011,22 +994,16 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                         </div>
                         <div
                           class="text-sm leading-none font-bold uppercase tracking-wide | lg:w-min"
-                        >
-                          Kenapa Kami
-                        </div>
+                        >{h.subtitle ?? "Kenapa Kami"}</div>
                       </div>
-                      <h2 class="leading-none text-balance" data-title>
-                        Kami Membantu Bisnis & Pekerjaan Menjadi Lebih Mudah
-                      </h2>
+                      <h2 class="leading-none text-balance" data-title>{h.title ?? "Kami Membantu Bisnis & Pekerjaan Menjadi Lebih Mudah"}</h2>
                     </div>
                   </div>
                   <div
                     class="col-span-full | lg:col-span-4 lg:col-start-9 | not-lg:text-center"
                   >
                     <p class="text-balance">
-                      Kami menawarkan solusi inovatif untuk efisiensi bisnis dan
-                      pekerjaan. Dengan teknologi, kami memudahkan proses,
-                      menghemat waktu, dan meningkatkan produktivitas.
+                      {h.description ?? "Tidak ditemukan deskripsi 'Kenapa Kami'!"}
                     </p>
                   </div>
                 </div>
@@ -1034,176 +1011,19 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                   <div
                     class="grid gap-16 | lg:grid-cols-12 lg:gap-x-6 lg:[&>*:nth-last-child(2)]:row-start-3 lg:[&>*:nth-last-child(3)]:row-start-3 lg:[&>*:last-child]:row-span-2 | 2xl:gap-y-24"
                   >
-                    <div class="col-span-full | lg:col-span-3">
-                      <div
-                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
-                      >
-                        <div class="text-sm font-bold text-primary-600">
-                          01.
-                        </div>
-                        <div
-                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
-                        >
-                          <h5 class="text-xl text-balance tracking-normal">
-                            Gratis Cari Loker
-                          </h5>
-                          <p class="text-balance">
-                            Kami Menawarkan lowongan kerja secara gratis dan
-                            dapat memberikan beberapa keuntungan bagi perusahaan
-                            atau organisasi.
-                          </p>
+                    {whyUsItems.map((item, i) => (
+                      <div class="col-span-full | lg:col-span-3">
+                        <div class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center">
+                          <div class="text-sm font-bold text-primary-600">
+                            {String(i + 1).padStart(2, "0")}.
+                          </div>
+                          <div class="flex flex-col gap-4 pt-6 border-t border-dark-300">
+                            <h5 class="text-xl text-balance tracking-normal">{item.title}</h5>
+                            {item.description && <p class="text-balance">{item.description}</p>}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="col-span-full | lg:col-span-3">
-                      <div
-                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
-                      >
-                        <div class="text-sm font-bold text-primary-600">
-                          02.
-                        </div>
-                        <div
-                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
-                        >
-                          <h5 class="text-xl text-balance tracking-normal">
-                            Gratis Pelamar Kerja
-                          </h5>
-                          <p class="text-balance">
-                            Bagi anda para pencari kerja, mencari peluang tanpa
-                            biaya dapat menjadi langkah cerdas untuk
-                            memaksimalkan potensi mereka tanpa menguras
-                            anggaran.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-span-full | lg:col-span-3">
-                      <div
-                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
-                      >
-                        <div class="text-sm font-bold text-primary-600">
-                          03.
-                        </div>
-                        <div
-                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
-                        >
-                          <h5 class="text-xl text-balance tracking-normal">
-                            Gratis Software HR
-                          </h5>
-                          <p class="text-balance">
-                            Kami Menyediakan Software HR yang telah menjadi
-                            fondasi utama dalam dunia bisnis modern, membantu
-                            perusahaan mengelola aspek-aspek kritis dari sumber
-                            daya manusia dengan lebih efektif.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-span-full | lg:col-span-3">
-                      <div
-                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
-                      >
-                        <div class="text-sm font-bold text-primary-600">
-                          04.
-                        </div>
-                        <div
-                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
-                        >
-                          <h5 class="text-xl text-balance tracking-normal">
-                            Cash Flow Bisnis Anda
-                          </h5>
-                          <p class="text-balance">
-                            Kami memberikan Solusi agar Arus kas cash flow
-                            Perusahaan anda tetap terjaga dengan baik dan dapat
-                            keberlanjutan dengan cara bekerjasama dengan kami.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-span-full | lg:col-span-3">
-                      <div
-                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
-                      >
-                        <div class="text-sm font-bold text-primary-600">
-                          05.
-                        </div>
-                        <div
-                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
-                        >
-                          <h5 class="text-xl text-balance tracking-normal">
-                            Kasbon Karyawan
-                          </h5>
-                          <p class="text-balance">
-                            Kami Menawarkan Sistem Kasbon Karyawan yang
-                            bermanfaat pada Karyawan Perusahaan Anda.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-span-full | lg:col-span-3">
-                      <div
-                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
-                      >
-                        <div class="text-sm font-bold text-primary-600">
-                          06.
-                        </div>
-                        <div
-                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
-                        >
-                          <h5 class="text-xl text-balance tracking-normal">
-                            Gratis Cari Karyawan
-                          </h5>
-                          <p class="text-balance">
-                            Kami Menawarkan Pencarian Karyawan secara gratis dan
-                            dapat memberikan beberapa keuntungan bagi perusahaan
-                            atau organisasi anda.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-span-full | lg:col-span-3">
-                      <div
-                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
-                      >
-                        <div class="text-sm font-bold text-primary-600">
-                          07.
-                        </div>
-                        <div
-                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
-                        >
-                          <h5 class="text-xl text-balance tracking-normal">
-                            Gratis Training
-                          </h5>
-                          <p class="text-balance">
-                            Kami Memberikan Pelatihan atau training yang
-                            memiliki banyak keuntungan, baik bagi perusahaan
-                            maupun individu.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-span-full | lg:col-span-3">
-                      <div
-                        class="flex flex-col gap-6 | not-lg:items-center not-lg:text-center"
-                      >
-                        <div class="text-sm font-bold text-primary-600">
-                          08.
-                        </div>
-                        <div
-                          class="flex flex-col gap-4 pt-6 border-t border-dark-300"
-                        >
-                          <h5 class="text-xl text-balance tracking-normal">
-                            Gratis Konsultasi
-                          </h5>
-                          <p class="text-balance">
-                            Kami Memberikan Konsultasi GRATIS, baik itu dalam
-                            konteks bisnis, pendidikan, atau masalah pribadi,
-                            dapat memberikan sejumlah keuntungan bagi individu
-                            atau perusahaan.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                     <div
                       class="col-span-full | lg:col-span-5 lg:col-start-8 | not-lg:mb-8 not-lg:-order-1"
                     >
@@ -1211,11 +1031,16 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                         <div
                           class="not-lg:aspect-square | lg:absolute lg:left-0 lg:top-0 lg lg:-bottom-27 lg:-right-8 | 2xl:-right-[calc((100vw-var(--breakpoint-2xl))/2)]"
                         >
-                          <img
-                            src="/assets/images/thumbnails/img01.webp"
-                            alt=""
-                            class="size-full object-cover rounded-lg overflow-clip | lg:rounded-r-none"
-                          />
+                          {(() => {
+                            const imgSrc = whyUsItems.find((it) => it.image)?.image;
+                            return (
+                              <img
+                                src={imgSrc ? `${API_URL}/pubs/${imgSrc}` : "/assets/images/thumbnails/img01.webp"}
+                                alt=""
+                                class="size-full object-cover rounded-lg overflow-clip | lg:rounded-r-none"
+                              />
+                            );
+                          })()}
                           <div
                             class="absolute top-12 left-12 -bottom-12 -right-4 rounded-l-lg bg-primary-600 -z-1 | lg:right-0 lg:-left-12"
                           >
@@ -1270,8 +1095,10 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                 </div>
               </div>
             </section>
+              );
 
-            <section id="section-testimonials" class="relative isolate">
+              if (sec.section_key === "testimonials") return (
+                <section id="section-testimonials" class="relative isolate">
               <div class="pt-16 | lg:pt-24">
                 <div class="max-container">
                   <div class="grid mb-16 | lg:grid-cols-12">
@@ -1286,19 +1113,16 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                           </div>
                           <div
                             class="text-sm leading-none font-bold uppercase tracking-wide"
-                          >
-                            Testimonials
-                          </div>
+                          >{h.subtitle ?? "Testimonials"}</div>
                         </div>
-                        <h2 class="leading-none text-balance">
-                          Apa Kata Pengguna tentang Runlapan
-                        </h2>
+                        <h2 class="leading-none text-balance">{h.title ?? "Apa Kata Pengguna tentang Runlapan"}</h2>
                       </div>
                     </div>
                   </div>
                   <div
                     class="splide group/slide w-min mx-auto max-w-full | not-lg:hidden"
                     data-slide-testimony-avatar
+                    data-testimonials={JSON.stringify(testimonials)}
                   >
                     <div class="splide__track !overflow-visible">
                       <div class="splide__list gap-4">
@@ -1310,7 +1134,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
               </div>
               <div class="relative isolate pb-24 | lg:py-24 lg:pb-32">
                 <div class="max-container">
-                  <div class="splide group/slide" data-slide-testimony-content>
+                  <div class="splide group/slide" data-slide-testimony-content data-testimonials={JSON.stringify(testimonials)}>
                     <div class="splide__track !overflow-visible">
                       <div
                         class="splide__list !h-auto [&>*]:w-[calc(1/1.125*100%)] | lg:[&>*]:w-[calc(1/3.5*100%)]"
@@ -1334,8 +1158,10 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                 </div>
               </div>
             </section>
+              );
 
-            <section id="section-services" class="relative bg-primary-900">
+              if (sec.section_key === "services") return (
+                <section id="section-services" class="relative bg-primary-900">
               <div
                 class="relative isolate py-16 | lg:py-24 lg:mb-8 | 2xl:pt-32"
               >
@@ -1359,27 +1185,20 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                             </div>
                             <div
                               class="text-sm leading-none font-bold uppercase tracking-wide text-white | lg:w-min"
-                            >
-                              Layanan Kami
-                            </div>
+                            >{h.subtitle ?? "Layanan Kami"}</div>
                           </div>
                           <h2
                             class="leading-none text-balance text-white"
                             data-title
-                          >
-                            Layanan Terpadu untuk Para Pencari Kerja
-                          </h2>
+                          >{h.title ?? "Layanan Terpadu untuk Para Pencari Kerja"}</h2>
                         </div>
                         <p class="text-balance text-white/70">
-                          Kami menawarkan solusi inovatif untuk efisiensi bisnis
-                          dan pekerjaan. Dengan teknologi, kami memudahkan
-                          proses, menghemat waktu, dan meningkatkan
-                          produktivitas.
+                          {h.description ?? "Tidak ditemukan deskripsi 'Layanan Kami'!"}
                         </p>
                       </div>
                     </div>
                     <div class="col-span-full | lg:col-span-6 lg:-order-1">
-                      <div class="grid gap-4 | lg:gap-6" data-services>
+                      <div class="grid gap-4 | lg:gap-6"  data-services data-contents={JSON.stringify(services)}>
                         <!-- @commponents listServices -->
                       </div>
                     </div>
@@ -1416,24 +1235,19 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                           </div>
                           <div
                             class="text-sm leading-none font-bold uppercase tracking-wide text-white | lg:w-min"
-                          >
-                            Produk Kami
-                          </div>
+                          >{hProducts.subtitle ?? "N/A"}</div>
                         </div>
                         <h2
                           class="leading-none text-balance text-white"
                           data-title
-                        >
-                          Dukungan untuk Masa Depan Karirmu
-                        </h2>
+                        >{hProducts.title ?? "Tidak ditemukan judul 'Produk Kami'!"}</h2>
                       </div>
                     </div>
                     <div
                       class="grid-item col-span-full | lg:col-span-4 lg:col-start-7 | not-lg:text-center"
                     >
                       <p class="text-balance text-white/70">
-                        Dapatkan dukungan lengkap untuk karir Anda, dari
-                        pencarian lowongan hingga tips interview.
+                        {hProducts.description ?? "Tidak ditemukan deskripsi 'Produk Kami'!"}
                       </p>
                     </div>
                   </div>
@@ -1442,7 +1256,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                   <div class="max-container">
                     <div class="grid gap-8 | lg:grid-cols-12">
                       <div class="col-span-full | lg:col-span-8 lg:col-start-3">
-                        <div class="splide group/slide" data-slide-products>
+                        <div class="splide group/slide" data-slide-products data-contents={JSON.stringify(products)}>
                           <div class="splide__track !overflow-visible mb-8">
                             <div class="splide__list">
                               <!-- @components listSlideProducts -->
@@ -1522,8 +1336,10 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                 </div>
               </div>
             </section>
+              );
 
-            <section
+              if (sec.section_key === "clients") return (
+                <section
               id="section-clients"
               class="relative isolate py-16 | lg:py-24 lg:my-8"
             >
@@ -1540,13 +1356,9 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                         </div>
                         <div
                           class="text-sm leading-none font-bold uppercase tracking-wide"
-                        >
-                          Klien Kami
-                        </div>
+                        >{h.subtitle ?? "N/A"}</div>
                       </div>
-                      <h2 class="leading-none text-balance">
-                        Mereka yang Percaya Menggunakan Jasa Kami
-                      </h2>
+                      <h2 class="leading-none text-balance">{h.title ?? "Tidak ditemukan judul 'Klien Kami'!"}</h2>
                     </div>
                   </div>
                 </div>
@@ -1554,14 +1366,16 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
               <div class="px-4">
                 <div
                   class="flex flex-wrap justify-center overflow-clip [&>*]:w-[calc((1/2*100%)+1px)] [&>*]:border-r [&>*]:border-b [&>*]:border-dark-300 [&>*:last-child]:border-r-transparent [&>*]:-mr-px [&>*]:-mb-px | lg:[&>*]:w-[calc((1/6*100%)+1px)]"
-                  data-clients="18"
+                  data-clients={clients.length} data-contents={JSON.stringify(clients)}
                 >
                   <!-- @components listClients -->
                 </div>
               </div>
             </section>
+              );
 
-            <section
+              if (sec.section_key === "news") return (
+                <section
               id="section-news"
               class="relative isolate py-16 | lg:py-24 lg:my-8"
             >
@@ -1578,31 +1392,28 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                         </div>
                         <div
                           class="text-sm leading-none font-bold uppercase tracking-wide"
-                        >
-                          Berita
-                        </div>
+                        >{h.subtitle ?? "N/A"}</div>
                       </div>
-                      <h2 class="leading-none text-balance">
-                        Pilihan Berita Terkini dari Runlapan
-                      </h2>
+                      <h2 class="leading-none text-balance">{h.title ?? "Tidak ditemukan judul 'Berita Terbaru'!"}</h2>
                     </div>
                   </div>
                 </div>
                 <div
                   class="grid gap-x-6 gap-y-12 | lg:grid-cols-3"
-                  data-blog="3"
+                  data-blog-home={blogs.length} data-contents={JSON.stringify(blogs)}
                 >
                   <!-- @components listBlog -->
                 </div>
                 <div class="flex justify-center mt-16">
                   <a href="/blog" class="btn btn-outline" data-hover-effect
-                    >Berita Lainnya</a
-                  >
+                    >Berita Lainnya</a>
                 </div>
               </div>
             </section>
+              );
 
-            <section
+              if (sec.section_key === "faq") return (
+                <section
               id="section-faq"
               class="relative isolate py-16 | lg:py-24 lg:my-8"
             >
@@ -1641,19 +1452,16 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                           </div>
                           <div
                             class="text-sm leading-none font-bold uppercase tracking-wide w-min"
-                          >
-                            FAQ
-                          </div>
+                          >{h.subtitle ?? "FAQ"}</div>
                         </div>
-                        <h2 class="leading-none text-balance" data-title>
-                          Pertanyaan yang Sering Diajukan
-                        </h2>
+                        <h2 class="leading-none text-balance" data-title>{h.title ?? "Pertanyaan yang Sering Diajukan"}</h2>
                       </div>
                       <div class="grid gap-16 | lg:gap-24">
                         <div
                           class="accordion grid divide-y divide-dark-400"
                           data-parent
                           data-faq="3"
+                          data-contents={JSON.stringify(faqs)}
                         >
                           <!-- @components listFaq -->
                         </div>
@@ -1712,31 +1520,23 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                 </div>
               </div>
             </section>
-          </div>
-          <!-- data-barba container -->
+              );
+
+              return null;
+            })}
+
+          </div><!-- data-barba container -->
         </main>
 
         <!-- @components sectionFooter -->
-      </div>
-      <!-- #app -->
+      </div><!-- #app -->
 
-      <svg
-        width="0"
-        height="0"
-        class="absolute hidden"
-        color-interpolation-filters="sRGB"
-      >
+      <svg width="0" height="0" class="absolute hidden" color-interpolation-filters="sRGB">
         <defs>
           <filter id="gooey-content">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"
-            ></feGaussianBlur>
-            <feColorMatrix
-              in="blur"
-              mode="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 11 -6"
-              result="gooey-content"></feColorMatrix>
-            <feComposite in="SourceGraphic" in2="gooey-content" operator="atop"
-            ></feComposite>
+            <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"></feGaussianBlur>
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 11 -6" result="gooey-content"></feColorMatrix>
+            <feComposite in="SourceGraphic" in2="gooey-content" operator="atop"></feComposite>
             <feBlend in="SourceGraphic" in2="gooey-content"></feBlend>
           </filter>
         </defs>
@@ -1759,22 +1559,15 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
   import barba from "@barba/core";
   import { showModal } from "../../public/assets/js/_modal";
 
-  const el = document.querySelector<HTMLElement>("#splide-hero");
-  if (el) {
-    new Splide(el).mount();
-  }
+  const heroSlide = document.querySelector<HTMLElement>("#splide-hero");
+  if (heroSlide) { new Splide(heroSlide).mount(); }
 
-  // "Cari Loker" Logic //
-  const initLogicLokerBtn = () => {
-    const btns = document.querySelectorAll("[data-cari-loker-btn]");
-
-    btns.forEach((btn) => {
+  const initCariLokerBtn = () => {
+    document.querySelectorAll("[data-cari-loker-btn]").forEach((btn) => {
       const fresh = btn.cloneNode(true) as HTMLElement;
       btn.parentNode?.replaceChild(fresh, btn);
-
       fresh.addEventListener("click", () => {
         const isLoggedIn = fresh.dataset.loggedIn === "true";
-
         if (isLoggedIn) {
           barba.go("/jobs");
         } else {
@@ -1785,6 +1578,5 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
     });
   };
 
-  // Jalankan saat load
-  initLogicLokerBtn();
+  initCariLokerBtn();
 </script>

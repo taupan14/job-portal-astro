@@ -2,11 +2,20 @@ import barba from "@barba/core";
 
 const iniComponents = async () => {
   try {
-    const response = await fetch("/assets/json/list-services.json");
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
+    // const response = await fetch("/assets/json/list-services.json");
+    // if (!response.ok) {
+    //   throw new Error("Network response was not ok");
+    // }
+    // const data = await response.json();
+    // const containers = document.querySelectorAll("[data-services]");
+    const API_URL = import.meta.env.PUBLIC_API_URL + "/pubs/";
+
+    const el = document.querySelector("[data-services]");
+    let data = [];
+    if (el) {
+      data = JSON.parse(el.dataset.contents || "[]");
     }
-    const data = await response.json();
+
     const containers = document.querySelectorAll("[data-services]");
 
     containers.forEach((container) => {
@@ -17,21 +26,22 @@ const iniComponents = async () => {
 
       data.slice(0, itemsToDisplay).forEach((item) => {
         const initImgThumbnail = (imageThumbnail) => {
-          if (!imageThumbnail?.img) {
+          if (!imageThumbnail?.image) {
             return `
                             <div></div>
                         `;
           }
+          item.image = API_URL + item.image;
           return `
                         <picture>
-                            <source type="image/webp" srcset="${item.img} 400w, ${item.img} 800w, ${item.img} 1200w, ${item.img} 1600w" sizes="100vw">
-                            <img src="${item.img}" srcset="${item.img} 400w, ${item.img} 800w, ${item.img} 1200w, ${item.img} 1600w" sizes="100vw" decoding="async" alt="${item.title}" class="size-full object-cover">
+                            <source type="image/webp" srcset="${item.image} 400w, ${item.image} 800w, ${item.image} 1200w, ${item.image} 1600w" sizes="100vw">
+                            <img src="${item.image}" srcset="${item.image} 400w, ${item.image} 800w, ${item.image} 1200w, ${item.image} 1600w" sizes="100vw" decoding="async" alt="${item.title}" class="size-full object-cover">
                         </picture>
                     `;
         };
 
         const items = `
-                    <a href="/service" class="flex flex-col aspect-4/3 rounded-lg overflow-clip bg-primary-950/40 | lg:aspect-video" data-hover-group>
+                    <a href="/service/${item.slug}" class="flex flex-col aspect-4/3 rounded-lg overflow-clip bg-primary-950/40 | lg:aspect-video" data-hover-group>
                         <div class="relative grow">
                             <div class="relative size-full [-webkit-mask-image:linear-gradient(to_bottom,black,transparent)]">
                                 ${initImgThumbnail(item)}
