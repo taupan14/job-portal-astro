@@ -103,11 +103,17 @@
 
   h6,
   .h6 {
+    --min-size: var(--text-xl);
+    --val-size: 1.5vw;
+    --max-size: var(--text-xl);
+  }
+  /* h6,
+  .h6 {
     @apply text-xs
         font-medium
         tracking-normal
         text-dark-600;
-  }
+  } */
 }
 
 @layer utilities {

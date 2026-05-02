@@ -1,9 +1,48 @@
 ---
+// src/pages/gallery/index.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
+
+interface Album {
+  id: number;
+  title: string;
+  slug: string;
+  cover_image: string | null;
+  event_date: string | null;
+  is_active: boolean;
+  _count: { gallery_media: number };
+}
+
+const API_URL = import.meta.env.PUBLIC_API_URL ?? "http://localhost:5000";
+const ASSETS_URL = API_URL + "/pubs";
+
+let albums: Album[] = [];
+try {
+  const res = await fetch(`${API_URL}/api/gallery/albums?active=true&limit=50`);
+  if (res.ok) {
+    const json = await res.json();
+    albums = json.data ?? [];
+  }
+} catch (e) {
+  console.error("Failed to fetch gallery albums:", e);
+}
+
+// console.log("albums", albums);
+function imgUrl(filename: string | null) {
+  if (!filename) return "/assets/images/thumbnails/placeholder.webp";
+  return `${ASSETS_URL}/uploads/gallery/${filename}`;
+}
+
+function fmtDate(d: string | null) {
+  if (!d) return null;
+  return new Date(d).toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
 ---
 
 <BaseLayout title="Gallery">
-  <!-- Paste HTML dari index.html di sini -->
   <html lang="en">
     <div id="app">
       <!-- @components sectionHeader -->
@@ -14,6 +53,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           data-barba="container"
           data-barba-namespace="gallery"
         >
+          <!-- ══ PAGE HEADER ════════════════════════════════════════════════ -->
           <section id="page-header" class="relative pt-(--space-header)">
             <div class="relative py-16 | lg:pt-24">
               <div class="max-container">
@@ -32,7 +72,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                         </div>
                       </div>
                       <h1 class="leading-none text-balance">
-                        Karya yang Membawa Perubahan
+                        Media Gallery
                       </h1>
                     </div>
                   </div>
@@ -50,16 +90,21 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             </div>
           </section>
 
+          <!-- ══ PAGE CONTENT ═══════════════════════════════════════════════ -->
           <section id="page-content" class="relative">
             <div class="py-16 | lg:py-24">
               <div class="max-container">
-                <div
-                  class="grid gap-4 gap-y-12 | lg:grid-cols-3 lg:gap-x-6 | 2xl:grid-cols-4"
-                  data-gallery-album
-                >
-                  <!-- @components listGalleryAlbum -->
-                </div>
-                <div data-pagination></div>
+                {
+                  albums.length === 0 ? (
+                    <div class="text-center py-16 text-dark-400">
+                      <p>Belum ada album gallery.</p>
+                    </div>
+                  ) : (
+                    <div class="grid gap-4 gap-y-12 | lg:grid-cols-3 lg:gap-x-6 | 2xl:grid-cols-4" data-gallery-album data-contents={JSON.stringify(albums)}>
+                        <!-- @components listGalleryAlbum -->
+                    </div>
+                  )
+                }
               </div>
             </div>
           </section>
@@ -97,7 +142,5 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       </div>
       <div id="preloader-transition"></div>
     </div>
-
-    <script is:inline type="module" src="/src/main.js"></script>
   </html>
 </BaseLayout>

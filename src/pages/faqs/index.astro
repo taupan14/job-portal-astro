@@ -16,7 +16,7 @@ type ApiResp = {
 };
 
 const resp = await apiGet<ApiResp>(`/api/homepage/faqs`, cookieHeader);
-console.log(resp?.data);
+// console.log(resp?.data);
 ---
 
 <BaseLayout title="FAQs">
@@ -154,7 +154,5 @@ console.log(resp?.data);
       </div>
       <div id="preloader-transition"></div>
     </div>
-
-    <script is:inline type="module" src="/src/main.js"></script>
   </html>
 </BaseLayout>

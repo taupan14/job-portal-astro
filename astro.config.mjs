@@ -1,12 +1,13 @@
-// astro.config.mjs
 import { defineConfig } from "astro/config";
-import vercel from "@astrojs/vercel";
+import node from "@astrojs/node";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
 export default defineConfig({
   output: "server",
-  adapter: vercel(),
+  adapter: node({
+    mode: "standalone",
+  }),
   vite: {
     plugins: [tailwindcss()],
     resolve: {

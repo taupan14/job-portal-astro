@@ -109,6 +109,7 @@ export const initSectionFooter = async () => {
                                         <li><a href="/gallery" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Gallery</a></li>
                                         <li><a href="/faqs" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">FAQ</a></li>
                                         <li><a href="/privacy-policy" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Privacy Policy</a></li>
+                                        <li><a href="/term-condition" class="text-sm font-bold uppercase tracking-wide link link-reverse text-white/70 [--link-underline:white] hover:text-white">Term & Condition</a></li>
                                     </ul>
                                 </div>
                             </div>

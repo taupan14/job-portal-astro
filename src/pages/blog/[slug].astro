@@ -624,7 +624,24 @@ const pageTitle = blog.title;
       </div>
       <div id="preloader-transition"></div>
     </div>
-
-    <script is:inline type="module" src="/src/main.js"></script>
   </html>
 </BaseLayout>
+
+<!-- Client-side SEO: fetch dari backend dan update <head> -->
+<script define:vars={{ slug }}>
+  window.__SEO_PAGE__ = {
+    contentType: "blog",
+    slug: `/blog/${slug}`,
+  };
+</script>
+
+<script>
+  import { useSeo } from "../../lib/useSeo";
+  import type { FetchSeoOptions } from "../../lib/seo";
+
+  const seoPage = (window as Window & {
+    __SEO_PAGE__?: FetchSeoOptions;
+  }).__SEO_PAGE__;
+
+  if (seoPage) useSeo(seoPage);
+</script>

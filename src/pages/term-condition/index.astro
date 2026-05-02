@@ -1,5 +1,5 @@
 ---
-// src/pages/privacy-policy/index.astro
+// src/pages/terms-condition/index.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -25,17 +25,17 @@ const API_URL = import.meta.env.PUBLIC_API_URL ?? "http://localhost:5000";
 
 let data: LegalPageData | null = null;
 try {
-  const res = await fetch(`${API_URL}/api/legals/privacy_policy`);
+  const res = await fetch(`${API_URL}/api/legals/terms_condition`);
   if (res.ok) data = await res.json();
 } catch (e) {
-  console.error("Failed to fetch privacy policy:", e);
+  console.error("Failed to fetch terms & condition:", e);
 }
 
 // ── Processed data ────────────────────────────────────────────────────────────
-const pageLabel = data?.page_label ?? "Privacy Policy";
-const pageTitle = data?.page_title ?? "Kebijakan Privasi";
+const pageLabel = data?.page_label ?? "Terms & Condition";
+const pageTitle = data?.page_title ?? "Syarat & Ketentuan";
 const intro = data?.intro ?? "";
-const sections: LegalSection[] = (data?.legal_section ?? []).sort(
+const legal_section: LegalSection[] = (data?.legal_section ?? []).sort(
   (a, b) => a.sort_order - b.sort_order,
 );
 
@@ -57,7 +57,7 @@ const lastUpdated = data?.last_updated
         <div
           data-hero-scheme="light"
           data-barba="container"
-          data-barba-namespace="privacy"
+          data-barba-namespace="terms"
         >
           <!-- ══ PAGE HEADER ════════════════════════════════════════════════ -->
           <section id="page-header" class="relative pt-(--space-header)">
@@ -117,19 +117,20 @@ const lastUpdated = data?.last_updated
                     }
 
                     <div class="flex flex-col gap-16 | lg:gap-24">
-                      {/* Accordion Sections */}
+                      {/* Accordion legal_section */}
                       {
-                        sections.length > 0 ? (
+                        legal_section.length > 0 ? (
                           <div
                             class="accordion grid divide-y divide-dark-400"
                             data-parent
+                            data-terms
                           >
-                            {sections.map((section, idx) => (
+                            {legal_section.map((section, idx) => (
                               <div class="accordion-item py-8 group">
                                 <a
                                   href="javascript:;"
                                   class="flex items-start justify-between gap-6"
-                                  data-target={`privacy-section-${section.id}`}
+                                  data-target={`terms-section-${section.id}`}
                                 >
                                   <div class="flex items-start gap-4">
                                     <span class="text-xl font-bold text-primary-600 shrink-0">
@@ -165,7 +166,7 @@ const lastUpdated = data?.last_updated
                                 </a>
 
                                 <div
-                                  id={`privacy-section-${section.id}`}
+                                  id={`terms-section-${section.id}`}
                                   class="accordion-content overflow-clip"
                                   aria-expanded="false"
                                 >

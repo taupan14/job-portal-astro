@@ -1,0 +1,74 @@
+---
+// src/components/SeoHead.astro
+// Komponen Astro untuk render semua meta SEO di <head>
+// Digunakan di layout utama, di-update client-side via useSeo()
+
+export interface Props {
+  // Data awal (diisi saat SSR/static jika ada, atau kosong)
+  title?: string;
+  description?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  ogImageAlt?: string;
+  ogType?: string;
+  canonicalUrl?: string;
+  siteUrl?: string;
+  siteName?: string;
+}
+
+const {
+  title = "",
+  description = "",
+  ogTitle,
+  ogDescription,
+  ogImage,
+  ogImageAlt = "",
+  ogType = "website",
+  canonicalUrl,
+  siteUrl = import.meta.env.PUBLIC_SITE_URL ?? "",
+  siteName = import.meta.env.PUBLIC_SITE_NAME ?? "Website",
+} = Astro.props;
+
+const resolvedTitle = title ? `RUNLAPAN | Job Portal - ${title}` : siteName;
+const resolvedOgTitle = ogTitle || title || siteName;
+const resolvedOgDescription = ogDescription || description;
+const resolvedCanonical = canonicalUrl || `${siteUrl}${Astro.url.pathname}`;
+---
+
+<!-- Primary Meta Tags -->
+<title id="meta-title">{resolvedTitle}</title>
+<meta id="meta-description" name="description" content={description} />
+<link id="meta-canonical" rel="canonical" href={resolvedCanonical} />
+
+<!-- Open Graph -->
+<meta id="og-type" property="og:type" content={ogType} />
+<meta id="og-url" property="og:url" content={resolvedCanonical} />
+<meta id="og-title" property="og:title" content={resolvedOgTitle} />
+<meta
+  id="og-description"
+  property="og:description"
+  content={resolvedOgDescription}
+/>
+<meta id="og-site-name" property="og:site_name" content={siteName} />
+{ogImage && <meta id="og-image" property="og:image" content={ogImage} />}
+{
+  ogImage && (
+    <meta id="og-image-alt" property="og:image:alt" content={ogImageAlt} />
+  )
+}
+
+<!-- Twitter Card -->
+<meta id="tw-card" name="twitter:card" content="summary_large_image" />
+<meta id="tw-title" name="twitter:title" content={resolvedOgTitle} />
+<meta
+  id="tw-description"
+  name="twitter:description"
+  content={resolvedOgDescription}
+/>
+{ogImage && <meta id="tw-image" name="twitter:image" content={ogImage} />}
+
+<!--
+  JSON-LD diinjeksikan client-side oleh useSeo().
+  Tidak ada elemen di luar <head> — aman untuk semua browser.
+-->

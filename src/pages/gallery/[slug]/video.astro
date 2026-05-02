@@ -1,6 +1,6 @@
 ---
-// src/pages/gallery/[slug].astro
-import BaseLayout from "../../layouts/BaseLayout.astro";
+// src/pages/gallery/[slug]/video.astro
+import BaseLayout from "../../../layouts/BaseLayout.astro";
 
 interface GalleryMedia {
   id: number;
@@ -19,7 +19,6 @@ interface Album {
   event_date: string | null;
   is_active: boolean;
   gallery_media: GalleryMedia[];
-  _count: { gallery_media: number };
 }
 
 const API_URL = import.meta.env.PUBLIC_API_URL ?? "http://localhost:5000";
@@ -27,8 +26,6 @@ const ASSETS_URL = API_URL + "/pubs";
 
 const { slug } = Astro.params;
 
-// console.log("slug", slug);
-// Fetch album yang sedang dibuka
 let album: Album | null = null;
 try {
   const res = await fetch(`${API_URL}/api/gallery/albums/${slug}`);
@@ -37,17 +34,14 @@ try {
   console.error("Failed to fetch album:", e);
 }
 
-// Fetch album lainnya untuk section "Album Lainnya"
 let otherAlbums: Album[] = [];
 try {
-  const res = await fetch(`${API_URL}/gallery/albums?active=true&limit=12`);
+  const res = await fetch(`${API_URL}/api/gallery/albums?active=true&limit=12`);
   if (res.ok) {
     const json = await res.json();
     otherAlbums = (json.data ?? []).filter((a: Album) => a.slug !== slug);
   }
-} catch (e) {
-  console.error("Failed to fetch other albums:", e);
-}
+} catch (e) {}
 
 if (!album || !album.is_active) {
   return Astro.redirect("/gallery");
@@ -67,16 +61,14 @@ function fmtDate(d: string | null) {
   });
 }
 
-// Pisahkan media berdasarkan type
-const photos = album.gallery_media
-  .filter((m) => m.type === "photo")
-  .sort((a, b) => a.sort_order - b.sort_order);
-const videos = album.gallery_media
-  .filter((m) => m.type === "video")
-  .sort((a, b) => a.sort_order - b.sort_order);
-const date = fmtDate(album.event_date);
+function ytThumb(url: string): string {
+  const match = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+  );
+  if (match) return `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`;
+  return "/assets/images/thumbnails/placeholder.webp";
+}
 
-// Helper: konversi URL YouTube ke embed
 function toYtEmbed(url: string): string {
   const match = url.match(
     /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
@@ -85,17 +77,14 @@ function toYtEmbed(url: string): string {
   return url;
 }
 
-// Helper: thumbnail YouTube
-function ytThumb(url: string): string | null {
-  const match = url.match(
-    /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
-  );
-  if (match) return `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`;
-  return null;
-}
+const photos = album.gallery_media.filter((m) => m.type === "photo");
+const videos = album.gallery_media
+  .filter((m) => m.type === "video")
+  .sort((a, b) => a.sort_order - b.sort_order);
+const date = fmtDate(album.event_date);
 ---
 
-<BaseLayout title={`Gallery — ${album.title}`}>
+<BaseLayout title={`Gallery Video — ${album.title}`}>
   <html lang="en">
     <div id="app">
       <!-- @components sectionHeader -->
@@ -152,12 +141,10 @@ function ytThumb(url: string): string | null {
           <section id="page-content" class="relative">
             <div class="py-16 | lg:py-24">
               <div class="max-full-container">
-                <!-- Tab navigasi foto / video -->
+                <!-- Tab navigasi -->
                 <div class="flex justify-center mb-16">
                   <ul class="flex items-center gap-8">
-                    <li
-                      class={`flex items-center gap-2 ${photos.length > 0 ? "is-active" : ""}`}
-                    >
+                    <li class="flex items-center gap-2">
                       <a
                         href={`/gallery/${slug}`}
                         class="flex text-sm font-bold uppercase tracking-wide link link-reverse [--link-underline:var(--color-primary-600)] [.is-active_&]:[--link-from:100%] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover)"
@@ -171,51 +158,75 @@ function ytThumb(url: string): string | null {
                         [{photos.length}]
                       </div>
                     </li>
-                    {
-                      videos.length > 0 && (
-                        <li class="flex items-center gap-2">
-                          <a
-                            href={`/gallery/${slug}/video`}
-                            class="flex text-sm font-bold uppercase tracking-wide link link-reverse [--link-underline:var(--color-primary-600)] [.is-active_&]:[--link-from:100%] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover)"
-                            data-hover-effect
-                          >
-                            Gallery Video
-                          </a>
-                          <div class="text-sm font-bold uppercase tracking-wide text-primary-600">
-                            [{videos.length}]
-                          </div>
-                        </li>
-                      )
-                    }
+                    <li class="flex items-center gap-2 is-active">
+                      <a
+                        href={`/gallery/${slug}/video`}
+                        class="flex text-sm font-bold uppercase tracking-wide link link-reverse [--link-underline:var(--color-primary-600)] [.is-active_&]:[--link-from:100%] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover)"
+                        data-hover-effect
+                      >
+                        Gallery Video
+                      </a>
+                      <div
+                        class="text-sm font-bold uppercase tracking-wide text-primary-600"
+                      >
+                        [{videos.length}]
+                      </div>
+                    </li>
                   </ul>
                 </div>
 
-                <!-- Grid foto -->
+                <!-- Grid video -->
                 {
-                  photos.length > 0 ? (
+                  videos.length > 0 ? (
                     <div
-                      class="grid gap-4 | lg:grid-cols-4 lg:gap-6"
+                      class="grid gap-4 | lg:grid-cols-3 lg:gap-6"
                       data-gallery
                     >
-                      {photos.map((photo) => (
-                        <a
-                          href={imgUrl(photo.file_url)}
-                          data-gallery-item
-                          class="block aspect-square rounded-lg overflow-clip group"
-                        >
-                          <img
-                            src={imgUrl(photo.file_url)}
-                            alt={photo.caption ?? album!.title}
-                            class="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            loading="lazy"
-                            onerror="this.src='/assets/images/thumbnails/placeholder.webp'"
-                          />
-                        </a>
-                      ))}
+                      {videos.map((video) => {
+                        const thumb =
+                          video.type === "photo"
+                            ? imgUrl(video.thumbnail)
+                            : ytThumb(video.file_url);
+                        const embed = toYtEmbed(video.file_url);
+                        return (
+                          <a
+                            href={embed}
+                            data-gallery-item="video"
+                            class="group block relative aspect-video rounded-lg overflow-clip bg-dark-900"
+                          >
+                            <img
+                              src={thumb}
+                              alt={video.caption ?? album!.title}
+                              class="size-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
+                              loading="lazy"
+                            />
+                            {/* Play button overlay */}
+                            <div class="absolute inset-0 flex items-center justify-center">
+                              <div class="size-16 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                                <svg
+                                  class="size-7 text-white translate-x-0.5"
+                                  viewBox="0 0 24 24"
+                                  fill="currentColor"
+                                >
+                                  <path d="M8 5v14l11-7z" />
+                                </svg>
+                              </div>
+                            </div>
+                            {/* Caption */}
+                            {video.caption && (
+                              <div class="absolute bottom-0 inset-x-0 px-3 py-2 bg-gradient-to-t from-dark-950/80 to-transparent">
+                                <p class="text-white text-sm truncate">
+                                  {video.caption}
+                                </p>
+                              </div>
+                            )}
+                          </a>
+                        );
+                      })}
                     </div>
                   ) : (
                     <div class="text-center py-16 text-dark-400">
-                      <p>Belum ada foto di album ini.</p>
+                      <p>Belum ada video di album ini.</p>
                     </div>
                   )
                 }
@@ -224,7 +235,7 @@ function ytThumb(url: string): string | null {
               </div>
             </div>
 
-            <!-- ── Album Lainnya (Splide slider) ─────────────────────────── -->
+            <!-- ── Album Lainnya ───────────────────────────────────────────── -->
             {
               otherAlbums.length > 0 && (
                 <div class="py-16 | lg:py-24">
@@ -266,7 +277,6 @@ function ytThumb(url: string): string | null {
                                     height="24"
                                     viewBox="0 0 24 24"
                                     fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
                                   >
                                     <path
                                       fill="none"
@@ -297,7 +307,6 @@ function ytThumb(url: string): string | null {
                                     height="24"
                                     viewBox="0 0 24 24"
                                     fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
                                   >
                                     <path
                                       fill="none"

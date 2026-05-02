@@ -1,10 +1,10 @@
 ---
 // src/layouts/BaseLayout.astro
-import "../styles/global.css";
 import ModalAuthExpired from "../components/ModalAuthExpired.astro";
 import ModalApplyConfirm from "../components/ModalApplyConfirm.astro";
 import ModalCariLoker from "../components/ModalCariLoker.astro";
 import ModalSaveProfile from "../components/ModalSaveProfile.astro";
+import SeoHead from "../components/SeoHead.astro";
 
 interface Props {
   title: string;
@@ -24,10 +24,12 @@ const tokenExpired = Astro.locals.tokenExpired ?? false;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
+    <!-- <meta name="description" content={description} />
+    <title>RUNLAPAN | Job Portal - {title}</title> -->
     <meta name="referrer" content="no-referrer-when-downgrade" />
-    <title>RUNLAPAN | Job Portal - {title}</title>
     <link rel="icon" href="/favicon.ico" />
+
+    <SeoHead title={title} description={description} />
   </head>
   <body>
     <slot />
@@ -45,6 +47,10 @@ const tokenExpired = Astro.locals.tokenExpired ?? false;
     <ModalSaveProfile />
   </body>
 </html>
+
+<script>
+  import "../main.js";
+</script>
 
 <script
   is:inline

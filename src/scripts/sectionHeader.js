@@ -224,12 +224,12 @@ export const initSectionHeader = async () => {
                         </li>
                         <li data-barba-active>
                             <a href="/our-team" class="flex text-sm font-bold uppercase tracking-wide link link-reverse [--link-underline:var(--color-primary-600)] [.is-active_&]:[--link-from:100%] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover) | [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:text-white [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--link-underline:white] [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--text-hover:white]" data-hover-effect>
-                                Tim Kami
+                                TEAM Kami
                             </a>
                         </li>
                         <li data-barba-active>
-                            <a href="/project" class="flex text-sm font-bold uppercase tracking-wide link link-reverse [--link-underline:var(--color-primary-600)] [.is-active_&]:[--link-from:100%] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover) | [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:text-white [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--link-underline:white] [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--text-hover:white]" data-hover-effect>
-                                Project
+                            <a href="/gallery" class="flex text-sm font-bold uppercase tracking-wide link link-reverse [--link-underline:var(--color-primary-600)] [.is-active_&]:[--link-from:100%] [.is-active_&_span]:animate-none [.is-active_&]:text-(--text-hover) | [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:text-white [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--link-underline:white] [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&)]:[--text-hover:white]" data-hover-effect>
+                                Gallery
                             </a>
                         </li>
                     </ul>
@@ -272,7 +272,7 @@ export const initSectionHeader = async () => {
                                 </div>
                             </li>
                             <li class="w-full" data-barba-active>
-                                <a href="/our-team"><span class="h2 uppercase tracking-tight leading-none [.is-active_&]:text-primary-600">Tim Kami</span></a>
+                                <a href="/our-team"><span class="h2 uppercase tracking-tight leading-none [.is-active_&]:text-primary-600">TEAM Kami</span></a>
                             </li>
                             <li class="w-full" data-barba-active>
                                 <a href="/project"><span class="h2 uppercase tracking-tight leading-none [.is-active_&]:text-primary-600">Project</span></a>

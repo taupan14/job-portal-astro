@@ -478,7 +478,23 @@ const pageTitle = product.page_title ?? product.title;
       </div>
       <div id="preloader-transition"></div>
     </div>
-
-    <script is:inline type="module" src="/src/main.js"></script>
   </html>
 </BaseLayout>
+
+<script define:vars={{ slug }}>
+  window.__SEO_PAGE__ = {
+    contentType: "product",
+    slug: `/produk/${slug}`,
+  };
+</script>
+
+<script>
+  import { useSeo } from "../../lib/useSeo";
+  import type { FetchSeoOptions } from "../../lib/seo";
+
+  const seoPage = (window as Window & {
+    __SEO_PAGE__?: FetchSeoOptions;
+  }).__SEO_PAGE__;
+
+  if (seoPage) useSeo(seoPage);
+</script>

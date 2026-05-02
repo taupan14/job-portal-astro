@@ -1,9 +1,67 @@
 ---
+// src/pages/our-team/index.astro
 import BaseLayout from "../../layouts/BaseLayout.astro";
+
+// ── Types ─────────────────────────────────────────────────────────────────────
+interface TeamFunction {
+  id: number;
+  title: string;
+  description: string;
+  sort_order: number;
+}
+
+interface Department {
+  id: number;
+  name: string;
+  subtitle: string;
+  description: string;
+  thumbnail: string;
+  banner_image: string;
+  sort_order: number;
+  is_active: boolean;
+  our_team_function: TeamFunction[];
+}
+
+interface OurTeamPage {
+  id: number;
+  page_title: string;
+  page_label: string;
+  our_team_department: Department[];
+}
+
+// ── Fetch data ────────────────────────────────────────────────────────────────
+const API_URL = import.meta.env.PUBLIC_API_URL ?? "-";
+const ASSETS_URL = API_URL + "/pubs";
+
+let data: OurTeamPage | null = null;
+try {
+  const res = await fetch(`${API_URL}/api/ourteams`);
+  if (res.ok) data = await res.json();
+} catch (e) {
+  console.error("Failed to fetch our-team data:", e);
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function imgUrl(folder: string, filename: string, fallback = "") {
+  if (!filename) return fallback;
+  // console.log(`${ASSETS_URL}/uploads/${folder}/${filename}`);
+  return `${ASSETS_URL}/uploads/${folder}/${filename}`;
+}
+
+function zeroPad(n: number) {
+  return String(n).padStart(2, "0");
+}
+
+// ── Processed data ────────────────────────────────────────────────────────────
+const pageLabel = data?.page_label ?? "N/A";
+const pageTitle = data?.page_title ?? "Tidak ada judul halaman tim kami";
+// Hanya tampilkan departemen yang aktif, urutkan by sort_order
+const departments: Department[] = (data?.our_team_department ?? [])
+  .filter((d) => d.is_active)
+  .sort((a, b) => a.sort_order - b.sort_order);
 ---
 
 <BaseLayout title="Tim Kami">
-  <!-- Paste HTML dari index.html di sini -->
   <html lang="en">
     <div id="app">
       <!-- @components sectionHeader -->
@@ -14,6 +72,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           data-barba="container"
           data-barba-namespace="team"
         >
+          <!-- ══ PAGE HEADER ════════════════════════════════════════════════ -->
           <section id="page-header" class="relative pt-(--space-header)">
             <div class="relative py-16 | lg:pt-24">
               <div class="max-container">
@@ -28,1308 +87,215 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                         <div
                           class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950"
                         >
-                          Team Kami
+                          {pageLabel}
                         </div>
                       </div>
                       <h1 class="leading-none text-balance">
-                        Kenali Tim Kami <br />Yang Berpengalaman <br />di
-                        Bidangnya
+                        {pageTitle}
                       </h1>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </section>
-          <div
-            class="absolute inset-0 flex justify-center -z-1 pointer-events-none select-none"
-          >
-            <h1
-              class="shrink-0 text-transparent [-webkit-text-stroke:1px_var(--color-dark-100)] leading-[0.8] uppercase whitespace-nowrap [--min-size:10rem] [--val-size:22vw] [--max-size:22rem]"
-            >
-              Team Kami
-            </h1>
-          </div>
 
+            <!-- Watermark background text -->
+            <div
+              class="absolute inset-0 flex justify-center -z-1 pointer-events-none select-none"
+            >
+              <h1
+                class="shrink-0 text-transparent [-webkit-text-stroke:1px_var(--color-dark-100)] leading-[0.8] uppercase whitespace-nowrap [--min-size:10rem] [--val-size:22vw] [--max-size:22rem]"
+              >
+                {pageLabel}
+              </h1>
+            </div>
+          </section>
+
+          <!-- ══ PAGE CONTENT — Accordion Departments ══════════════════════ -->
           <section id="page-content" class="relative">
             <div class="py-16 | lg:py-24">
               <div class="accordion grid -mt-8" data-parent>
-                <div class="relative accordion-item py-8 group" data-scroll-top>
-                  <a
-                    href="javascript:;"
-                    class="relative block max-container"
-                    data-target="team-1"
-                  >
-                    <div class="grid grid-cols-12 gap-4 | lg:gap-8">
-                      <div class="col-span-2 | lg:col-span-3">
-                        <div
-                          class="text-sm leading-none font-bold tracking-wide text-dark-950"
-                        >
-                          01
-                        </div>
-                      </div>
-                      <div class="col-span-8 | lg:col-span-6">
-                        <div class="flex flex-col gap-1">
-                          <div class="text-sm">Team</div>
-                          <h4
-                            class="text-balance leading-none tracking-normal transition-colors duration-800 ease-custom [--min-size:var(--text-3xl)] [.is-open_&]:text-primary-600"
-                          >
-                            Marketing
-                          </h4>
-                        </div>
-                      </div>
-                      <div class="col-span-2 text-end | lg:col-span-3">
-                        <svg
-                          class="icon icon-stroke size-6 text-primary-600 transition-all duration-800 ease-custom [.is-open_&]:rotate-180"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M17.5 6.5L6 18"
-                            stroke="#141B34"
-                            stroke-width="1.5"
-                            stroke-linecap="square"></path>
-                          <path
-                            d="M8 6H18V16"
-                            stroke="#141B34"
-                            stroke-width="1.5"
-                            stroke-linecap="square"></path>
-                        </svg>
-                      </div>
+                {
+                  departments.length === 0 && (
+                    <div class="max-container py-16 text-center text-dark-400">
+                      <p>Data tim belum tersedia.</p>
                     </div>
-                    <div
-                      class="absolute inset-0 flex items-center pointer-events-none z-10 | not-lg:hidden"
-                    >
-                      <div class="w-full max-container shrink-0">
-                        <div class="grid gap-8 | lg:grid-cols-12">
-                          <div
-                            class="col-span-full | lg:col-span-3 lg:col-start-9"
-                          >
-                            <div
-                              class="aspect-4/3 rounded-lg bg-black overflow-clip opacity-0 translate-y-1/4 transition-all duration-800 ease-custom group-hover:opacity-100 group-hover:translate-y-0 [.is-open_&]:opacity-0"
-                            >
-                              <img
-                                src="/assets/images/thumbnails/img01.webp"
-                                alt=""
-                                class="size-full object-cover"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                  <div
-                    id="team-1"
-                    class="accordion-content overflow-clip"
-                    aria-expanded="false"
-                  >
-                    <div class="max-container py-8 | lg:py-16">
-                      <div
-                        class="grid gap-8 mb-8 | lg:grid-cols-12 lg:gap-16 lg:mb-16"
-                      >
-                        <div class="col-span-full | lg:col-span-6">
-                          <div
-                            class="relative | lg:h-full lg:-ml-8 lg:-mr-8 | 2xl:-ml-[calc((100vw-var(--breakpoint-2xl))/2)]"
-                          >
-                            <div
-                              class="aspect-video overflow-clip rounded-lg | lg:rounded-l-none lg:size-full"
-                            >
-                              <img
-                                src="/assets/images/thumbnails/img01.webp"
-                                alt=""
-                                class="size-full object-cover"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          class="col-span-full | lg:col-span-5 lg:col-start-8"
-                        >
-                          <div
-                            class="flex flex-col gap-8 py-8 | lg:h-full lg:justify-center lg:gap-16"
-                          >
-                            <div class="flex flex-col gap-4 | lg:gap-6">
-                              <div
-                                class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
-                              >
-                                Marketing
-                              </div>
-                              <h3 class="leading-none text-balance">
-                                Kami Memiliki Tim Marketing yang Handal
-                              </h3>
-                            </div>
-                            <article
-                              class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]"
-                            >
-                              <p>
-                                Pekerjaan dalam bidang pemasaran (marketing)
-                                memiliki peran yang kritis dalam kesuksesan
-                                suatu perusahaan. Berikut adalah beberapa fungsi
-                                utama dari pekerjaan pemasaran
-                              </p>
-                            </article>
-                          </div>
-                        </div>
-                      </div>
-                      <div
-                        class="grid gap-x-8 gap-y-16 | lg:grid-cols-3 lg:gap-16 | 2xl:grid-cols-4"
-                      >
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Pengenalan Produk atau Layanan
-                              </h5>
-                            </div>
-                            <p>
-                              Memperkenalkan produk atau sajian, Membangun
-                              kesadaran merek dan mengomunikasikan nilai unik
-                              dari produk atau layanan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Pengembangan Strategi Pemasaran
-                              </h5>
-                            </div>
-                            <p>
-                              Rancang strategi pemasaran yang sesuai dengan itu,
-                              Menganalisis pasar dan pesaing untuk
-                              mengidentifikasi peluang dan tantangan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Penetapan Harga
-                              </h5>
-                            </div>
-                            <p>
-                              Menentukan strategi penetapan harga yang sesuai
-                              dengan posisi pasar dan nilai produk. Memastikan
-                              bahwa harga mencerminkan nilai produk dan dapat
-                              diterima oleh pelanggan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Distribusi (Pemasaran)
-                              </h5>
-                            </div>
-                            <p>
-                              Merencanakan dan mengelola saluran distribusi
-                              untuk mengoptimalkan ketersediaan produk.
-                              Memastikan produk dapat diakses oleh target pasar
-                              dengan efisien.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Promosi
-                              </h5>
-                            </div>
-                            <p>
-                              Mengembangkan kampanye promosi untuk meningkatkan
-                              penjualan dan kesadaran merek.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Penelitian Pasar
-                              </h5>
-                            </div>
-                            <p>
-                              Melakukan penelitian pasar untuk memahami
-                              kebutuhan dan preferensi pelanggan. Menganalisis
-                              tren pasar dan merespons perubahan dalam perilaku
-                              konsumen.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Pengelolaan Hubungan Pelanggan
-                              </h5>
-                            </div>
-                            <p>
-                              Membangun dan memelihara hubungan dengan
-                              pelanggan. Menanggapi umpan balik pelanggan untuk
-                              meningkatkan kepuasan pelanggan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Analisis Kinerja Pemasaran
-                              </h5>
-                            </div>
-                            <p>
-                              Melakukan analisis kinerja kampanye pemasaran
-                              untuk mengukur ROI. Menggunakan data untuk membuat
-                              keputusan yang lebih baik dan mengoptimalkan
-                              strategi pemasaran di masa depan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Inovasi Produk dan Pengembangan
-                              </h5>
-                            </div>
-                            <p>
-                              Berkolaborasi dengan tim pengembangan produk untuk
-                              memahami kebutuhan pasar. Memberikan wawasan
-                              pemasaran untuk membentuk pengembangan produk yang
-                              sukses.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Manajemen Merek
-                              </h5>
-                            </div>
-                            <p>
-                              Membangun, memelihara, dan melindungi citra merek
-                              perusahaan. Mengembangkan strategi untuk
-                              memposisikan merek di pasar.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="absolute bottom-0 inset-x-0 h-px bg-dark-400 max-w-screen-2xl mx-auto [.accordion-item:last-child_&]:hidden"
-                  >
-                  </div>
-                </div>
+                  )
+                }
 
-                <div class="relative accordion-item py-8 group" data-scroll-top>
-                  <a
-                    href="javascript:;"
-                    class="relative block max-container"
-                    data-target="team-2"
-                  >
-                    <div class="grid grid-cols-12 gap-4 | lg:gap-8">
-                      <div class="col-span-2 | lg:col-span-3">
-                        <div
-                          class="text-sm leading-none font-bold tracking-wide text-dark-950"
-                        >
-                          02
-                        </div>
-                      </div>
-                      <div class="col-span-8 | lg:col-span-6">
-                        <div class="flex flex-col gap-1">
-                          <div class="text-sm">Team</div>
-                          <h4
-                            class="text-balance leading-none tracking-normal transition-colors duration-800 ease-custom [--min-size:var(--text-3xl)] [.is-open_&]:text-primary-600"
-                          >
-                            Human Resource
-                          </h4>
-                        </div>
-                      </div>
-                      <div class="col-span-2 text-end | lg:col-span-3">
-                        <svg
-                          class="icon icon-stroke size-6 text-primary-600 transition-all duration-800 ease-custom [.is-open_&]:rotate-180"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M17.5 6.5L6 18"
-                            stroke="#141B34"
-                            stroke-width="1.5"
-                            stroke-linecap="square"></path>
-                          <path
-                            d="M8 6H18V16"
-                            stroke="#141B34"
-                            stroke-width="1.5"
-                            stroke-linecap="square"></path>
-                        </svg>
-                      </div>
-                    </div>
-                    <div
-                      class="absolute inset-0 flex items-center pointer-events-none z-10"
-                    >
-                      <div class="w-full max-container shrink-0">
-                        <div class="grid gap-8 | lg:grid-cols-12">
-                          <div
-                            class="col-span-full | lg:col-span-3 lg:col-start-9"
-                          >
-                            <div
-                              class="aspect-4/3 rounded-lg bg-black overflow-clip opacity-0 translate-y-1/4 transition-all duration-800 ease-custom group-hover:opacity-100 group-hover:translate-y-0 [.is-open_&]:opacity-0"
-                            >
-                              <img
-                                src="/assets/images/thumbnails/img02.webp"
-                                alt=""
-                                class="size-full object-cover"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                  <div
-                    id="team-2"
-                    class="accordion-content overflow-clip"
-                    aria-expanded="false"
-                  >
-                    <div class="max-container py-8 | lg:py-16">
-                      <div
-                        class="grid gap-8 mb-8 | lg:grid-cols-12 lg:gap-16 lg:mb-16"
-                      >
-                        <div class="col-span-full | lg:col-span-6">
-                          <div
-                            class="relative | lg:h-full lg:-ml-8 lg:-mr-8 | 2xl:-ml-[calc((100vw-var(--breakpoint-2xl))/2)]"
-                          >
-                            <div
-                              class="aspect-video overflow-clip rounded-lg | lg:rounded-l-none lg:size-full"
-                            >
-                              <img
-                                src="/assets/images/thumbnails/img02.webp"
-                                alt=""
-                                class="size-full object-cover"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          class="col-span-full | lg:col-span-5 lg:col-start-8"
-                        >
-                          <div
-                            class="flex flex-col gap-8 py-8 | lg:h-full lg:justify-center lg:gap-16"
-                          >
-                            <div class="flex flex-col gap-4 | lg:gap-6">
-                              <div
-                                class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
-                              >
-                                Human Resource
-                              </div>
-                              <h3 class="leading-none text-balance">
-                                Kami Memiliki Tim Human Resource yang Handal
-                              </h3>
-                            </div>
-                            <article
-                              class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]"
-                            >
-                              <p>
-                                Departemen Sumber Daya Manusia (Human Resources
-                                atau HR) memiliki peran yang sangat penting
-                                dalam mengelola aspek-aspek terkait sumber daya
-                                manusia di suatu organisasi. Berikut adalah
-                                beberapa fungsi utama dari departemen HR :
-                              </p>
-                            </article>
-                          </div>
-                        </div>
-                      </div>
-                      <div
-                        class="grid gap-x-8 gap-y-16 | lg:grid-cols-3 lg:gap-16 | 2xl:grid-cols-4"
-                      >
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Rekrutmen dan Seleksi
-                              </h5>
-                            </div>
-                            <p>
-                              Menentukan kebutuhan SDM dan merancang strategi
-                              rekrutmen. Melakukan proses seleksi dan perekrutan
-                              untuk menemukan karyawan yang sesuai dengan
-                              kebutuhan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Manajemen Kinerja
-                              </h5>
-                            </div>
-                            <p>
-                              Mengembangkan sistem evaluasi kinerja. Memberikan
-                              umpan balik kepada karyawan dan merancang program
-                              pengembangan karyawan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Pelatihan dan Pengembangan
-                              </h5>
-                            </div>
-                            <p>
-                              Menilai kebutuhan pelatihan karyawan. Mendesain
-                              dan menyelenggarakan program pelatihan untuk
-                              meningkatkan keterampilan dan kompetensi.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Manajemen Konflik dan Penyelesaian Masalah
-                              </h5>
-                            </div>
-                            <p>
-                              Memberikan penyelesaian masalah yang adil dan
-                              efektif.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Manajemen Kompensasi dan Manfaat
-                              </h5>
-                            </div>
-                            <p>
-                              Menentukan struktur gaji dan kebijakan kompensasi.
-                              Mengelola program manfaat karyawan, termasuk
-                              asuransi kesehatan, cuti, dan kebijakan tunjangan
-                              lainnya.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Kepatuhan dan Pengelolaan Resiko
-                              </h5>
-                            </div>
-                            <p>
-                              Memastikan kepatuhan terhadap peraturan
-                              ketenagakerjaan dan hukum ketenagakerjaan.
-                              Mengelola risiko terkait dengan masalah-masalah
-                              ketenagakerjaan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Manajemen Hubungan Karyawan
-                              </h5>
-                            </div>
-                            <p>
-                              Membangun dan memelihara hubungan baik dengan
-                              karyawan. Menanggapi kebutuhan dan keprihatinan
-                              karyawan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <!-- <div class="text-sm">Keamanan Fisik</div> -->
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Pengembangan Budaya Organisasi
-                              </h5>
-                            </div>
-                            <p>
-                              Mempromosikan nilai-nilai dan budaya perusahaan.
-                              Mendorong lingkungan kerja yang inklusif dan
-                              berfokus pada keberagaman.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="absolute bottom-0 inset-x-0 h-px bg-dark-400 max-w-screen-2xl mx-auto [.accordion-item:last-child_&]:hidden"
-                  >
-                  </div>
-                </div>
+                {
+                  departments.map((dept, idx) => {
+                    const thumbnailSrc = imgUrl(
+                      "ourteam",
+                      dept.thumbnail,
+                      "/assets/images/thumbnails/img01.webp",
+                    );
+                    const bannerSrc = imgUrl(
+                      "ourteam",
+                      dept.banner_image,
+                      "/assets/images/thumbnails/img01.webp",
+                    );
+                    const accordionId = `team-dept-${dept.id}`;
 
-                <div class="relative accordion-item py-8 group" data-scroll-top>
-                  <a
-                    href="javascript:;"
-                    class="relative block max-container"
-                    data-target="team-3"
-                  >
-                    <div class="grid grid-cols-12 gap-4 | lg:gap-8">
-                      <div class="col-span-2 | lg:col-span-3">
-                        <div
-                          class="text-sm leading-none font-bold tracking-wide text-dark-950"
-                        >
-                          03
-                        </div>
-                      </div>
-                      <div class="col-span-8 | lg:col-span-6">
-                        <div class="flex flex-col gap-1">
-                          <div class="text-sm">Team</div>
-                          <h4
-                            class="text-balance leading-none tracking-normal transition-colors duration-800 ease-custom [--min-size:var(--text-3xl)] [.is-open_&]:text-primary-600"
-                          >
-                            Recruitment
-                          </h4>
-                        </div>
-                      </div>
-                      <div class="col-span-2 text-end | lg:col-span-3">
-                        <svg
-                          class="icon icon-stroke size-6 text-primary-600 transition-all duration-800 ease-custom [.is-open_&]:rotate-180"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M17.5 6.5L6 18"
-                            stroke="#141B34"
-                            stroke-width="1.5"
-                            stroke-linecap="square"></path>
-                          <path
-                            d="M8 6H18V16"
-                            stroke="#141B34"
-                            stroke-width="1.5"
-                            stroke-linecap="square"></path>
-                        </svg>
-                      </div>
-                    </div>
-                    <div
-                      class="absolute inset-0 flex items-center pointer-events-none z-10"
-                    >
-                      <div class="w-full max-container shrink-0">
-                        <div class="grid gap-8 | lg:grid-cols-12">
-                          <div
-                            class="col-span-full | lg:col-span-3 lg:col-start-9"
-                          >
-                            <div
-                              class="aspect-4/3 rounded-lg bg-black overflow-clip opacity-0 translate-y-1/4 transition-all duration-800 ease-custom group-hover:opacity-100 group-hover:translate-y-0 [.is-open_&]:opacity-0"
-                            >
-                              <img
-                                src="/assets/images/thumbnails/img03.webp"
-                                alt=""
-                                class="size-full object-cover"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                  <div
-                    id="team-3"
-                    class="accordion-content overflow-clip"
-                    aria-expanded="false"
-                  >
-                    <div class="max-container py-8 | lg:py-16">
+                    return (
                       <div
-                        class="grid gap-8 mb-8 | lg:grid-cols-12 lg:gap-16 lg:mb-16"
+                        class="relative accordion-item py-8 group"
+                        data-scroll-top
                       >
-                        <div class="col-span-full | lg:col-span-6">
-                          <div
-                            class="relative | lg:h-full lg:-ml-8 lg:-mr-8 | 2xl:-ml-[calc((100vw-var(--breakpoint-2xl))/2)]"
-                          >
-                            <div
-                              class="aspect-video overflow-clip rounded-lg | lg:rounded-l-none lg:size-full"
-                            >
-                              <img
-                                src="/assets/images/thumbnails/img03.webp"
-                                alt=""
-                                class="size-full object-cover"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          class="col-span-full | lg:col-span-5 lg:col-start-8"
+                        {/* ── Accordion Trigger ─────────────────────────────── */}
+                        <a
+                          href="javascript:;"
+                          class="relative block max-container"
+                          data-target={accordionId}
                         >
-                          <div
-                            class="flex flex-col gap-8 py-8 | lg:h-full lg:justify-center lg:gap-16"
-                          >
-                            <div class="flex flex-col gap-4 | lg:gap-6">
-                              <div
-                                class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
-                              >
-                                Recruitment
+                          <div class="grid grid-cols-12 gap-4 | lg:gap-8">
+                            {/* Nomor */}
+                            <div class="col-span-2 | lg:col-span-3">
+                              <div class="text-sm leading-none font-bold tracking-wide text-dark-950">
+                                {zeroPad(idx + 1)}
                               </div>
-                              <h3 class="leading-none text-balance">
-                                Kami Memiliki Tim Recruitment yang Handal
-                              </h3>
                             </div>
-                            <article
-                              class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]"
-                            >
-                              <p>
-                                Rekrutmen (recruitment) adalah bagian integral
-                                dari manajemen sumber daya manusia yang
-                                bertanggung jawab untuk menarik, memilih, dan
-                                merekrut karyawan yang sesuai dengan kebutuhan
-                                dan tujuan perusahaan. Berkomunikasi dengan
-                                manajer departemen untuk memahami kebutuhan
-                                tenaga kerja mereka.
-                              </p>
-                              <p>
-                                Berikut adalah beberapa fungsi utama dari
-                                departemen rekrutmen :
-                              </p>
-                            </article>
-                          </div>
-                        </div>
-                      </div>
-                      <div
-                        class="grid gap-x-8 gap-y-16 | lg:grid-cols-3 lg:gap-16 | 2xl:grid-cols-4"
-                      >
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Analisis Kebutuhan Tenaga Kerja
-                              </h5>
-                            </div>
-                            <p>
-                              Menganalisis perencanaan strategis perusahaan
-                              untuk menentukan jenis keterampilan dan jumlah
-                              karyawan yang diperlukan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Pengembangan Strategi Rekrutmen
-                              </h5>
-                            </div>
-                            <p>
-                              Merancang strategi rekrutmen yang efektif untuk
-                              menarik bakat terbaik. Menentukan saluran
-                              rekrutmen yang paling sesuai, seperti portal
-                              pekerjaan, media sosial, atau kegiatan pameran
-                              karir.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Penyusunan Deskripsi Pekerjaan
-                              </h5>
-                            </div>
-                            <p>
-                              Membuat deskripsi pekerjaan yang jelas dan
-                              komprehensif untuk setiap posisi yang tersedia.
-                              Menentukan persyaratan kualifikasi, tanggung jawab
-                              pekerjaan, dan harapan perusahaan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Penyeleksian Kandidat
-                              </h5>
-                            </div>
-                            <p>
-                              Menilai aplikasi dan resume yang masuk. Melakukan
-                              wawancara awal dan seleksi awal terhadap calon
-                              karyawan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Pelaksanaan Proses Rekrutmen
-                              </h5>
-                            </div>
-                            <p>
-                              Mengoordinasikan kegiatan seleksi, termasuk uji
-                              keterampilan, uji psikologi, dan uji kesehatan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Pengelolaan Pelamar
-                              </h5>
-                            </div>
-                            <p>
-                              Menyimpan dan melacak data pelamar. Memberikan
-                              umpan balik kepada pelamar yang tidak berhasil dan
-                              memberikan informasi lebih lanjut kepada pelamar
-                              yang berhasil.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Negosiasi Gaji dan Penawaran Kerja
-                              </h5>
-                            </div>
-                            <p>
-                              Menegosiasikan gaji dan kondisi kerja dengan calon
-                              karyawan yang berhasil. Menyusun dan memberikan
-                              penawaran kerja resmi kepada kandidat terpilih.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Onboarding Karyawan Baru
-                              </h5>
-                            </div>
-                            <p>
-                              Mengkoordinasikan proses onboarding untuk
-                              memastikan integrasi yang lancar karyawan baru ke
-                              dalam organisasi. Menyediakan informasi yang
-                              diperlukan untuk memperkenalkan karyawan baru pada
-                              budaya dan kebijakan perusahaan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Pemeliharaan Database Karyawan
-                              </h5>
-                            </div>
-                            <p>
-                              Menjaga dan memperbarui database karyawan dan
-                              pelamar. Menciptakan dan memelihara daftar bakat
-                              untuk digunakan pada rekrutmen di masa depan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Evaluasi dan Peningkatan Proses Rekrutmen
-                              </h5>
-                            </div>
-                            <p>
-                              Mengevaluasi efektivitas proses rekrutmen secara
-                              berkala. Mengidentifikasi area yang perlu
-                              ditingkatkan dan mengimplementasikan perubahan
-                              yang diperlukan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Mengikuti Kebijakan dan Hukum Ketenagakerjaan
-                              </h5>
-                            </div>
-                            <p>
-                              Memastikan kepatuhan terhadap hukum dan regulasi
-                              ketenagakerjaan yang berlaku. Mengelola proses
-                              rekrutmen dengan etika dan keadilan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Mengelola Hubungan dengan Agen Rekrutmen
-                              </h5>
-                            </div>
-                            <p>
-                              Berinteraksi dengan agen rekrutmen eksternal jika
-                              diperlukan. Menegosiasikan kontrak dan memastikan
-                              penyediaan kandidat yang sesuai.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="absolute bottom-0 inset-x-0 h-px bg-dark-400 max-w-screen-2xl mx-auto [.accordion-item:last-child_&]:hidden"
-                  >
-                  </div>
-                </div>
 
-                <div class="relative accordion-item py-8 group" data-scroll-top>
-                  <a
-                    href="javascript:;"
-                    class="relative block max-container"
-                    data-target="team-4"
-                  >
-                    <div class="grid grid-cols-12 gap-4 | lg:gap-8">
-                      <div class="col-span-2 | lg:col-span-3">
-                        <div
-                          class="text-sm leading-none font-bold tracking-wide text-dark-950"
-                        >
-                          04
-                        </div>
-                      </div>
-                      <div class="col-span-8 | lg:col-span-6">
-                        <div class="flex flex-col gap-1">
-                          <div class="text-sm">Team</div>
-                          <h4
-                            class="text-balance leading-none tracking-normal transition-colors duration-800 ease-custom [--min-size:var(--text-3xl)] [.is-open_&]:text-primary-600"
-                          >
-                            IT Development
-                          </h4>
-                        </div>
-                      </div>
-                      <div class="col-span-2 text-end | lg:col-span-3">
-                        <svg
-                          class="icon icon-stroke size-6 text-primary-600 transition-all duration-800 ease-custom [.is-open_&]:rotate-180"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M17.5 6.5L6 18"
-                            stroke="#141B34"
-                            stroke-width="1.5"
-                            stroke-linecap="square"></path>
-                          <path
-                            d="M8 6H18V16"
-                            stroke="#141B34"
-                            stroke-width="1.5"
-                            stroke-linecap="square"></path>
-                        </svg>
-                      </div>
-                    </div>
-                    <div
-                      class="absolute inset-0 flex items-center pointer-events-none z-10"
-                    >
-                      <div class="w-full max-container shrink-0">
-                        <div class="grid gap-8 | lg:grid-cols-12">
-                          <div
-                            class="col-span-full | lg:col-span-3 lg:col-start-9"
-                          >
-                            <div
-                              class="aspect-4/3 rounded-lg bg-black overflow-clip opacity-0 translate-y-1/4 transition-all duration-800 ease-custom group-hover:opacity-100 group-hover:translate-y-0 [.is-open_&]:opacity-0"
-                            >
-                              <img
-                                src="/assets/images/thumbnails/img04.webp"
-                                alt=""
-                                class="size-full object-cover"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                  <div
-                    id="team-4"
-                    class="accordion-content overflow-clip"
-                    aria-expanded="false"
-                  >
-                    <div class="max-container py-8 | lg:py-16">
-                      <div
-                        class="grid gap-8 mb-8 | lg:grid-cols-12 lg:gap-16 lg:mb-16"
-                      >
-                        <div class="col-span-full | lg:col-span-6">
-                          <div
-                            class="relative | lg:h-full lg:-ml-8 lg:-mr-8 | 2xl:-ml-[calc((100vw-var(--breakpoint-2xl))/2)]"
-                          >
-                            <div
-                              class="aspect-video overflow-clip rounded-lg | lg:rounded-l-none lg:size-full"
-                            >
-                              <img
-                                src="/assets/images/thumbnails/img04.webp"
-                                alt=""
-                                class="size-full object-cover"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          class="col-span-full | lg:col-span-5 lg:col-start-8"
-                        >
-                          <div
-                            class="flex flex-col gap-8 py-8 | lg:h-full lg:justify-center lg:gap-16"
-                          >
-                            <div class="flex flex-col gap-4 | lg:gap-6">
-                              <div
-                                class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600"
-                              >
-                                IT Development
+                            {/* Nama departemen */}
+                            <div class="col-span-8 | lg:col-span-6">
+                              <div class="flex flex-col gap-1">
+                                <div class="text-sm">Team</div>
+                                <h4 class="text-balance leading-none tracking-normal transition-colors duration-800 ease-custom [--min-size:var(--text-3xl)] [.is-open_&]:text-primary-600">
+                                  {dept.name}
+                                </h4>
                               </div>
-                              <h3 class="leading-none text-balance">
-                                Kami Memiliki Tim IT Development yang Handal
-                              </h3>
                             </div>
-                            <article
-                              class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]"
-                            >
-                              <p>
-                                Programmer melibatkan berbagai tugas dan
-                                tanggung jawab dalam mengembangkan, mengelola,
-                                dan memelihara perangkat lunak atau aplikasi.
-                                Berinteraksi dengan pengguna atau pemangku
-                                kepentingan untuk memahami kebutuhan bisnis.
-                              </p>
-                              <p>
-                                Berikut adalah beberapa fungsi utama dari
-                                seorang programmer :
-                              </p>
-                            </article>
+
+                            {/* Arrow icon */}
+                            <div class="col-span-2 text-end | lg:col-span-3">
+                              <svg
+                                class="icon icon-stroke size-6 text-primary-600 transition-all duration-800 ease-custom [.is-open_&]:rotate-180"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M17.5 6.5L6 18"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="square"
+                                />
+                                <path
+                                  d="M8 6H18V16"
+                                  stroke="#141B34"
+                                  stroke-width="1.5"
+                                  stroke-linecap="square"
+                                />
+                              </svg>
+                            </div>
+                          </div>
+
+                          {/* Thumbnail hover (desktop) */}
+                          <div class="absolute inset-0 flex items-center pointer-events-none z-10 | not-lg:hidden">
+                            <div class="w-full max-container shrink-0">
+                              <div class="grid gap-8 | lg:grid-cols-12">
+                                <div class="col-span-full | lg:col-span-3 lg:col-start-9">
+                                  <div class="aspect-4/3 rounded-lg bg-black overflow-clip opacity-0 translate-y-1/4 transition-all duration-800 ease-custom group-hover:opacity-100 group-hover:translate-y-0 [.is-open_&]:opacity-0">
+                                    <img
+                                      src={thumbnailSrc}
+                                      alt={dept.name}
+                                      class="size-full object-cover"
+                                      loading="lazy"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </a>
+
+                        {/* ── Accordion Content ─────────────────────────────── */}
+                        <div
+                          id={accordionId}
+                          class="accordion-content overflow-clip"
+                          aria-expanded="false"
+                        >
+                          <div class="max-container py-8 | lg:py-16">
+                            {/* Banner + deskripsi */}
+                            <div class="grid gap-8 mb-8 | lg:grid-cols-12 lg:gap-16 lg:mb-16">
+                              {/* Banner image */}
+                              <div class="col-span-full | lg:col-span-6">
+                                <div class="relative | lg:h-full lg:-ml-8 lg:-mr-8 | 2xl:-ml-[calc((100vw-var(--breakpoint-2xl))/2)]">
+                                  <div class="aspect-video overflow-clip rounded-lg | lg:rounded-l-none lg:size-full">
+                                    <img
+                                      src={bannerSrc}
+                                      alt={dept.name}
+                                      class="size-full object-cover"
+                                      loading="lazy"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Teks kanan */}
+                              <div class="col-span-full | lg:col-span-5 lg:col-start-8">
+                                <div class="flex flex-col gap-8 py-8 | lg:h-full lg:justify-center lg:gap-16">
+                                  <div class="flex flex-col gap-4 | lg:gap-6">
+                                    <div class="text-sm leading-none font-bold uppercase tracking-wide text-primary-600">
+                                      {dept.name}
+                                    </div>
+                                    {dept.subtitle && (
+                                      <h3 class="leading-none text-balance">
+                                        {dept.subtitle}
+                                      </h3>
+                                    )}
+                                  </div>
+                                  {dept.description && (
+                                    <article class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]">
+                                      {dept.description
+                                        .split("\n\n")
+                                        .map((para) => (
+                                          <p>{para.trim()}</p>
+                                        ))}
+                                    </article>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Functions grid */}
+                            {dept.our_team_function.length > 0 && (
+                              <div class="grid gap-x-8 gap-y-16 | lg:grid-cols-3 lg:gap-16 | 2xl:grid-cols-4">
+                                {dept.our_team_function
+                                  .sort((a, b) => a.sort_order - b.sort_order)
+                                  .map((fn) => (
+                                    <div class="col-span-full | lg:col-span-1">
+                                      <div class="flex flex-col gap-4">
+                                        <div class="flex flex-col gap-2">
+                                          <h5 class="text-xl leading-tight tracking-normal text-balance">
+                                            {fn.title}
+                                          </h5>
+                                        </div>
+                                        <p>{fn.description}</p>
+                                      </div>
+                                    </div>
+                                  ))}
+                              </div>
+                            )}
                           </div>
                         </div>
+
+                        {/* Divider (sembunyikan di item terakhir) */}
+                        <div class="absolute bottom-0 inset-x-0 h-px bg-dark-400 max-w-screen-2xl mx-auto [.accordion-item:last-child_&]:hidden" />
                       </div>
-                      <div
-                        class="grid gap-x-8 gap-y-16 | lg:grid-cols-3 lg:gap-16 | 2xl:grid-cols-4"
-                      >
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Analisis Kebutuhan
-                              </h5>
-                            </div>
-                            <p>
-                              Menganalisis persyaratan dan merancang solusi
-                              perangkat lunak yang sesuai.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Pengembangan Kode
-                              </h5>
-                            </div>
-                            <p>
-                              Menulis dan mengembangkan kode pemrograman sesuai
-                              dengan spesifikasi proyek. Menggunakan bahasa
-                              pemrograman yang relevan seperti Javascript,
-                              Golang, Java, Python, JavaScript, C++, dll.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Pengujian Perangkat Lunak
-                              </h5>
-                            </div>
-                            <p>
-                              Merancang dan melaksanakan tes unit untuk
-                              memastikan keandalan dan kinerja kode.
-                              Mengidentifikasi dan memperbaiki bug atau
-                              kesalahan dalam perangkat lunak.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Optimisasi Kode
-                              </h5>
-                            </div>
-                            <p>
-                              Meningkatkan efisiensi dan kinerja kode. Melakukan
-                              debugging untuk mengatasi masalah dan membuat
-                              perangkat lunak berjalan lebih efisien.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Pemeliharaan Perangkat Lunak
-                              </h5>
-                            </div>
-                            <p>
-                              Mengelola pembaruan perangkat lunak dan memastikan
-                              kepatuhan terhadap standar pengembangan. Merespons
-                              perubahan kebutuhan atau masalah yang muncul
-                              setelah implementasi.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Pengelolaan Basis Data
-                              </h5>
-                            </div>
-                            <p>
-                              Merancang dan memelihara basis data yang mendukung
-                              aplikasi. Mengelola query dan pembaruan data untuk
-                              memastikan integritas dan ketersediaan data.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Integrasi Sistem
-                              </h5>
-                            </div>
-                            <p>
-                              Mengintegrasikan perangkat lunak dengan sistem
-                              atau platform lain. Menjamin interoperabilitas
-                              antar berbagai komponen perangkat lunak.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Pengembangan Antarmuka Pengguna (UI/UX)
-                              </h5>
-                            </div>
-                            <p>
-                              Mendesain antarmuka pengguna yang ramah pengguna.
-                              Mengimplementasikan desain antarmuka dan
-                              menyediakan pengalaman pengguna yang baik.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Keamanan Perangkat Lunak
-                              </h5>
-                            </div>
-                            <p>
-                              Menerapkan praktik keamanan untuk melindungi
-                              perangkat lunak dari ancaman keamanan. Melakukan
-                              pengujian keamanan dan mengidentifikasi potensi
-                              kerentanan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Dokumentasi
-                              </h5>
-                            </div>
-                            <p>
-                              Menyusun dokumentasi teknis yang jelas untuk kode
-                              dan proyek. Membuat petunjuk pengguna dan manual
-                              pengembang.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Kolaborasi Tim
-                              </h5>
-                            </div>
-                            <p>
-                              Bekerja sama dengan anggota tim pengembangan dan
-                              pemangku kepentingan lainnya. Berpartisipasi dalam
-                              rapat proyek dan memberikan pembaruan terkait
-                              kemajuan.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Pengembangan Berkelanjutan
-                              </h5>
-                            </div>
-                            <p>
-                              Mengikuti perkembangan teknologi dan tren terkini
-                              dalam pemrograman. Terus meningkatkan keterampilan
-                              dan pengetahuan melalui pelatihan dan
-                              self-learning.
-                            </p>
-                          </div>
-                        </div>
-                        <div class="col-span-full | lg:col-span-1">
-                          <div class="flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
-                              <h5
-                                class="text-xl leading-tight tracking-normal text-balance"
-                              >
-                                Penerapan Prinsip Pengembangan Perangkat Lunak
-                              </h5>
-                            </div>
-                            <p>
-                              Menerapkan prinsip-prinsip pengembangan perangkat
-                              lunak, seperti Agile atau DevOps, untuk
-                              meningkatkan efisiensi dan fleksibilitas
-                              pengembangan.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="absolute bottom-0 inset-x-0 h-px bg-dark-400 max-w-screen-2xl mx-auto [.accordion-item:last-child_&]:hidden"
-                  >
-                  </div>
-                </div>
-              </div>
+                    );
+                  })
+                }
+              </div>{/* /accordion */}
             </div>
           </section>
-        </div><!-- data-barba container -->
+        </div>{/* data-barba container */}
       </main>
 
       <!-- @components sectionFooter -->
-    </div><!-- #app -->
+    </div>{/* #app */}
 
     <svg
       width="0"
@@ -1359,7 +325,5 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       </div>
       <div id="preloader-transition"></div>
     </div>
-
-    <script is:inline type="module" src="/src/main.js"></script>
   </html>
 </BaseLayout>
