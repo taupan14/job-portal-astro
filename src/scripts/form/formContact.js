@@ -1,6 +1,4 @@
-const API_BASE_URL = window.__CONFIG__.API_BASE_URL;
-
-console.log("INIT FORM CONTACT");
+// console.log("INIT FORM CONTACT");
 // ─── Konstanta ──────────────────────────────────────────────
 const FIELD_LABELS = {
   name: "Nama Lengkap",
@@ -72,6 +70,17 @@ async function handleSubmit(e) {
   e.preventDefault();
   hideAlert(form);
 
+  // ✅ Baca lazy dari variabel yang sudah ada di BaseLayout
+  const API_BASE_URL = window.__ENV_PUBLIC_API_URL__;
+  if (!API_BASE_URL) {
+    showAlert(
+      form,
+      "Konfigurasi tidak ditemukan. Coba refresh halaman.",
+      "error",
+    );
+    return;
+  }
+
   const getValue = (id) => form.querySelector(`#${id}`)?.value.trim() ?? "";
 
   const data = {
@@ -93,6 +102,7 @@ async function handleSubmit(e) {
   setLoading(form, true);
 
   try {
+    // console.log("API_BASE_URL:", `${API_BASE_URL}/api/contacts/messages`);
     const res = await fetch(`${API_BASE_URL}/api/contacts/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

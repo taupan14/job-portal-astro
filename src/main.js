@@ -33,6 +33,7 @@ import "@js/_select";
 import "@js/_tabbed";
 import "@js/_datepicker";
 import "@js/_main";
+import "@scripts/form/formContact";
 
 // CSS
 import "@css/global.css";

@@ -249,8 +249,8 @@ const companyContact = await apiGet<ApiResp>(
                       >
                         <p class="text-sm text-balance text-dark-400">
                           Dengan menekan tombol <b>Kirim Pesan</b>, Anda telah
-                          menyetujuai <a
-                            href="#!"
+                          menyetujui <a
+                            href="/term-condition"
                             class="link font-semibold text-primary-600"
                             >Syarat & Ketentuan</a
                           > yang berlaku.
@@ -269,7 +269,7 @@ const companyContact = await apiGet<ApiResp>(
                             class="link font-semibold text-dark-950"
                             data-hover-effect
                           >
-                            Kirim Pesan
+                            KIRIM PESAN
                           </div>
                           <div
                             class="btn btn-icon btn-primary"
@@ -342,11 +342,11 @@ const companyContact = await apiGet<ApiResp>(
   </div>
 
   <!-- ── CLIENT-SIDE SCRIPT: Form Submission ── -->
-  <script define:vars={{ API_BASE_URL }}>
+  <!-- <script is:inline define:vars={{ API_BASE_URL }}>
     window.__CONFIG__ = { API_BASE_URL };
-  </script>
+  </script> -->
 
-  <script>
+  <!-- <script>
     import "../../scripts/form/formContact.js";
-  </script>
+  </script> -->
 </BaseLayout>
