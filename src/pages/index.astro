@@ -560,7 +560,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                  ═══════════════════════════════════════════════════ -->
             {activeSections.map((sec) => {
               const h        = headers[sec.section_key]        ?? {} as SectionHeader;
-              const hProducts = headers['products']            ?? {} as SectionHeader;
+              // const hProducts = headers['products']            ?? {} as SectionHeader;
  
               if (sec.section_key === "loker") return (
                 <section id="section-loker" class="lg:mb-8">
@@ -607,9 +607,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                               {step.title}
                             </h5>
                             {step.description && (
-                              <p class="text-balance text-white/70">
-                                {step.description}
-                              </p>
+                              <div class="text-balance text-white/70" set:html={step.description}/>
                             )}
                           </div>
                         </div>
@@ -1016,7 +1014,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                           </div>
                           <div class="flex flex-col gap-4 pt-6 border-t border-dark-300">
                             <h5 class="text-xl text-balance tracking-normal">{item.title}</h5>
-                            {item.description && <p class="text-balance">{item.description}</p>}
+                            {item.description && <div class="text-balance" set:html={item.description}/>}
                           </div>
                         </div>
                       </div>
@@ -1157,17 +1155,71 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
             </section>
               );
 
-              if (sec.section_key === "services") return (
+              if (sec.section_key === "services" ) return (
                 <section id="section-services" class="relative bg-primary-900">
-              <div
-                class="relative isolate py-16 | lg:py-24 lg:mb-8 | 2xl:pt-32"
-              >
-                <div class="max-container relative">
-                  <div class="grid gap-16 | lg:grid-cols-12">
-                    <div class="col-span-full | lg:col-span-5 lg:col-start-8">
+                <div
+                  class="relative isolate py-16 | lg:py-24 lg:mb-8 | 2xl:pt-32"
+                >
+                  <div class="max-container relative">
+                    <div class="grid gap-16 | lg:grid-cols-12">
+                      <div class="col-span-full | lg:col-span-5 lg:col-start-8">
+                        <div
+                          class="flex flex-col gap-16 | lg:sticky lg:inset-y-[36vh] | not-lg:text-center"
+                        >
+                          <div
+                            class="flex flex-col gap-6 | lg:gap-4 | not-lg:items-center not-lg:text-center"
+                            data-title-wrapper
+                          >
+                            <div
+                              class="inline-flex items-center gap-3 | lg:w-min"
+                              data-subtitle
+                            >
+                              <div
+                                class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                              >
+                              </div>
+                              <div
+                                class="text-sm leading-none font-bold uppercase tracking-wide text-white | lg:w-min"
+                              >{h.subtitle ?? "Layanan Kami"}</div>
+                            </div>
+                            <h2
+                              class="leading-none text-balance text-white"
+                              data-title
+                            >{h.title ?? "Layanan Terpadu untuk Para Pencari Kerja"}</h2>
+                          </div>
+                          <p class="text-balance text-white/70">
+                            {h.description ?? "Tidak ditemukan deskripsi 'Layanan Kami'!"}
+                          </p>
+                        </div>
+                      </div>
+                      <div class="col-span-full | lg:col-span-6 lg:-order-1">
+                        <div class="grid gap-4 | lg:gap-6"  data-services data-contents={JSON.stringify(services)}>
+                          <!-- @commponents listServices -->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="absolute inset-0 -z-1">
+                    <div class="sticky top-0 h-dvh">
                       <div
-                        class="flex flex-col gap-16 | lg:sticky lg:inset-y-[36vh] | not-lg:text-center"
+                        class="absolute inset-0 [-webkit-mask-image:radial-gradient(closest-side,black,transparent)] -z-1 translate-y-1/3 translate-x-1/2 pointer-events-none opacity-30 [--square:4rem] [--line-w:1px] | lg:[--square:6rem] lg:[--line-w:1px]"
                       >
+                        <div
+                          class="size-full bg-[repeating-linear-gradient(to_left,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square)),repeating-linear-gradient(to_bottom,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square))]"
+                        >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              );
+
+              if (sec.section_key === "products") return (
+                <section id="section-products" class="relative isolate py-16 | lg:pt-24 lg:mt-8">
+                  <div class="max-container">
+                    <div class="grid gap-16 mb-16 | lg:gap-8 lg:grid-cols-12">
+                      <div class="col-span-full | lg:col-span-6 lg:col-start-3">
                         <div
                           class="flex flex-col gap-6 | lg:gap-4 | not-lg:items-center not-lg:text-center"
                           data-title-wrapper
@@ -1181,159 +1233,108 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
                             >
                             </div>
                             <div
-                              class="text-sm leading-none font-bold uppercase tracking-wide text-white | lg:w-min"
-                            >{h.subtitle ?? "Layanan Kami"}</div>
+                              class="text-sm leading-none font-bold uppercase tracking-wide | lg:w-min"
+                            >{h.subtitle ?? "N/A"}</div>
                           </div>
                           <h2
-                            class="leading-none text-balance text-white"
+                            class="leading-none text-balance"
                             data-title
-                          >{h.title ?? "Layanan Terpadu untuk Para Pencari Kerja"}</h2>
+                          >{h.title ?? "Tidak ditemukan judul 'Produk Kami'!"}</h2>
                         </div>
-                        <p class="text-balance text-white/70">
-                          {h.description ?? "Tidak ditemukan deskripsi 'Layanan Kami'!"}
+                      </div>
+                      <div
+                        class="grid-item col-span-full | lg:col-span-4 lg:col-start-7 | not-lg:text-center"
+                      >
+                        <p class="text-balance text-primary/70">
+                          {h.description ?? "Tidak ditemukan deskripsi 'Produk Kami'!"}
                         </p>
                       </div>
                     </div>
-                    <div class="col-span-full | lg:col-span-6 lg:-order-1">
-                      <div class="grid gap-4 | lg:gap-6"  data-services data-contents={JSON.stringify(services)}>
-                        <!-- @commponents listServices -->
-                      </div>
-                    </div>
                   </div>
-                </div>
-                <div class="absolute inset-0 -z-1">
-                  <div class="sticky top-0 h-dvh">
-                    <div
-                      class="absolute inset-0 [-webkit-mask-image:radial-gradient(closest-side,black,transparent)] -z-1 translate-y-1/3 translate-x-1/2 pointer-events-none opacity-30 [--square:4rem] [--line-w:1px] | lg:[--square:6rem] lg:[--line-w:1px]"
-                    >
-                      <div
-                        class="size-full bg-[repeating-linear-gradient(to_left,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square)),repeating-linear-gradient(to_bottom,var(--color-primary-600),var(--color-primary-600)_var(--line-w),transparent_var(--line-w),transparent_var(--square))]"
-                      >
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="relative isolate py-16 | lg:pt-24 lg:mt-8">
-                <div class="max-container">
-                  <div class="grid gap-16 mb-16 | lg:gap-8 lg:grid-cols-12">
-                    <div class="col-span-full | lg:col-span-6 lg:col-start-3">
-                      <div
-                        class="flex flex-col gap-6 | lg:gap-4 | not-lg:items-center not-lg:text-center"
-                        data-title-wrapper
-                      >
-                        <div
-                          class="inline-flex items-center gap-3 | lg:w-min"
-                          data-subtitle
-                        >
-                          <div
-                            class="size-1.5 rounded-full bg-primary-600 shrink-0"
-                          >
-                          </div>
-                          <div
-                            class="text-sm leading-none font-bold uppercase tracking-wide text-white | lg:w-min"
-                          >{hProducts.subtitle ?? "N/A"}</div>
-                        </div>
-                        <h2
-                          class="leading-none text-balance text-white"
-                          data-title
-                        >{hProducts.title ?? "Tidak ditemukan judul 'Produk Kami'!"}</h2>
-                      </div>
-                    </div>
-                    <div
-                      class="grid-item col-span-full | lg:col-span-4 lg:col-start-7 | not-lg:text-center"
-                    >
-                      <p class="text-balance text-white/70">
-                        {hProducts.description ?? "Tidak ditemukan deskripsi 'Produk Kami'!"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div class="relative isolate">
-                  <div class="max-container">
-                    <div class="grid gap-8 | lg:grid-cols-12">
-                      <div class="col-span-full | lg:col-span-8 lg:col-start-3">
-                        <div class="splide group/slide" data-slide-products data-contents={JSON.stringify(products)}>
-                          <div class="splide__track !overflow-visible mb-8">
-                            <div class="splide__list">
-                              <!-- @components listSlideProducts -->
+                  <div class="relative isolate">
+                    <div class="max-container">
+                      <div class="grid gap-8 | lg:grid-cols-12">
+                        <div class="col-span-full | lg:col-span-8 lg:col-start-3">
+                          <div class="splide group/slide" data-slide-products data-contents={JSON.stringify(products)}>
+                            <div class="splide__track !overflow-visible mb-8">
+                              <div class="splide__list">
+                                <!-- @components listSlideProducts -->
+                              </div>
                             </div>
-                          </div>
-                          <div class="flex items-center justify-between">
-                            <div class="splide__pagination_fraction"></div>
-                            <div class="flex items-center gap-1">
-                              <button
-                                type="button"
-                                class="btn-splide-prev btn btn-sm btn-icon"
-                                data-hover-effect
-                              >
-                                <svg
-                                  class="icon icon-stroke icon-left"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
+                            <div class="flex items-center justify-between">
+                              <div class="splide__pagination_fraction"></div>
+                              <div class="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  class="btn-splide-prev btn btn-sm btn-icon"
+                                  data-hover-effect
                                 >
-                                  <path
+                                  <svg
+                                    class="icon icon-stroke icon-left"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
                                     fill="none"
-                                    stroke="#141B34"
-                                    stroke-width="1.5"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M4.2,12h16.3"></path>
-                                  <path
-                                    fill="none"
-                                    stroke="#141B34"
-                                    stroke-width="1.5"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M10.6,19.1L3.5,12 l7.1-7.1"></path>
-                                </svg>
-                              </button>
-                              <button
-                                type="button"
-                                class="btn-splide-next btn btn-sm btn-icon"
-                                data-hover-effect
-                              >
-                                <svg
-                                  class="icon icon-stroke icon-right"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      fill="none"
+                                      stroke="#141B34"
+                                      stroke-width="1.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      d="M4.2,12h16.3"></path>
+                                    <path
+                                      fill="none"
+                                      stroke="#141B34"
+                                      stroke-width="1.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      d="M10.6,19.1L3.5,12 l7.1-7.1"></path>
+                                  </svg>
+                                </button>
+                                <button
+                                  type="button"
+                                  class="btn-splide-next btn btn-sm btn-icon"
+                                  data-hover-effect
                                 >
-                                  <path
+                                  <svg
+                                    class="icon icon-stroke icon-right"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
                                     fill="none"
-                                    stroke="#141B34"
-                                    stroke-width="1.5"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M19.8,12H3.5"></path>
-                                  <path
-                                    fill="none"
-                                    stroke="#141B34"
-                                    stroke-width="1.5"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M13.4,4.9l7.1,7.1 l-7.1,7.1"></path>
-                                </svg>
-                              </button>
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      fill="none"
+                                      stroke="#141B34"
+                                      stroke-width="1.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      d="M19.8,12H3.5"></path>
+                                    <path
+                                      fill="none"
+                                      stroke="#141B34"
+                                      stroke-width="1.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      d="M13.4,4.9l7.1,7.1 l-7.1,7.1"></path>
+                                  </svg>
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
+                    <div
+                      class="absolute top-1/2 -bottom-16 inset-x-0 bg-body -z-1"
+                    >
+                    </div>
                   </div>
-                  <div
-                    class="absolute top-1/2 -bottom-16 inset-x-0 bg-body -z-1"
-                  >
-                  </div>
-                </div>
-              </div>
-            </section>
-              );
+                </section>
+                );
 
               if (sec.section_key === "clients") return (
                 <section

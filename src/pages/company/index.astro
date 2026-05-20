@@ -168,7 +168,6 @@ const provinces =
                           placeholder="Pilih tanggal *"
                         />
                       </div>
-                      <!-- <div class="text-xs mt-1 text-dark-400">please fill out this field</div> -->
                     </div>
                     <div class="c-form-wrapper">
                       <div class="c-form c-form-default">
@@ -204,7 +203,6 @@ const provinces =
                           placeholder="Alamat website"
                         />
                       </div>
-                      <!-- <div class="text-xs mt-1 text-dark-400">please fill out this field</div> -->
                     </div>
                   </div>
                 </div>
@@ -397,6 +395,106 @@ const provinces =
                     </div>
                   </div>
                 </div>
+
+                <!-- ── Upload Dokumen ─────────────────────────────────────────── -->
+                <div class="grid gap-8">
+                  <div>
+                    <h5>Upload Dokumen</h5>
+                    <p class="text-sm text-dark-400 mt-1">
+                      Tambahkan dokumen pendukung perusahaan (opsional). Format
+                      PDF, maks. 10MB per file.
+                    </p>
+                  </div>
+
+                  <!-- Form tambah dokumen -->
+                  <div
+                    class="grid gap-4 p-6 border border-dark-100 rounded-lg bg-dark-50 | lg:grid-cols-[1fr_1fr_auto]"
+                  >
+                    <div class="c-form-wrapper mb-0">
+                      <div class="c-form c-form-default">
+                        <label for="input-doc-name" class="c-label"
+                          >Nama Dokumen</label
+                        >
+                        <input
+                          type="text"
+                          id="input-doc-name"
+                          class="c-input"
+                          placeholder="cth. Akta Pendirian, NPWP, dll."
+                        />
+                      </div>
+                    </div>
+
+                    <div class="c-form-wrapper mb-0">
+                      <div class="c-form c-form-default">
+                        <label class="c-label">File Dokumen (PDF)</label>
+                        <label
+                          for="input-doc-file"
+                          class="c-input flex items-center gap-3 cursor-pointer hover:border-primary-400 transition-colors"
+                        >
+                          <svg
+                            class="shrink-0 text-dark-400"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M12 16V8M12 8L9 11M12 8L15 11"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"></path>
+                            <path
+                              d="M3 15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              stroke-linecap="round"></path>
+                          </svg>
+                          <span
+                            id="doc-file-label"
+                            class="text-sm text-dark-400 truncate"
+                          >
+                            Pilih file PDF *
+                          </span>
+                          <input
+                            type="file"
+                            id="input-doc-file"
+                            accept="application/pdf"
+                            hidden
+                          />
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="flex items-end">
+                      <button
+                        type="button"
+                        id="btn-add-document"
+                        class="btn btn-primary w-full | lg:w-auto"
+                      >
+                        <svg
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M12 5V19M5 12H19"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"></path>
+                        </svg>
+                        Tambah
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Daftar dokumen yang sudah ditambahkan -->
+                  <div id="document-list" class="grid gap-3"></div>
+                </div>
+                <!-- ── /Upload Dokumen ─────────────────────────────────────────── -->
               </div>
 
               <div class="grid gap-6 mt-16 | lg:grid-cols-2">
@@ -576,6 +674,10 @@ const provinces =
 
   const BASE_URL = `${import.meta.env.PUBLIC_API_URL}/api/wai`;
 
+  // ── Helper: populate select via TomSelect API ──────────────────────────────
+  // TomSelect mengganti native <select> dengan custom widget, sehingga event
+  // "change" native tidak ter-trigger. Fungsi ini mengisi option lewat TS API
+  // agar ts.on("change") bekerja dengan benar di downstream cascade.
   async function populateSelect(
     url: string,
     select: HTMLSelectElement,
@@ -583,7 +685,6 @@ const provinces =
   ): Promise<void> {
     const ts = (select as any).tomselect as TomSelect | undefined;
 
-    // Reset & disable via TomSelect API
     if (ts) {
       ts.clear(true);
       ts.clearOptions();
@@ -596,12 +697,11 @@ const provinces =
     }
 
     try {
-      // console.log(url);
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
 
       const data: { id: string; name: string }[] = await res.json();
-      // console.log(data);
+
       if (ts) {
         ts.clearOptions();
         ts.addOption({ value: "", text: placeholder });
@@ -609,7 +709,7 @@ const provinces =
           ts.addOption({ value: item.id, text: item.name });
         });
         ts.refreshOptions(false);
-        ts.enable(); // ← enable via TomSelect API
+        ts.enable();
         ts.setValue("", true);
       } else {
         data.forEach((item) => {
@@ -633,11 +733,43 @@ const provinces =
       ts.clearOptions();
       ts.addOption({ value: "", text: placeholder });
       ts.setValue("", true);
-      ts.disable(); // ← disable via TomSelect API
+      ts.disable();
     } else {
       select.innerHTML = `<option value="" disabled selected>${placeholder}</option>`;
       select.disabled = true;
     }
+  }
+
+  // ── Helper: attach cascade listener via TomSelect API atau native ──────────
+  // Masalah utama: TomSelect tidak memicu event "change" pada native <select>.
+  // Solusi: gunakan ts.on("change", callback) jika TS sudah init, fallback ke
+  // native addEventListener jika tidak ada TomSelect.
+  function onSelectChange(
+    select: HTMLSelectElement,
+    callback: (value: string) => void,
+  ): void {
+    // TomSelect mungkin belum diinisialisasi saat script ini jalan (karena
+    // initFormCompany dipanggil setelah blok ini). Gunakan MutationObserver
+    // atau polling singkat untuk menunggu TS siap, tapi cara paling reliable
+    // adalah mendaftarkan listener native DAN TomSelect — keduanya tidak
+    // konflik karena TS juga sync value ke native select saat berubah.
+
+    // Listener native (fallback / jika TS belum init)
+    select.addEventListener("change", () => {
+      callback(select.value);
+    });
+
+    // Listener TomSelect — dipasang setelah microtask agar TS sempat init
+    // (TomSelect biasanya diinit sinkron di script yang sama, tapi untuk
+    // keamanan kita defer 0ms)
+    setTimeout(() => {
+      const ts = (select as any).tomselect as TomSelect | undefined;
+      if (ts) {
+        ts.on("change", (value: string) => {
+          callback(value);
+        });
+      }
+    }, 0);
   }
 
   const selectProvince = document.getElementById(
@@ -654,50 +786,44 @@ const provinces =
   ) as HTMLSelectElement | null;
 
   if (selectProvince && selectCityreg && selectSubdistrict && selectWard) {
-    // ── 2. Provinsi dipilih → load regency ──────────────────────────────────
-    selectProvince.addEventListener("change", () => {
-      const provinceId = selectProvince.value;
-
-      resetSelect(selectCityreg, "Pilih kota/kabupaten *");
-      resetSelect(selectSubdistrict, "Pilih kecamatan *");
-      resetSelect(selectWard, "Pilih kelurahan *");
+    // Provinsi → load Kota/Kab.
+    onSelectChange(selectProvince, (provinceId) => {
+      resetSelect(selectCityreg!, "Pilih kota/kabupaten *");
+      resetSelect(selectSubdistrict!, "Pilih kecamatan *");
+      resetSelect(selectWard!, "Pilih kelurahan *");
 
       if (!provinceId) return;
 
       populateSelect(
         `${BASE_URL}/regencies/${provinceId}`,
-        selectCityreg,
+        selectCityreg!,
         "Pilih kota/kabupaten *",
       );
     });
 
-    // ── 3. Regency dipilih → load district ───────────────────────────────────
-    selectCityreg.addEventListener("change", () => {
-      const regencyId = selectCityreg.value;
-
-      resetSelect(selectSubdistrict, "Pilih kecamatan *");
-      resetSelect(selectWard, "Pilih kelurahan *");
+    // Kota/Kab. → load Kecamatan
+    onSelectChange(selectCityreg, (regencyId) => {
+      resetSelect(selectSubdistrict!, "Pilih kecamatan *");
+      resetSelect(selectWard!, "Pilih kelurahan *");
 
       if (!regencyId) return;
 
       populateSelect(
         `${BASE_URL}/districts/${regencyId}`,
-        selectSubdistrict,
+        selectSubdistrict!,
         "Pilih kecamatan *",
       );
     });
 
-    // ── 4. District dipilih → load village ───────────────────────────────────
-    selectSubdistrict.addEventListener("change", () => {
-      const districtId = selectSubdistrict.value;
-
-      resetSelect(selectWard, "Pilih kelurahan *");
+    // Kecamatan → load Kelurahan
+    onSelectChange(selectSubdistrict, (districtId) => {
+      resetSelect(selectWard!, "Pilih kelurahan *");
 
       if (!districtId) return;
 
       populateSelect(
         `${BASE_URL}/villages/${districtId}`,
-        selectWard,
+        selectWard!,
         "Pilih kelurahan *",
       );
     });

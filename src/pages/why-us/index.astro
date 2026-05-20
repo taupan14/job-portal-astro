@@ -1,593 +1,214 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+
+// ─── Fetch data dari backend ──────────────────────────────────────────────────
+interface WhyUsHeader {
+  id: number;
+  title: string;
+  subtitle: string;
+  description: string;
+}
+
+interface WhyUsItem {
+  id: number;
+  title: string;
+  description: string | null;
+  sort_order: number;
+  is_active: boolean;
+  image: string | null;
+}
+
+let items: WhyUsItem[] = [];
+let header: WhyUsHeader | null = null;
+let fetchError = false;
+
+const apiBase = import.meta.env.PUBLIC_API_URL;
+try {
+  const res = await fetch(`${apiBase}/api/whyuses`);
+
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+  const json = await res.json();
+  items = json.data ?? [];
+  header = json.head ?? null;
+} catch (e) {
+  console.error("[why-us] Gagal fetch data:", e);
+  fetchError = true;
+}
+
+// Helper: format nomor urut jadi "01.", "02.", dst.
+function formatOrder(index: number): string {
+  return String(index + 1).padStart(2, "0") + ".";
+}
+
+// Helper: resolve URL gambar
+
+function imageUrl(image: string | null, index: number): string {
+  if (image) {
+    // Jika sudah full URL, pakai langsung; jika nama file, gabungkan dengan base
+    if (image.startsWith("http")) return image;
+    // console.log("[why-us] image:", `${apiBase}/pubs/${image}`);
+    return `${apiBase}/pubs/${image}`;
+  }
+  // Fallback ke asset statis lama berdasarkan urutan
+  const n = String(index + 1).padStart(2, "0");
+  return `/assets/images/thumbnails/img${n}.webp`;
+}
 ---
 
 <BaseLayout title="Kenapa Kami">
-  <!-- Paste HTML dari index.html di sini -->
-  <html lang="en">
-    <div id="app">
-      <!-- @components sectionHeader -->
+  <div id="app">
+    <!-- @components sectionHeader -->
 
-      <main id="section-main" data-barba="wrapper">
-        <div
-          data-hero-scheme="light"
-          data-barba="container"
-          data-barba-namespace="why-us"
-        >
-          <section id="page-header" class="relative pt-(--space-header)">
-            <div class="relative py-16 | lg:pt-24">
-              <div class="max-container">
-                <div class="grid gap-8 | lg:grid-cols-12">
-                  <div class="col-span-full | lg:col-span-8 lg:col-start-3">
-                    <div class="flex flex-col gap-6 items-center text-center">
-                      <div class="inline-flex items-center gap-3">
-                        <div
-                          class="size-1.5 rounded-full bg-primary-600 shrink-0"
-                        >
-                        </div>
-                        <div
-                          class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950"
-                        >
-                          Kenapa Kami
-                        </div>
+    <main id="section-main" data-barba="wrapper">
+      <div
+        data-hero-scheme="light"
+        data-barba="container"
+        data-barba-namespace="why-us"
+      >
+        <section id="page-header" class="relative pt-(--space-header)">
+          <div class="relative py-16 | lg:pt-24">
+            <div class="max-container">
+              <div class="grid gap-8 | lg:grid-cols-12">
+                <div class="col-span-full | lg:col-span-8 lg:col-start-3">
+                  <div class="flex flex-col gap-6 items-center text-center">
+                    <div class="inline-flex items-center gap-3">
+                      <div
+                        class="size-1.5 rounded-full bg-primary-600 shrink-0"
+                      >
                       </div>
-                      <h1 class="leading-none text-balance">
-                        Membantu Bisnis & Pekerjaan Menjadi Lebih Mudah
-                      </h1>
+                      <div
+                        class="text-sm leading-none font-bold uppercase tracking-wide text-dark-950"
+                      >
+                        {header?.subtitle}
+                      </div>
                     </div>
+                    <h1 class="leading-none text-balance">
+                      {header?.title}
+                    </h1>
                   </div>
                 </div>
               </div>
-              <div
-                class="absolute inset-0 flex justify-center -z-1 pointer-events-none select-none"
-              >
-                <h1
-                  class="shrink-0 text-transparent [-webkit-text-stroke:1px_var(--color-dark-100)] leading-[0.8] uppercase whitespace-nowrap [--min-size:10rem] [--val-size:22vw] [--max-size:22rem]"
-                >
-                  Kenapa Kami
-                </h1>
-              </div>
             </div>
-          </section>
-
-          <section id="page-content" class="relative">
             <div
-              class="py-16 | not-lg:divide-y not-lg:divide-dark-300 | lg:py-24 lg:space-y-24"
+              class="absolute inset-0 flex justify-center -z-1 pointer-events-none select-none"
             >
-              <div
-                class="max-container group | not-lg:py-16 not-lg:first:pt-0 not-lg:last:pb-0"
+              <h1
+                class="shrink-0 text-transparent [-webkit-text-stroke:1px_var(--color-dark-100)] leading-[0.8] uppercase whitespace-nowrap [--min-size:10rem] [--val-size:22vw] [--max-size:22rem]"
               >
-                <div class="grid gap-8 | lg:grid-cols-12 lg:gap-16">
-                  <div
-                    class="col-span-full | lg:col-span-6 lg:group-even:col-start-7"
-                  >
-                    <div class="flex flex-col gap-6 mb-8 | lg:hidden">
-                      <div class="text-sm font-bold text-primary-600">01.</div>
-                      <h3 class="leading-none text-balance">
-                        Gratis Pasang Loker Pada Platform Kami
-                      </h3>
-                    </div>
-                    <div
-                      class="relative | lg:h-full lg:group-odd:-ml-8 lg:group-even:-mr-8 | 2xl:group-odd:-ml-[calc((100vw-var(--breakpoint-2xl))/2)] 2xl:group-even:-mr-[calc((100vw-var(--breakpoint-2xl))/2)]"
-                    >
-                      <div
-                        class="aspect-4/3 overflow-clip rounded-lg | lg:group-odd:rounded-l-none lg:group-even:rounded-r-none lg:size-full"
-                      >
-                        <img
-                          src="/assets/images/thumbnails/img01.webp"
-                          alt=""
-                          class="size-full object-cover"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="col-span-full | lg:col-span-5 lg:group-odd:col-start-8 lg:group-even:-order-1"
-                  >
-                    <div
-                      class="flex flex-col gap-8 | lg:py-8 lg:h-full lg:justify-center lg:gap-16"
-                    >
-                      <div class="flex flex-col gap-6 | not-lg:hidden">
-                        <div class="text-sm font-bold text-primary-600">
-                          01.
-                        </div>
-                        <h3 class="leading-none text-balance">
-                          Gratis Pasang Loker Pada Platform Kami
-                        </h3>
-                      </div>
-                      <article
-                        class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]"
-                      >
-                        <p>
-                          Kami Menawarkan lowongan kerja secara gratis dan dapat
-                          memberikan beberapa keuntungan bagi perusahaan atau
-                          organisasi. Pemasangan lowongan kerja secara gratis
-                          dapat menghemat biaya perusahaan yang mungkin
-                          dikeluarkan untuk iklan berbayar.
-                        </p>
-                        <p>
-                          Semua ini dapat menjadi solusi ekonomis terutama untuk
-                          bisnis kecil atau organisasi nirlaba dengan anggaran
-                          terbatas.
-                        </p>
-                      </article>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                class="max-container group | not-lg:py-16 not-lg:first:pt-0 not-lg:last:pb-0"
-              >
-                <div class="grid gap-8 | lg:grid-cols-12 lg:gap-16">
-                  <div
-                    class="col-span-full | lg:col-span-6 lg:group-even:col-start-7"
-                  >
-                    <div class="flex flex-col gap-6 mb-8 | lg:hidden">
-                      <div class="text-sm font-bold text-primary-600">02.</div>
-                      <h3 class="leading-none text-balance">
-                        Gratis Untuk Pelamar Kerja
-                      </h3>
-                    </div>
-                    <div
-                      class="relative | lg:h-full lg:group-odd:-ml-8 lg:group-even:-mr-8 | 2xl:group-odd:-ml-[calc((100vw-var(--breakpoint-2xl))/2)] 2xl:group-even:-mr-[calc((100vw-var(--breakpoint-2xl))/2)]"
-                    >
-                      <div
-                        class="aspect-4/3 overflow-clip rounded-lg | lg:group-odd:rounded-l-none lg:group-even:rounded-r-none lg:size-full"
-                      >
-                        <img
-                          src="/assets/images/thumbnails/img02.webp"
-                          alt=""
-                          class="size-full object-cover"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="col-span-full | lg:col-span-5 lg:group-odd:col-start-8 lg:group-even:-order-1"
-                  >
-                    <div
-                      class="flex flex-col gap-8 | lg:py-8 lg:h-full lg:justify-center lg:gap-16"
-                    >
-                      <div class="flex flex-col gap-6 | not-lg:hidden">
-                        <div class="text-sm font-bold text-primary-600">
-                          02.
-                        </div>
-                        <h3 class="leading-none text-balance">
-                          Gratis Untuk Pelamar Kerja
-                        </h3>
-                      </div>
-                      <article
-                        class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]"
-                      >
-                        <p>
-                          Bagi anda para pencari kerja, mencari peluang tanpa
-                          biaya dapat menjadi langkah cerdas untuk memaksimalkan
-                          potensi mereka tanpa menguras anggaran. Platform
-                          pencarian pekerjaan besar kami menyediakan akses ke
-                          ribuan lowongan kerja dari berbagai industri. Pencari
-                          kerja dapat membuat profil dan melamar tanpa dikenakan
-                          biaya.
-                        </p>
-                        <p>
-                          Selalu perbarui profil Anda dengan informasi terbaru
-                          dan sesuaikan resume Anda dengan pekerjaan yang Anda
-                          lamar. Dengan menggunakan sumber daya ini, Anda dapat
-                          menavigasi pasar kerja tanpa harus membayar untuk
-                          mengakses peluang pekerjaan yang menarik.
-                        </p>
-                      </article>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                class="max-container group | not-lg:py-16 not-lg:first:pt-0 not-lg:last:pb-0"
-              >
-                <div class="grid gap-8 | lg:grid-cols-12 lg:gap-16">
-                  <div
-                    class="col-span-full | lg:col-span-6 lg:group-even:col-start-7"
-                  >
-                    <div class="flex flex-col gap-6 mb-8 | lg:hidden">
-                      <div class="text-sm font-bold text-primary-600">03.</div>
-                      <h3 class="leading-none text-balance">
-                        Gratis Software HR
-                      </h3>
-                    </div>
-                    <div
-                      class="relative | lg:h-full lg:group-odd:-ml-8 lg:group-even:-mr-8 | 2xl:group-odd:-ml-[calc((100vw-var(--breakpoint-2xl))/2)] 2xl:group-even:-mr-[calc((100vw-var(--breakpoint-2xl))/2)]"
-                    >
-                      <div
-                        class="aspect-4/3 overflow-clip rounded-lg | lg:group-odd:rounded-l-none lg:group-even:rounded-r-none lg:size-full"
-                      >
-                        <img
-                          src="/assets/images/thumbnails/img03.webp"
-                          alt=""
-                          class="size-full object-cover"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="col-span-full | lg:col-span-5 lg:group-odd:col-start-8 lg:group-even:-order-1"
-                  >
-                    <div
-                      class="flex flex-col gap-8 | lg:py-8 lg:h-full lg:justify-center lg:gap-16"
-                    >
-                      <div class="flex flex-col gap-6 | not-lg:hidden">
-                        <div class="text-sm font-bold text-primary-600">
-                          03.
-                        </div>
-                        <h3 class="leading-none text-balance">
-                          Gratis Software HR
-                        </h3>
-                      </div>
-                      <article
-                        class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]"
-                      >
-                        <p>
-                          Kami Menyediakan Software HR yang telah menjadi
-                          fondasi utama dalam dunia bisnis modern, membantu
-                          perusahaan mengelola aspek-aspek kritis dari sumber
-                          daya manusia dengan lebih efektif.
-                        </p>
-                        <p>
-                          kami Juga Memiliki database yang terpusat untuk
-                          menyimpan informasi karyawan, absensi, gaji, pinjaman,
-                          kontrak digital, KPI dll.
-                        </p>
-                      </article>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                class="max-container group | not-lg:py-16 not-lg:first:pt-0 not-lg:last:pb-0"
-              >
-                <div class="grid gap-8 | lg:grid-cols-12 lg:gap-16">
-                  <div
-                    class="col-span-full | lg:col-span-6 lg:group-even:col-start-7"
-                  >
-                    <div class="flex flex-col gap-6 mb-8 | lg:hidden">
-                      <div class="text-sm font-bold text-primary-600">04.</div>
-                      <h3 class="leading-none text-balance">
-                        Cash Flow Bisnis Anda
-                      </h3>
-                    </div>
-                    <div
-                      class="relative | lg:h-full lg:group-odd:-ml-8 lg:group-even:-mr-8 | 2xl:group-odd:-ml-[calc((100vw-var(--breakpoint-2xl))/2)] 2xl:group-even:-mr-[calc((100vw-var(--breakpoint-2xl))/2)]"
-                    >
-                      <div
-                        class="aspect-4/3 overflow-clip rounded-lg | lg:group-odd:rounded-l-none lg:group-even:rounded-r-none lg:size-full"
-                      >
-                        <img
-                          src="/assets/images/thumbnails/img04.webp"
-                          alt=""
-                          class="size-full object-cover"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="col-span-full | lg:col-span-5 lg:group-odd:col-start-8 lg:group-even:-order-1"
-                  >
-                    <div
-                      class="flex flex-col gap-8 | lg:py-8 lg:h-full lg:justify-center lg:gap-16"
-                    >
-                      <div class="flex flex-col gap-6 | not-lg:hidden">
-                        <div class="text-sm font-bold text-primary-600">
-                          04.
-                        </div>
-                        <h3 class="leading-none text-balance">
-                          Cash Flow Bisnis Anda
-                        </h3>
-                      </div>
-                      <article
-                        class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]"
-                      >
-                        <p>
-                          Kami memberikan Solusi agar Arus kas cash flow
-                          Perusahaan anda tetap terjaga dengan baik dan dapat
-                          keberlanjutan dengan cara bekerjasama dengan kami.
-                          Kemampuan untuk mengelola dengan baik aliran masuk dan
-                          keluar uang adalah kunci kesuksesan finansial.
-                        </p>
-                        <p>
-                          Arus kas yang baik memastikan perusahaan dapat
-                          membayar utang dan biaya operasional tepat waktu,
-                          mencegah masalah likuiditas dan mendukung kemampuan
-                          perusahaan untuk menguntungkan dan meningkatkan nilai
-                          bisnis.
-                        </p>
-                      </article>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                class="max-container group | not-lg:py-16 not-lg:first:pt-0 not-lg:last:pb-0"
-              >
-                <div class="grid gap-8 | lg:grid-cols-12 lg:gap-16">
-                  <div
-                    class="col-span-full | lg:col-span-6 lg:group-even:col-start-7"
-                  >
-                    <div class="flex flex-col gap-6 mb-8 | lg:hidden">
-                      <div class="text-sm font-bold text-primary-600">05.</div>
-                      <h3 class="leading-none text-balance">Kasbon Karyawan</h3>
-                    </div>
-                    <div
-                      class="relative | lg:h-full lg:group-odd:-ml-8 lg:group-even:-mr-8 | 2xl:group-odd:-ml-[calc((100vw-var(--breakpoint-2xl))/2)] 2xl:group-even:-mr-[calc((100vw-var(--breakpoint-2xl))/2)]"
-                    >
-                      <div
-                        class="aspect-4/3 overflow-clip rounded-lg | lg:group-odd:rounded-l-none lg:group-even:rounded-r-none lg:size-full"
-                      >
-                        <img
-                          src="/assets/images/thumbnails/img05.webp"
-                          alt=""
-                          class="size-full object-cover"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="col-span-full | lg:col-span-5 lg:group-odd:col-start-8 lg:group-even:-order-1"
-                  >
-                    <div
-                      class="flex flex-col gap-8 | lg:py-8 lg:h-full lg:justify-center lg:gap-16"
-                    >
-                      <div class="flex flex-col gap-6 | not-lg:hidden">
-                        <div class="text-sm font-bold text-primary-600">
-                          05.
-                        </div>
-                        <h3 class="leading-none text-balance">
-                          Kasbon Karyawan
-                        </h3>
-                      </div>
-                      <article
-                        class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]"
-                      >
-                        <p>
-                          Kami Menawarkan Sistem Kasbon Karyawan yang bermanfaat
-                          pada Karyawan Perusahaan Anda. Kami memberikan
-                          Pinjaman kepada karyawan dan menerima pembayaran bunga
-                          secara periodik hingga jatuh tempo, di mana mereka
-                          juga akan menerima pengembalian pokok.
-                        </p>
-                        <p>
-                          Kasbon Perusahaan sering dianggap sebagai investasi
-                          yang sangat aman karena dianggap memiliki risiko
-                          kredit yang rendah. Dengan bergabung dengan kami maka
-                          Karyawan dapat merasakan kegembiraan pada saat
-                          Karyawan membutuhkan Pinjaman uang.
-                        </p>
-                      </article>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                class="max-container group | not-lg:py-16 not-lg:first:pt-0 not-lg:last:pb-0"
-              >
-                <div class="grid gap-8 | lg:grid-cols-12 lg:gap-16">
-                  <div
-                    class="col-span-full | lg:col-span-6 lg:group-even:col-start-7"
-                  >
-                    <div class="flex flex-col gap-6 mb-8 | lg:hidden">
-                      <div class="text-sm font-bold text-primary-600">06.</div>
-                      <h3 class="leading-none text-balance">
-                        Gratis Cari Karyawan
-                      </h3>
-                    </div>
-                    <div
-                      class="relative | lg:h-full lg:group-odd:-ml-8 lg:group-even:-mr-8 | 2xl:group-odd:-ml-[calc((100vw-var(--breakpoint-2xl))/2)] 2xl:group-even:-mr-[calc((100vw-var(--breakpoint-2xl))/2)]"
-                    >
-                      <div
-                        class="aspect-4/3 overflow-clip rounded-lg | lg:group-odd:rounded-l-none lg:group-even:rounded-r-none lg:size-full"
-                      >
-                        <img
-                          src="/assets/images/thumbnails/img06.webp"
-                          alt=""
-                          class="size-full object-cover"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="col-span-full | lg:col-span-5 lg:group-odd:col-start-8 lg:group-even:-order-1"
-                  >
-                    <div
-                      class="flex flex-col gap-8 | lg:py-8 lg:h-full lg:justify-center lg:gap-16"
-                    >
-                      <div class="flex flex-col gap-6 | not-lg:hidden">
-                        <div class="text-sm font-bold text-primary-600">
-                          06.
-                        </div>
-                        <h3 class="leading-none text-balance">
-                          Gratis Cari Karyawan
-                        </h3>
-                      </div>
-                      <article
-                        class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]"
-                      >
-                        <p>
-                          Kami Menawarkan Pencarian Karyawan secara gratis dan
-                          dapat memberikan beberapa keuntungan bagi perusahaan
-                          atau organisasi anda. Mencari karyawan secara gratis
-                          dapat memberikan beberapa keuntungan, terutama untuk
-                          perusahaan dengan anggaran terbatas atau yang ingin
-                          memaksimalkan efisiensi.
-                        </p>
-                        <p>
-                          Tidak ada biaya iklan atau pemasangan lowongan kerja
-                          berarti penghematan langsung bagi perusahaan. Ini bisa
-                          sangat bermanfaat untuk bisnis kecil atau start-up
-                          yang memiliki keterbatasan anggaran.
-                        </p>
-                      </article>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                class="max-container group | not-lg:py-16 not-lg:first:pt-0 not-lg:last:pb-0"
-              >
-                <div class="grid gap-8 | lg:grid-cols-12 lg:gap-16">
-                  <div
-                    class="col-span-full | lg:col-span-6 lg:group-even:col-start-7"
-                  >
-                    <div class="flex flex-col gap-6 mb-8 | lg:hidden">
-                      <div class="text-sm font-bold text-primary-600">07.</div>
-                      <h3 class="leading-none text-balance">Gratis Training</h3>
-                    </div>
-                    <div
-                      class="relative | lg:h-full lg:group-odd:-ml-8 lg:group-even:-mr-8 | 2xl:group-odd:-ml-[calc((100vw-var(--breakpoint-2xl))/2)] 2xl:group-even:-mr-[calc((100vw-var(--breakpoint-2xl))/2)]"
-                    >
-                      <div
-                        class="aspect-4/3 overflow-clip rounded-lg | lg:group-odd:rounded-l-none lg:group-even:rounded-r-none lg:size-full"
-                      >
-                        <img
-                          src="/assets/images/thumbnails/img07.webp"
-                          alt=""
-                          class="size-full object-cover"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="col-span-full | lg:col-span-5 lg:group-odd:col-start-8 lg:group-even:-order-1"
-                  >
-                    <div
-                      class="flex flex-col gap-8 | lg:py-8 lg:h-full lg:justify-center lg:gap-16"
-                    >
-                      <div class="flex flex-col gap-6 | not-lg:hidden">
-                        <div class="text-sm font-bold text-primary-600">
-                          07.
-                        </div>
-                        <h3 class="leading-none text-balance">
-                          Gratis Training
-                        </h3>
-                      </div>
-                      <article
-                        class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]"
-                      >
-                        <p>
-                          Kami Memberikan Pelatihan atau training yang memiliki
-                          banyak keuntungan, baik bagi perusahaan maupun
-                          individu. Pelatihan membantu individu untuk
-                          meningkatkan keterampilan teknis dan pengetahuan
-                          mereka dalam bidang tertentu, membuat mereka lebih
-                          kompeten dan efektif dalam pekerjaan mereka.
-                        </p>
-                        <p>
-                          Dengan memahami tugas dan tanggung jawab mereka dengan
-                          lebih baik melalui pelatihan, individu dapat menjadi
-                          lebih produktif dan efisien dalam melaksanakan
-                          pekerjaan sehari-hari. Karyawan lebih mudah memahami
-                          segala aspek dalam pekerjaannya.
-                        </p>
-                      </article>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                class="max-container group | not-lg:py-16 not-lg:first:pt-0 not-lg:last:pb-0"
-              >
-                <div class="grid gap-8 | lg:grid-cols-12 lg:gap-16">
-                  <div
-                    class="col-span-full | lg:col-span-6 lg:group-even:col-start-7"
-                  >
-                    <div class="flex flex-col gap-6 mb-8 | lg:hidden">
-                      <div class="text-sm font-bold text-primary-600">08.</div>
-                      <h3 class="leading-none text-balance">
-                        Gratis Konsultasi
-                      </h3>
-                    </div>
-                    <div
-                      class="relative | lg:h-full lg:group-odd:-ml-8 lg:group-even:-mr-8 | 2xl:group-odd:-ml-[calc((100vw-var(--breakpoint-2xl))/2)] 2xl:group-even:-mr-[calc((100vw-var(--breakpoint-2xl))/2)]"
-                    >
-                      <div
-                        class="aspect-4/3 overflow-clip rounded-lg | lg:group-odd:rounded-l-none lg:group-even:rounded-r-none lg:size-full"
-                      >
-                        <img
-                          src="/assets/images/thumbnails/img08.webp"
-                          alt=""
-                          class="size-full object-cover"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="col-span-full | lg:col-span-5 lg:group-odd:col-start-8 lg:group-even:-order-1"
-                  >
-                    <div
-                      class="flex flex-col gap-8 | lg:py-8 lg:h-full lg:justify-center lg:gap-16"
-                    >
-                      <div class="flex flex-col gap-6 | not-lg:hidden">
-                        <div class="text-sm font-bold text-primary-600">
-                          08.
-                        </div>
-                        <h3 class="leading-none text-balance">
-                          Gratis Konsultasi
-                        </h3>
-                      </div>
-                      <article
-                        class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]"
-                      >
-                        <p>
-                          Kami Memberikan Konsultasi GRATIS, baik itu dalam
-                          konteks bisnis, pendidikan, atau masalah pribadi,
-                          dapat memberikan sejumlah keuntungan bagi individu
-                          atau perusahaan. Konsultasi membantu dalam
-                          mengidentifikasi, menganalisis, dan menyelesaikan
-                          masalah atau tantangan yang dihadapi oleh individu
-                          atau perusahaan.
-                        </p>
-                        <p>
-                          Konsultasi memberikan kesempatan untuk memperoleh
-                          pengetahuan tambahan dan mengembangkan keterampilan
-                          baru melalui pertukaran informasi dengan ahli atau
-                          konsultan.
-                        </p>
-                      </article>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                {header?.subtitle}
+              </h1>
             </div>
-          </section>
-        </div><!-- data-barba container -->
-      </main>
+          </div>
+        </section>
 
-      <!-- @components sectionFooter -->
-    </div><!-- #app -->
+        <section id="page-content" class="relative">
+          {
+            fetchError && (
+              <div class="max-container py-16 text-center text-dark-500">
+                <p>Gagal memuat data. Silakan coba lagi nanti.</p>
+              </div>
+            )
+          }
 
-    <svg
-      width="0"
-      height="0"
-      class="absolute hidden"
-      color-interpolation-filters="sRGB"
-    >
-      <defs>
-        <filter id="gooey-content">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"
-          ></feGaussianBlur>
-          <feColorMatrix
-            in="blur"
-            mode="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 11 -6"
-            result="gooey-content"></feColorMatrix>
-          <feComposite in="SourceGraphic" in2="gooey-content" operator="atop"
-          ></feComposite>
-          <feBlend in="SourceGraphic" in2="gooey-content"></feBlend>
-        </filter>
-      </defs>
-    </svg>
+          {
+            !fetchError && items.length === 0 && (
+              <div class="max-container py-16 text-center text-dark-500">
+                <p>Belum ada item yang tersedia.</p>
+              </div>
+            )
+          }
 
-    <div id="preloader">
-      <div id="preloader-spinner">
-        <img src="/assets/images/logo/logo-icon.png" alt="" />
-      </div>
-      <div id="preloader-transition"></div>
+          {
+            !fetchError && items.length > 0 && (
+              <div class="py-16 | not-lg:divide-y not-lg:divide-dark-300 | lg:py-24 lg:space-y-24">
+                {items.map((item, index) => (
+                  <div class="max-container group | not-lg:py-16 not-lg:first:pt-0 not-lg:last:pb-0">
+                    <div class="grid gap-8 | lg:grid-cols-12 lg:gap-16">
+                      {/* ── Kolom Gambar ── */}
+                      <div class="col-span-full | lg:col-span-6 lg:group-even:col-start-7">
+                        {/* Judul mobile */}
+                        <div class="flex flex-col gap-6 mb-8 | lg:hidden">
+                          <div class="text-sm font-bold text-primary-600">
+                            {formatOrder(index)}
+                          </div>
+                          <h3 class="leading-none text-balance">
+                            {item.title}
+                          </h3>
+                        </div>
+
+                        <div class="relative | lg:h-full lg:group-odd:-ml-8 lg:group-even:-mr-8 | 2xl:group-odd:-ml-[calc((100vw-var(--breakpoint-2xl))/2)] 2xl:group-even:-mr-[calc((100vw-var(--breakpoint-2xl))/2)]">
+                          <div class="aspect-4/3 overflow-clip rounded-lg | lg:group-odd:rounded-l-none lg:group-even:rounded-r-none lg:size-full">
+                            <img
+                              src={imageUrl(item.image, index)}
+                              alt={item.title}
+                              class="size-full object-cover"
+                              loading="lazy"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ── Kolom Teks ── */}
+                      <div class="col-span-full | lg:col-span-5 lg:group-odd:col-start-8 lg:group-even:-order-1">
+                        <div class="flex flex-col gap-8 | lg:py-8 lg:h-full lg:justify-center lg:gap-16">
+                          {/* Judul desktop */}
+                          <div class="flex flex-col gap-6 | not-lg:hidden">
+                            <div class="text-sm font-bold text-primary-600">
+                              {formatOrder(index)}
+                            </div>
+                            <h3 class="leading-none text-balance">
+                              {item.title}
+                            </h3>
+                          </div>
+
+                          {item.description && (
+                            <article
+                              class="post-entry no-grid [&>*]:!text-[size:inherit] [&>*]:!leading-[inherit]"
+                              set:html={item.description}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          }
+        </section>
+      </div><!-- data-barba container -->
+    </main>
+
+    <!-- @components sectionFooter -->
+  </div><!-- #app -->
+
+  <svg
+    width="0"
+    height="0"
+    class="absolute hidden"
+    color-interpolation-filters="sRGB"
+  >
+    <defs>
+      <filter id="gooey-content">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"
+        ></feGaussianBlur>
+        <feColorMatrix
+          in="blur"
+          mode="matrix"
+          values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 11 -6"
+          result="gooey-content"></feColorMatrix>
+        <feComposite in="SourceGraphic" in2="gooey-content" operator="atop"
+        ></feComposite>
+        <feBlend in="SourceGraphic" in2="gooey-content"></feBlend>
+      </filter>
+    </defs>
+  </svg>
+
+  <div id="preloader">
+    <div id="preloader-spinner">
+      <img src="/assets/images/logo/logo-icon.png" alt="" />
     </div>
-  </html>
+    <div id="preloader-transition"></div>
+  </div>
 </BaseLayout>
