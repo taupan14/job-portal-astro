@@ -158,7 +158,7 @@ export const initSectionHeader = async () => {
                         </div>
                         <div class="flex flex-col leading-none uppercase font-extrabold whitespace-nowrap text-dark-950 transition-colors duration-800 ease-custom | [.is-dark_&:not(.is-sticky_&,.is-hover-menu_&,.is-active-menu_&)]:text-white | not-lg:text-sm">
                             <div>Radar Utama</div>
-                            <div>Nusantara</div>
+                            <div>Nusantara Lapan</div>
                         </div>
                     </a>
                 </div>
@@ -283,7 +283,7 @@ export const initSectionHeader = async () => {
                         </ul>
                     </div>
                     <div class="py-4 text-center shrink-0">
-                        <div class="text-sm font-bold uppercase tracking-wide">© 2025 Radar Utama Nusantara</div>
+                        <div class="text-sm font-bold uppercase tracking-wide">© 2025 Radar Utama Nusantara Lapan</div>
                     </div>
                 </div>
                 <div id="mobile-menu-bg" class="absolute inset-0 bg-white border-t-4 border-primary-600 -z-1"></div>

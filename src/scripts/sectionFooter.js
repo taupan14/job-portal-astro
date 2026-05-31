@@ -161,7 +161,7 @@ export const initSectionFooter = async () => {
                 </div>
                 <div class="flex flex-col text-base leading-none uppercase font-extrabold whitespace-nowrap text-white">
                   <div>Radar Utama</div>
-                  <div>Nusantara</div>
+                  <div>Nusantara Lapan</div>
                 </div>
               </a>
               <div class="flex flex-col gap-6 not-lg:items-center not-lg:text-center">
@@ -220,7 +220,7 @@ export const initSectionFooter = async () => {
               <div class="text-sm font-bold uppercase tracking-wide text-white/70">© 2025</div>
               <div class="flex flex-col h2 leading-[0.9] text-white | not-lg:items-center not-lg:text-center">
                 <div>Radar Utama</div>
-                <div>Nusantara</div>
+                <div>Nusantara Lapan</div>
               </div>
             </div>
           </div>
